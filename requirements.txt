@@ -1,8 +1,15 @@
+autopep8==1.5.4
 flake8==3.8.4
 importlib-metadata==3.4.0
+joblib==1.0.0
 mccabe==0.6.1
+numpy==1.19.5
 pycodestyle==2.6.0
 pyflakes==2.2.0
+scikit-learn==0.24.1
+scipy==1.6.0
+sklearn==0.0
+threadpoolctl==2.1.0
+toml==0.10.2
 typing-extensions==3.7.4.3
 zipp==3.4.0
-autopep8==1.5.4

@@ -3,7 +3,7 @@ import json
 
 
 class Parameters:
-    default: None
+    pass
 
 
 if __name__ == "__main__":
