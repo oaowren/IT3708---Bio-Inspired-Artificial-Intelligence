@@ -6,10 +6,7 @@ def generate_initial_pop(size, length):
     for _ in range(size):
         individual = ""
         for _ in range(length):
-            if random.random() >= 0.5:
-                individual += "1"
-            else:
-                individual += "0"
+            individual = random.choice(["0", "1"])
         pop.append(individual)
     return pop
 
@@ -18,17 +15,17 @@ def selection(population, cutoff):
     return sorted(population, reverse=True)[:cutoff]
 
 
-def crossover(parent1, parent2, length):
+def crossover(parent1, parent2, length, mutation_chance):
     offspring1 = parent1[:length] + parent2[length:]
     offspring2 = parent2[:length] + parent1[length:]
     for i in range(len(offspring1)):
         mutation = random.random()
-        if mutation > 0.95:
+        if mutation > 1-mutation_chance:
             if offspring1[i] == "1":
                 offspring1 = offspring1[:i] + "0" + offspring1[i + 1:]
             else:
                 offspring1 = offspring1[:i] + "1" + offspring1[i + 1:]
-        if mutation < 0.05:
+        if mutation < mutation_chance:
             if offspring2[i] == "1":
                 offspring2 = offspring2[:i] + "0" + offspring2[i + 1:]
             else:
