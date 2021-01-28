@@ -1,4 +1,6 @@
 import random
+import math
+from typing import Tuple
 
 
 def generate_initial_pop(size, length):
@@ -11,8 +13,10 @@ def generate_initial_pop(size, length):
     return tuple(pop)
 
 
-def selection(population, cutoff):
-    return tuple(sorted(population, reverse=True)[:cutoff])
+def parent_selection(population, fitness_function, cutoff):
+    return tuple(
+        sorted(population, key=fitness_function, reverse=True)
+        [: cutoff])
 
 
 def crossover(parent1, parent2, length, mutation_chance):
@@ -24,8 +28,16 @@ def crossover(parent1, parent2, length, mutation_chance):
     }
     for i in range(len(offspring1)):
         mutation = random.random()
-        if mutation > 1-mutation_chance:
+        if mutation > 1 - mutation_chance:
             offspring1[i] = mutation_map[offspring1[i]]
         if mutation < mutation_chance:
             offspring2[i] = mutation_map[offspring2[i]]
     return "".join(offspring1), "".join(offspring2)
+
+
+def scale(x, length, interval: Tuple[int, int]):
+    return (((interval[1] - interval[0]) * x) / (2 ** length)) + interval[0]
+
+
+def fitness_sine(offspring, length, interval: Tuple[int, int]):
+    return math.sin(scale(int(offspring, 2), length, interval))

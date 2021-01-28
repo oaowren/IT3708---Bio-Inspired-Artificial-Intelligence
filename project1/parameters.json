@@ -1,7 +1,8 @@
 {
-  "selection_cutoff": 2,
-  "init_pop_size": 50,
-  "length": 10,
+  "selection_cutoff": 20,
+  "init_pop_size": 150,
+  "length": 15,
   "crossover_length": 5,
-  "mutation_chance": 0.95
+  "mutation_chance": 0.95,
+  "interval": [0, 128]
 }

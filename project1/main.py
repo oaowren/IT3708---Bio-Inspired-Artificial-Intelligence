@@ -16,11 +16,8 @@ if __name__ == "__main__":
     initial_population = GA.generate_initial_pop(
         parameters.init_pop_size, parameters.length)
     print(initial_population)
-    parent_selection = GA.selection(
-        initial_population, parameters.selection_cutoff)
-    print(parent_selection)
-    o1, o2 = GA.crossover(
-        parent_selection[0],
-        parent_selection[1],
-        parameters.crossover_length, parameters.mutation_chance)
-    print(o1, " and ", o2)
+    population_fitness = GA.parent_selection(
+        initial_population, lambda offspring: GA.fitness_sine(
+            offspring, parameters.length, parameters.interval),
+        parameters.selection_cutoff)
+    print(population_fitness)
