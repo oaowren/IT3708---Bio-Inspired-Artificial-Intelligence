@@ -25,12 +25,12 @@ def crossover(parent1, parent2, length):
         mutation = random.random()
         if mutation > 0.95:
             if offspring1[i] == "1":
-                offspring1 = offspring1[:i] + "0" + offspring1[i + 1 :]
+                offspring1 = offspring1[:i] + "0" + offspring1[i + 1:]
             else:
-                offspring1 = offspring1[:i] + "1" + offspring1[i + 1 :]
+                offspring1 = offspring1[:i] + "1" + offspring1[i + 1:]
         if mutation < 0.05:
             if offspring2[i] == "1":
-                offspring2 = offspring2[:i] + "0" + offspring2[i + 1 :]
+                offspring2 = offspring2[:i] + "0" + offspring2[i + 1:]
             else:
-                offspring2 = offspring2[:i] + "1" + offspring2[i + 1 :]
+                offspring2 = offspring2[:i] + "1" + offspring2[i + 1:]
     return offspring1, offspring2

@@ -1,0 +1,10 @@
+{
+  "python.pythonPath": "venv/bin/python3",
+  "code-runner.runInTerminal": true,
+  "editor.formatOnSave": true,
+  "python.linting.lintOnSave": true,
+  "python.linting.pylintEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.enabled": true,
+  "python.formatting.provider": "autopep8"
+}
