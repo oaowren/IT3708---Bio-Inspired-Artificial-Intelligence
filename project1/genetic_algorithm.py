@@ -1,6 +1,9 @@
 import random
+import math
+from typing import Dict, Tuple
 from individual import Individual
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class SimpleGenetic():
@@ -64,12 +67,16 @@ class SimpleGenetic():
 
     def survivor_selection_age(self, population):
         filtered_pop = tuple(filter(
-                lambda individual: individual.age <= self.survivor_age,
-                population))
+            lambda individual: individual.age <= self.survivor_age,
+            population))
         # Remove minimum n individuals, take the oldest if not enough individuals too old
         diff = len(population) - len(filtered_pop)
         if diff < self.minimum_age_replacement:
-            return tuple(sorted(filtered_pop, key=lambda individual: individual.age, reverse=True))[self.minimum_age_replacement - diff :]
+            return tuple(
+                sorted(
+                    filtered_pop, key=lambda individual: individual.age,
+                    reverse=True))[
+                self.minimum_age_replacement - diff:]
         return tuple(filtered_pop)
 
     def crossover(self, parent1, parent2):
@@ -99,18 +106,33 @@ class SimpleGenetic():
         return map(lambda individual: individual.fitness,
                    self.population).sum()
 
-    def visualize_generations(self):
-        plt.plot([i for i in range(len(self.generations))], self.generations)
+    @staticmethod
+    def visualize_generations(generations: Tuple[int]):
+        plt.plot(
+            [i for i in range(1, len(generations) + 1)],
+            generations, marker='o')
         plt.xlabel('Generation')
-        plt.ylabel('Total fitness')
+        plt.ylabel('Average population fitness')
         plt.show()
 
-    def visualize_generation_sine(self):
-        x = list(map(lambda individual: individual.dna_value, self.population))
-        y = list(map(lambda individual: individual.fitness, self.population))
-        plt.scatter(x, y)
-        plt.xlabel('Numeric value')
-        plt.ylabel('Fitness (sine)')
+    def visualize_all_generations_sine(self):
+        plt.figure()
+        fig, axs = plt.subplots(
+            nrows=math.ceil(self.generation / 3),
+            ncols=3, sharex=True, sharey=True, squeeze=False)
+        for i in range(0, self.generation):
+            y = list(map(lambda individual: individual.fitness - 1,
+                         self.generation_dict[i + 1]))
+            x = list(map(lambda individual: self.scale(individual.dna_value(), len(
+                individual.dna), self.interval), self.generation_dict[i + 1]))
+            lin = np.linspace(0, 128, num=1024)
+            axs[i // 3][i % 3].plot(lin, np.sin(lin), color="y")
+            axs[i // 3][i % 3].scatter(x, y)
+            axs[i // 3][i % 3].set_title('Gen: ' + str(i + 1))
+
+        for ax in axs.flat:
+            ax.set(xlabel='Value', ylabel='Sine')
+
         plt.show()
 
     def run_generation(self):
@@ -135,8 +157,8 @@ class SimpleGenetic():
             # Remove oldest individuals, fill with fittest from new genereation
             old_pop = self.survivor_func(self.population)
             diff = len(self.population) - len(old_pop)
-            self.population = (old_pop
-                               + self.survivor_selection_elitism(new_pop, diff))
+            self.population = (
+                old_pop + self.survivor_selection_elitism(new_pop, diff))
         # Save generation for plots
         self.generation_dict[self.generation] = self.population
         # Calculate new best average
