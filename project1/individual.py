@@ -7,7 +7,7 @@ class Individual():
         self.dna = dna
         self.fitness = GA.fitness_sine(
             self.dna, len(self.dna),
-            tuple([0, 128]))
+            tuple([0, 128])) + 1
         self.age = 0
 
     def generation(self):

@@ -16,8 +16,4 @@ if __name__ == "__main__":
     initial_population = GA.generate_initial_pop(
         parameters.init_pop_size, parameters.length)
     print(initial_population)
-    population_fitness = GA.parent_selection(
-        initial_population, lambda offspring: GA.fitness_sine(
-            offspring.dna, parameters.length, parameters.interval),
-        parameters.selection_cutoff)
-    print(population_fitness)
+    parents = GA.parent_selection(initial_population, 1)

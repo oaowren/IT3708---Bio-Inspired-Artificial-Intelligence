@@ -14,10 +14,19 @@ def generate_initial_pop(size, length):
     return tuple(pop)
 
 
-def parent_selection(population, fitness_function, cutoff):
-    return tuple(
-        sorted(population, key=fitness_function, reverse=True)
-        [: cutoff])
+def parent_selection(population, count):
+    parents = []
+    fitness_sum = sum([x.fitness for x in population])
+    roulette_wheel = [population[0].fitness/fitness_sum]
+    for i in range(1, len(population)):
+        roulette_wheel.append(population[i].fitness/fitness_sum + roulette_wheel[i-1])
+    for i in range(count):
+        sel = random.random()
+        for n in range(len(roulette_wheel)):
+            if sel < roulette_wheel[n]:
+                parents.append(population[n])
+                break
+    return parents
 
 
 def crossover(parent1, parent2, length, mutation_chance):
