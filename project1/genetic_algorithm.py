@@ -123,8 +123,8 @@ class SimpleGenetic():
         for i in range(0, self.generation):
             y = list(map(lambda individual: individual.fitness - 1,
                          self.generation_dict[i + 1]))
-            x = list(map(lambda individual: self.scale(individual.dna_value(), len(
-                individual.dna), self.interval), self.generation_dict[i + 1]))
+            x = list(map(lambda individual: individual.scale(),
+                         self.generation_dict[i + 1]))
             lin = np.linspace(0, 128, num=1024)
             axs[i // 3][i % 3].plot(lin, np.sin(lin), color="y")
             axs[i // 3][i % 3].scatter(x, y)
