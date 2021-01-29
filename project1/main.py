@@ -14,9 +14,9 @@ if __name__ == "__main__":
             setattr(parameters, attr, value)
 
     initial_population = GA.generate_initial_pop(
-        parameters.init_pop_size, parameters.length)
+        parameters.init_pop_size, parameters.dna_length)
     print(initial_population)
-    population_fitness = GA.parent_selection(
+    population_fitness = GA.survivor_selection(
         initial_population, lambda offspring: GA.fitness_sine(
             offspring.dna, parameters.length, parameters.interval),
         parameters.selection_cutoff)

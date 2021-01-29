@@ -14,10 +14,25 @@ def generate_initial_pop(size, length):
     return tuple(pop)
 
 
-def parent_selection(population, fitness_function, cutoff):
+def parent_selection(population, cutoff):
     return tuple(
-        sorted(population, key=fitness_function, reverse=True)
-        [: cutoff])
+        sorted(
+            population, key=lambda individual: individual.fitness,
+            reverse=True)[: cutoff])
+
+
+def survivor_selection_elitism(population, fitness_function, cutoff):
+    return tuple(
+        sorted(
+            population,
+            key=fitness_function, reverse=True)[: cutoff])
+
+
+def survivor_selection_age(population, age_cutoff):
+    return tuple(
+        filter(
+            lambda individual: individual.age < age_cutoff,
+            population))
 
 
 def crossover(parent1, parent2, length, mutation_chance):
