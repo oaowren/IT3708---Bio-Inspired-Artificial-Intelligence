@@ -19,9 +19,10 @@ def generate_initial_pop(size, length):
 def parent_selection(population, count):
     parents = []
     fitness_sum = sum([x.fitness for x in population])
-    roulette_wheel = [population[0].fitness/fitness_sum]
+    roulette_wheel = [population[0].fitness / fitness_sum]
     for i in range(1, len(population)):
-        roulette_wheel.append(population[i].fitness/fitness_sum + roulette_wheel[i-1])
+        roulette_wheel.append(
+            population[i].fitness / fitness_sum + roulette_wheel[i - 1])
     for i in range(count):
         sel = random.random()
         for n in range(len(roulette_wheel)):
@@ -77,4 +78,13 @@ def visualize_generations(generations: Tuple[int], population_size):
     plt.plot([i for i in range(len(generations))], generations)
     plt.xlabel('Generation')
     plt.ylabel('Total fitness')
+    plt.show()
+
+
+def visualize_generation_sine(population: Tuple[Individual]):
+    x = list(map(lambda individual: individual.dna_value, population))
+    y = list(map(lambda individual: individual.fitness, population))
+    plt.scatter(x, y)
+    plt.xlabel('Numeric value')
+    plt.ylabel('Fitness (sine)')
     plt.show()
