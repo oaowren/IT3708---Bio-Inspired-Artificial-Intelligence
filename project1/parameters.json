@@ -1,6 +1,7 @@
 {
   "parent_selection_cutoff": 20,
   "survivor_selection_cutoff": 20,
+  "minimum_age_replacement": 5,
   "number_of_children":20, 
   "survivor_age_cutoff": 5,
   "population_size": 50,
@@ -9,5 +10,6 @@
   "mutation_chance": 0.98,
   "interval": [0, 128],
   "best_n_individuals": 25,
-  "exit_threshold": 1.995
+  "exit_threshold": 1.995,
+  "survivor_func": "age"
 }

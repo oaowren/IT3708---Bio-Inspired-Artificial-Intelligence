@@ -1,90 +1,144 @@
 import random
-import math
-from typing import Tuple
 from individual import Individual
 import matplotlib.pyplot as plt
-import numpy as np
 
 
-def generate_initial_pop(size, length):
-    pop = []
-    for _ in range(size):
-        dna = ""
-        for _ in range(length):
-            dna += random.choice(["0", "1"])
-        pop.append(Individual(dna))
-    return tuple(pop)
+class SimpleGenetic():
 
+    def __init__(self, parameters):
+        # Define parameters
+        self.parent_cutoff = parameters.parent_selection_cutoff
+        self.survivor_cutoff = parameters.survivor_selection_cutoff
+        self.minimum_age_replacement = parameters.minimum_age_replacement
+        self.children_count = parameters.number_of_children
+        self.survivor_age = parameters.survivor_age_cutoff
+        self.pop_size = parameters.population_size
+        self.dna_length = parameters.dna_length
+        self.crossover_length = parameters.crossover_length
+        self.mutation_chance = parameters.mutation_chance
+        self.interval = parameters.interval
+        self.best_n_individuals = parameters.best_n_individuals
+        self.survivor_func = (
+            self.survivor_selection_age
+            if parameters.survivor_func == "age" else
+            self.survivor_selection_elitism)
 
-def parent_selection(population, count):
-    parents = []
-    fitness_sum = sum([x.fitness for x in population])
-    roulette_wheel = [population[0].fitness / fitness_sum]
-    for i in range(1, len(population)):
-        roulette_wheel.append(
-            population[i].fitness / fitness_sum + roulette_wheel[i - 1])
-    for i in range(count):
-        sel = random.random()
-        for n in range(len(roulette_wheel)):
-            if sel < roulette_wheel[n]:
-                parents.append(population[n])
-                break
-    return parents
+        # Initialize first generation and save in generational dictionary
+        self.population = self.generate_initial_pop()
+        self.generation_dict = dict()
+        self.generation = 1
+        self.generation_dict[self.generation] = self.population
+        self.best_individuals_average = (sum([x.fitness for x in self.survivor_selection_elitism(
+            self.population, self.best_n_individuals)]) / self.best_n_individuals)
 
+    def generate_initial_pop(self):
+        pop = []
+        for _ in range(self.pop_size):
+            dna = ""
+            for _ in range(self.dna_length):
+                dna += random.choice(["0", "1"])
+            pop.append(Individual(dna, self.dna_length, self.interval))
+        return tuple(pop)
 
-def survivor_selection_elitism(population, cutoff):
-    return tuple(
-        sorted(
-            population, key=lambda individual: individual.fitness,
-            reverse=True)[: cutoff])
+    def parent_selection(self):
+        parents = []
+        fitness_sum = sum([x.fitness for x in self.population])
+        roulette_wheel = [self.population[0].fitness / fitness_sum]
+        for i in range(1, len(self.population)):
+            roulette_wheel.append(
+                self.population[i].fitness / fitness_sum +
+                roulette_wheel[i - 1])
+        for i in range(self.parent_cutoff):
+            sel = random.random()
+            for n in range(len(roulette_wheel)):
+                if sel < roulette_wheel[n]:
+                    parents.append(self.population[n])
+                    break
+        return tuple(parents)
 
+    def survivor_selection_elitism(self, population, cutoff):
+        return tuple(
+            sorted(
+                population, key=lambda individual: individual.fitness,
+                reverse=True)[: cutoff])
 
-def survivor_selection_age(population, age_cutoff):
-    return tuple(
-        filter(
-            lambda individual: individual.age < age_cutoff,
-            population))
+    def survivor_selection_age(self, population):
+        filtered_pop = tuple(filter(
+                lambda individual: individual.age <= self.survivor_age,
+                population))
+        # Remove minimum n individuals, take the oldest if not enough individuals too old
+        diff = len(population) - len(filtered_pop)
+        if diff < self.minimum_age_replacement:
+            return tuple(sorted(filtered_pop, key=lambda individual: individual.age, reverse=True))[self.minimum_age_replacement - diff :]
+        return tuple(filtered_pop)
 
+    def crossover(self, parent1, parent2):
+        offspring1 = list(
+            parent1.dna[: self.crossover_length] + parent2.dna
+            [self.crossover_length:])
+        offspring2 = list(
+            parent2.dna[: self.crossover_length] + parent1.dna
+            [self.crossover_length:])
+        mutation_map = {
+            "0": "1",
+            "1": "0"
+        }
+        for i in range(len(offspring1)):
+            mutation = random.random()
+            if mutation > 1 - self.mutation_chance:
+                offspring1[i] = mutation_map[offspring1[i]]
+            if mutation < self.mutation_chance:
+                offspring2[i] = mutation_map[offspring2[i]]
+        return Individual(
+            "".join(offspring1),
+            self.dna_length, self.interval), Individual(
+            "".join(offspring2),
+            self.dna_length, self.interval)
 
-def crossover(parent1, parent2, length, mutation_chance):
-    offspring1 = list(parent1.dna[:length] + parent2.dna[length:])
-    offspring2 = list(parent2.dna[:length] + parent1.dna[length:])
-    mutation_map = {
-        "0": "1",
-        "1": "0"
-    }
-    for i in range(len(offspring1)):
-        mutation = random.random()
-        if mutation > 1 - mutation_chance:
-            offspring1[i] = mutation_map[offspring1[i]]
-        if mutation < mutation_chance:
-            offspring2[i] = mutation_map[offspring2[i]]
-    return Individual("".join(offspring1)), Individual("".join(offspring2))
+    def get_total_generation_fitness(self):
+        return map(lambda individual: individual.fitness,
+                   self.population).sum()
 
+    def visualize_generations(self):
+        plt.plot([i for i in range(len(self.generations))], self.generations)
+        plt.xlabel('Generation')
+        plt.ylabel('Total fitness')
+        plt.show()
 
-def scale(x, length, interval: Tuple[int, int]):
-    return (((interval[1] - interval[0]) * x) / (2 ** length)) + interval[0]
+    def visualize_generation_sine(self):
+        x = list(map(lambda individual: individual.dna_value, self.population))
+        y = list(map(lambda individual: individual.fitness, self.population))
+        plt.scatter(x, y)
+        plt.xlabel('Numeric value')
+        plt.ylabel('Fitness (sine)')
+        plt.show()
 
+    def run_generation(self):
+        self.generation += 1
+        for individual in self.population:
+            individual.grow_older()
+        parents = self.parent_selection()
+        new_pop = []
 
-def fitness_sine(offspring, length, interval: Tuple[int, int]):
-    return math.sin(scale(int(offspring, 2), length, interval))
+        # Generate new population based on random pairs of parents
+        for i in range(self.children_count):
+            par1, par2 = random.choice(parents), random.choice(parents)
+            off1, off2 = self.crossover(par1, par2)
+            new_pop.append(off1)
+            new_pop.append(off2)
 
-
-def get_total_generation_fitness(population):
-    return map(lambda individual: individual.fitness, population).sum()
-
-
-def visualize_generations(generations: Tuple[int], population_size):
-    plt.plot([i for i in range(len(generations))], generations)
-    plt.xlabel('Generation')
-    plt.ylabel('Total fitness')
-    plt.show()
-
-
-def visualize_generation_sine(population: Tuple[Individual]):
-    x = list(map(lambda individual: individual.dna_value, population))
-    y = list(map(lambda individual: individual.fitness, population))
-    plt.scatter(x, y)
-    plt.xlabel('Numeric value')
-    plt.ylabel('Fitness (sine)')
-    plt.show()
+        if self.survivor_func == self.survivor_selection_elitism:
+            # Select survivors based on elitism
+            self.population = self.survivor_func(
+                self.population + tuple(new_pop), self.pop_size)
+        else:
+            # Remove oldest individuals, fill with fittest from new genereation
+            old_pop = self.survivor_func(self.population)
+            diff = len(self.population) - len(old_pop)
+            self.population = (old_pop
+                               + self.survivor_selection_elitism(new_pop, diff))
+        # Save generation for plots
+        self.generation_dict[self.generation] = self.population
+        # Calculate new best average
+        self.best_individuals_average = (sum([x.fitness for x in self.survivor_selection_elitism(
+            self.population, self.best_n_individuals)]) / self.best_n_individuals)
