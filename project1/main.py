@@ -14,6 +14,6 @@ if __name__ == "__main__":
             setattr(parameters, attr, value)
 
     initial_population = GA.generate_initial_pop(
-        parameters.init_pop_size, parameters.length)
+        parameters.init_pop_size, parameters.dna_length)
     print(initial_population)
     parents = GA.parent_selection(initial_population, 1)

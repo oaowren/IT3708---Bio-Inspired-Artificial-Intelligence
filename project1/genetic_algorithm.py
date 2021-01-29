@@ -29,6 +29,20 @@ def parent_selection(population, count):
     return parents
 
 
+def survivor_selection_elitism(population, cutoff):
+    return tuple(
+        sorted(
+            population, key=lambda individual: individual.fitness,
+            reverse=True)[: cutoff])
+
+
+def survivor_selection_age(population, age_cutoff):
+    return tuple(
+        filter(
+            lambda individual: individual.age < age_cutoff,
+            population))
+
+
 def crossover(parent1, parent2, length, mutation_chance):
     offspring1 = list(parent1[:length] + parent2[length:])
     offspring2 = list(parent2[:length] + parent1[length:])
