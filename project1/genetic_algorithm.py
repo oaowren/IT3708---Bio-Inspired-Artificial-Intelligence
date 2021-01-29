@@ -2,6 +2,8 @@ import random
 import math
 from typing import Tuple
 from individual import Individual
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def generate_initial_pop(size, length):
@@ -65,3 +67,14 @@ def scale(x, length, interval: Tuple[int, int]):
 
 def fitness_sine(offspring, length, interval: Tuple[int, int]):
     return math.sin(scale(int(offspring, 2), length, interval))
+
+
+def get_total_generation_fitness(population):
+    return map(lambda individual: individual.fitness, population).sum()
+
+
+def visualize_generations(generations: Tuple[int], population_size):
+    plt.plot([i for i in range(len(generations))], generations)
+    plt.xlabel('Generation')
+    plt.ylabel('Total fitness')
+    plt.show()

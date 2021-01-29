@@ -2,7 +2,7 @@
   "parent_selection_cutoff": 20,
   "survivor_selection_cutoff": 20,
   "survivor_age_cutoff": 5,
-  "init_pop_size": 150,
+  "population_size": 150,
   "dna_length": 15,
   "crossover_length": 5,
   "mutation_chance": 0.95,
