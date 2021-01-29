@@ -1,15 +1,16 @@
 import random
 import math
 from typing import Tuple
+from individual import Individual
 
 
 def generate_initial_pop(size, length):
     pop = []
     for _ in range(size):
-        individual = ""
+        dna = ""
         for _ in range(length):
-            individual += random.choice(["0", "1"])
-        pop.append(individual)
+            dna += random.choice(["0", "1"])
+        pop.append(Individual(dna))
     return tuple(pop)
 
 

@@ -18,6 +18,6 @@ if __name__ == "__main__":
     print(initial_population)
     population_fitness = GA.parent_selection(
         initial_population, lambda offspring: GA.fitness_sine(
-            offspring, parameters.length, parameters.interval),
+            offspring.dna, parameters.length, parameters.interval),
         parameters.selection_cutoff)
     print(population_fitness)
