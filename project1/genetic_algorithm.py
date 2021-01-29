@@ -17,9 +17,10 @@ def generate_initial_pop(size, length):
 def parent_selection(population, count):
     parents = []
     fitness_sum = sum([x.fitness for x in population])
-    roulette_wheel = [population[0].fitness/fitness_sum]
+    roulette_wheel = [population[0].fitness / fitness_sum]
     for i in range(1, len(population)):
-        roulette_wheel.append(population[i].fitness/fitness_sum + roulette_wheel[i-1])
+        roulette_wheel.append(
+            population[i].fitness / fitness_sum + roulette_wheel[i - 1])
     for i in range(count):
         sel = random.random()
         for n in range(len(roulette_wheel)):
@@ -44,8 +45,8 @@ def survivor_selection_age(population, age_cutoff):
 
 
 def crossover(parent1, parent2, length, mutation_chance):
-    offspring1 = list(parent1[:length] + parent2[length:])
-    offspring2 = list(parent2[:length] + parent1[length:])
+    offspring1 = list(parent1.dna[:length] + parent2.dna[length:])
+    offspring2 = list(parent2.dna[:length] + parent1.dna[length:])
     mutation_map = {
         "0": "1",
         "1": "0"
@@ -56,7 +57,7 @@ def crossover(parent1, parent2, length, mutation_chance):
             offspring1[i] = mutation_map[offspring1[i]]
         if mutation < mutation_chance:
             offspring2[i] = mutation_map[offspring2[i]]
-    return "".join(offspring1), "".join(offspring2)
+    return Individual("".join(offspring1)), Individual("".join(offspring2))
 
 
 def scale(x, length, interval: Tuple[int, int]):

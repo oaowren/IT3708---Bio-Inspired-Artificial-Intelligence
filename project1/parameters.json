@@ -1,10 +1,13 @@
 {
   "parent_selection_cutoff": 20,
   "survivor_selection_cutoff": 20,
+  "number_of_children":20, 
   "survivor_age_cutoff": 5,
-  "init_pop_size": 150,
-  "dna_length": 15,
-  "crossover_length": 5,
-  "mutation_chance": 0.95,
-  "interval": [0, 128]
+  "init_pop_size": 50,
+  "dna_length": 128,
+  "crossover_length": 40,
+  "mutation_chance": 0.98,
+  "interval": [0, 128],
+  "best_n_individuals": 25,
+  "exit_threshold": 1.995
 }
