@@ -12,3 +12,6 @@ class Individual():
 
     def generation(self):
         self.age += 1
+
+    def dna_value(self):
+        return int(self.dna, 2)

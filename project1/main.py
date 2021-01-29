@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     # Initial population
     population = GA.generate_initial_pop(
-        parameters.init_pop_size, parameters.dna_length)
+        parameters.population_size, parameters.dna_length)
     generation = 1
     # Save population for each generation to use in plots
     generation_dict = dict()
@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
         # Select survivors based on elitism
         population = GA.survivor_selection_elitism(
-            population + tuple(new_pop), parameters.init_pop_size)
+            population + tuple(new_pop), parameters.population_size)
         generation_dict[generation] = population
         best_individuals = GA.survivor_selection_elitism(
             population, parameters.best_n_individuals)
