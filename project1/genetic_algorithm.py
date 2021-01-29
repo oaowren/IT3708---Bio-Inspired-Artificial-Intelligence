@@ -21,11 +21,11 @@ def parent_selection(population, cutoff):
             reverse=True)[: cutoff])
 
 
-def survivor_selection_elitism(population, fitness_function, cutoff):
+def survivor_selection_elitism(population, cutoff):
     return tuple(
         sorted(
-            population,
-            key=fitness_function, reverse=True)[: cutoff])
+            population, key=lambda individual: individual.fitness,
+            reverse=True)[: cutoff])
 
 
 def survivor_selection_age(population, age_cutoff):
