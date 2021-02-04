@@ -11,5 +11,7 @@
   "interval": [0, 128],
   "best_n_individuals": 25,
   "exit_threshold": 1.995,
-  "survivor_func": "age"
+  "survivor_func": "el",
+  "crowding_func": "det",
+  "use_crowding": true
 }

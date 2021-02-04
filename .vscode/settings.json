@@ -1,5 +1,4 @@
 {
-  "python.pythonPath": "venv/bin/python3",
   "code-runner.runInTerminal": true,
   "editor.formatOnSave": true,
   "python.linting.lintOnSave": true,
