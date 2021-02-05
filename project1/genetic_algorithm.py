@@ -8,7 +8,7 @@ import numpy as np
 
 class SimpleGenetic():
 
-    def __init__(self, parameters):
+    def __init__(self, parameters, use_crowding=False):
         # Define parameters
         self.parent_cutoff = parameters.parent_selection_cutoff
         self.minimum_age_replacement = parameters.minimum_age_replacement
@@ -28,7 +28,7 @@ class SimpleGenetic():
             if parameters.crowding_func == "det" else
             self.crowding_probabilistic
         )
-        self.use_crowding = parameters.use_crowding
+        self.use_crowding = use_crowding
         self.fitness_function = parameters.fitness_function
 
         # Initialize first generation and save in generational dictionary
@@ -230,6 +230,19 @@ class SimpleGenetic():
             ax.set(xlabel='Value', ylabel='Sine')
 
         plt.show()
+
+    def get_entropy(self):
+        entropy_dict = {}
+        for n in range(self.generation):
+            entropy = 0
+            for i in range(self.dna_length):
+                p_i = len([x for x in self.generation_dict[n+1] if x.dna[i] == "1"]) / len(self.generation_dict[n+1])
+                if p_i == 0:
+                    entropy = 0
+                    break
+                entropy -= p_i * math.log2(p_i)
+            entropy_dict[n+1] = entropy
+        return entropy_dict
 
     def run_generation(self):
         self.generation += 1
