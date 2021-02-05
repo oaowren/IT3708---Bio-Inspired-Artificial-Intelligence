@@ -87,9 +87,9 @@ class SimpleGenetic():
                 offspring2[i] = mutation_map[offspring2[i]]
         child1, child2 = Individual(
             "".join(offspring1),
-            self.dna_length, self.interval, parents=[parent1, parent2]), Individual(
+            self.dna_length, self.interval, self.fitness_function, parents=[parent1, parent2]), Individual(
             "".join(offspring2),
-            self.dna_length, self.interval, parents=[parent1, parent2])
+            self.dna_length, self.interval, self.fitness_function, parents=[parent1, parent2])
         parent1.children = [child1, child2]
         parent2.children = [child1, child2]
         return child1, child2

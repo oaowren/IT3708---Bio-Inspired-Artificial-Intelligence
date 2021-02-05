@@ -10,7 +10,7 @@
   "best_n_individuals": 20,
   "exit_threshold": 1.95,
   "survivor_func": "age",
-  "crowding_func": "det",
+  "crowding_func": "prob",
   "use_crowding": true,
-  "fitness_function": "dataset"
+  "fitness_function": "fuckall"
 }
