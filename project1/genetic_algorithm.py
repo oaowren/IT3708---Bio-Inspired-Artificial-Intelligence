@@ -36,8 +36,10 @@ class SimpleGenetic():
         self.generation_dict = dict()
         self.generation = 1
         self.generation_dict[self.generation] = self.population
-        self.best_individuals_average = (sum([x.fitness for x in self.survivor_selection_elitism(
-            self.population, self.best_n_individuals)]) / self.best_n_individuals)
+        self.best_individuals_average = self.find_best_individuals_average()
+
+    def find_best_individuals_average(self):
+        return (sum([x.fitness for x in self.survivor_selection_elitism(self.population, self.best_n_individuals)]) / self.best_n_individuals)
 
     def generate_initial_pop(self):
         pop = []
@@ -288,5 +290,4 @@ class SimpleGenetic():
         # Save generation for plots
         self.generation_dict[self.generation] = self.population
         # Calculate new best average
-        self.best_individuals_average = (sum([x.fitness for x in self.survivor_selection_elitism(
-            self.population, self.best_n_individuals)]) / self.best_n_individuals)
+        self.best_individuals_average = self.find_best_individuals_average()
