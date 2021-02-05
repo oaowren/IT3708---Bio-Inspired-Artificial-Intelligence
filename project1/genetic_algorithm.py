@@ -29,6 +29,7 @@ class SimpleGenetic():
             self.crowding_probabilistic
         )
         self.use_crowding = parameters.use_crowding
+        self.fitness_function = parameters.fitness_function
 
         # Initialize first generation and save in generational dictionary
         self.population = self.generate_initial_pop()
@@ -44,7 +45,10 @@ class SimpleGenetic():
             dna = ""
             for _ in range(self.dna_length):
                 dna += random.choice(["0", "1"])
-            pop.append(Individual(dna, self.dna_length, self.interval))
+            pop.append(
+                Individual(
+                    dna, self.dna_length, self.interval,
+                    self.fitness_function))
         return tuple(pop)
 
     def parent_selection(self):
@@ -153,11 +157,14 @@ class SimpleGenetic():
         return map(lambda individual: individual.fitness,
                    self.population).sum()
 
-    @staticmethod
-    def visualize_generations(generations: Tuple[int]):
+    def visualize_generations(self):
+        generational_average = []
+        for i in range(1, self.generation + 1):
+            generational_average.append(sum(map(lambda individual: individual.fitness,
+                                                self.generation_dict[i])))
         plt.plot(
-            [i for i in range(1, len(generations) + 1)],
-            generations, marker='o')
+            [i for i in range(1, len(generational_average) + 1)],
+            generational_average, marker='o')
         plt.xlabel('Generation')
         plt.ylabel('Average population fitness')
         plt.show()

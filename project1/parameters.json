@@ -3,7 +3,7 @@
   "minimum_age_replacement": 5,
   "survivor_age_cutoff": 5,
   "population_size": 50,
-  "dna_length": 256,
+  "dna_length": 101,
   "mutation_chance": 0.98,
   "crossover_chance": 0.8,
   "interval": [0, 128],
@@ -11,5 +11,6 @@
   "exit_threshold": 1.95,
   "survivor_func": "age",
   "crowding_func": "det",
-  "use_crowding": true
+  "use_crowding": true,
+  "fitness_function": "dataset"
 }

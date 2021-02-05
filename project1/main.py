@@ -1,6 +1,8 @@
 from genetic_algorithm import SimpleGenetic
 import json
 from LinReg import LinReg
+import random
+import numpy as np
 
 
 class Parameters:
@@ -15,7 +17,6 @@ if __name__ == "__main__":
             setattr(parameters, attr, value)
 
     ga = SimpleGenetic(parameters)
-
     while ga.best_individuals_average < parameters.exit_threshold:
         print(ga.best_individuals_average)
         ga.run_generation()
@@ -34,5 +35,5 @@ if __name__ == "__main__":
             map(lambda individual: individual.fitness, ga.generation_dict[i]))
         generational_average_fitness.append(
             (total_fitness / len(ga.generation_dict[i])) - 1)
-    SimpleGenetic.visualize_generations(ga.generational_average_fitness)
+    ga.visualize_generations()
 
