@@ -161,7 +161,7 @@ class SimpleGenetic():
         generational_average = []
         for i in range(1, self.generation + 1):
             generational_average.append(sum(map(lambda individual: individual.fitness,
-                                                self.generation_dict[i])))
+                                                self.generation_dict[i])) / len(self.generation_dict[i]))
         plt.plot(
             [i for i in range(1, len(generational_average) + 1)],
             generational_average, marker='o')
