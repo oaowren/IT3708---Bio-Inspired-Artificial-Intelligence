@@ -32,12 +32,14 @@ if __name__ == "__main__":
             setattr(parameters, attr, value)
 
     fitness_func = parameters.fitness_function
+    # Initialize genetic algorithm without crowding
     ga = SimpleGenetic(parameters)
     exit_threshold = 0.124 if fitness_func == 'dataset' else parameters.exit_threshold
     while ((ga.best_individuals_average < exit_threshold and ga.generation < parameters.max_generations and not fitness_func == 'dataset')
             or (-ga.best_individuals_average > exit_threshold)):
         ga.run_generation()
 
+    # Initialize genetic algorithm with crowding
     ga2 = SimpleGenetic(parameters, use_crowding=True)
     exit_threshold = 0.124 if fitness_func == 'dataset' else parameters.exit_threshold
     while ((ga2.best_individuals_average < exit_threshold and ga2.generation < parameters.max_generations and not fitness_func == 'dataset')
@@ -58,5 +60,6 @@ if __name__ == "__main__":
         generational_average_fitness.append(
             (total_fitness / len(ga.generation_dict[i])) - 1)
 
+    # Vizualise average fitness per generation
     ga.visualize_generations(signum=-1 if fitness_func == "dataset" else 1)
     ga2.visualize_generations(signum=-1 if fitness_func == "dataset" else 1)
