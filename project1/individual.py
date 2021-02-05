@@ -1,14 +1,18 @@
 import math
+import fitness
 
 
 class Individual():
 
-    def __init__(self, dna, dna_length, interval):
+    def __init__(self, dna, dna_length, interval, fitness_function):
         self.dna = dna
         self.age = 0
         self.dna_length = dna_length
         self.interval = interval
-        self.fitness = self.fitness_sine() + 1
+        if fitness_function == "dataset":
+            self.fitness = fitness.get_fitness(dna)
+        else:
+            self.fitness = self.fitness_sine() + 1
 
     def grow_older(self):
         self.age += 1

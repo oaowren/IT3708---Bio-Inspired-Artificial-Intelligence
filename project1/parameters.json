@@ -5,7 +5,7 @@
   "number_of_children": 20,
   "survivor_age_cutoff": 5,
   "population_size": 50,
-  "dna_length": 256,
+  "dna_length": 101,
   "crossover_length": 40,
   "mutation_chance": 0.98,
   "interval": [0, 128],
@@ -13,5 +13,6 @@
   "exit_threshold": 1.995,
   "survivor_func": "el",
   "crowding_func": "det",
-  "use_crowding": true
+  "use_crowding": true,
+  "fitness_function": "dataset"
 }
