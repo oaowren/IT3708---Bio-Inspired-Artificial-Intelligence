@@ -1,6 +1,5 @@
 from genetic_algorithm import SimpleGenetic
 import json
-import random
 from LinReg import LinReg
 
 
@@ -18,11 +17,15 @@ if __name__ == "__main__":
     ga = SimpleGenetic(parameters)
 
     while ga.best_individuals_average < parameters.exit_threshold:
-        print(ga.generation)
+        print(ga.best_individuals_average)
         ga.run_generation()
 
+    print([x.fitness for x in ga.generation_dict[ga.generation]])
+    print("\n\n")
+    print([x.dna for x in sorted(ga.generation_dict[ga.generation], key=lambda i: i.fitness, reverse=True)][0])
+
     # Plot the generation
-    ga.visualize_all_generations_sine()
+    ga.visualize_three_generations_sine()
 
     # Plot the average fitness level of the population for each generation
     generational_average_fitness = []
@@ -32,6 +35,4 @@ if __name__ == "__main__":
         generational_average_fitness.append(
             (total_fitness / len(ga.generation_dict[i])) - 1)
     SimpleGenetic.visualize_generations(ga.generational_average_fitness)
-    print([x.fitness for x in ga.generation_dict[1]])
-    print("\n\n")
-    print([x.fitness for x in ga.generation_dict[ga.generation]])
+

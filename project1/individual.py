@@ -3,12 +3,14 @@ import math
 
 class Individual():
 
-    def __init__(self, dna, dna_length, interval):
+    def __init__(self, dna, dna_length, interval, parents=None, children=None):
         self.dna = dna
         self.age = 0
         self.dna_length = dna_length
         self.interval = interval
         self.fitness = self.fitness_sine() + 1
+        self.parents = parents
+        self.children = children
 
     def grow_older(self):
         self.age += 1
