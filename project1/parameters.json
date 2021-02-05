@@ -1,16 +1,16 @@
 {
-  "parent_selection_cutoff": 25,
+  "parent_selection_cutoff": 200,
   "minimum_age_replacement": 5,
   "survivor_age_cutoff": 5,
-  "population_size": 50,
+  "population_size": 5000,
   "dna_length": 101,
-  "mutation_chance": 0.98,
+  "mutation_chance": 0.85,
   "crossover_chance": 0.8,
   "interval": [0, 128],
-  "best_n_individuals": 20,
+  "best_n_individuals": 1,
   "exit_threshold": 1.95,
-  "survivor_func": "age",
+  "survivor_func": "el",
   "crowding_func": "prob",
-  "use_crowding": true,
-  "fitness_function": "fuckall"
+  "use_crowding": false,
+  "fitness_function": "dataset"
 }

@@ -17,16 +17,26 @@ if __name__ == "__main__":
             setattr(parameters, attr, value)
 
     ga = SimpleGenetic(parameters)
-    while ga.best_individuals_average < parameters.exit_threshold:
-        print(ga.best_individuals_average)
+    current_min = 1000
+    exit_threshold = 0.124 if parameters.fitness_function == 'dataset' else parameters.exit_threshold
+    while (ga.best_individuals_average < exit_threshold if not parameters.fitness_function == 'dataset' else (-ga.best_individuals_average) > exit_threshold):
+        new_min = round(-ga.best_individuals_average, 7)
+        if new_min < current_min:
+            print(new_min)
+            current_min = new_min
+        #print(list(map(lambda i: i.fitness, ga.population)))
         ga.run_generation()
 
     print([x.fitness for x in ga.generation_dict[ga.generation]])
     print("\n\n")
-    print([x.dna for x in sorted(ga.generation_dict[ga.generation], key=lambda i: i.fitness, reverse=True)][0])
+    print(
+        [x.dna
+         for x in sorted(
+             ga.generation_dict[ga.generation],
+             key=lambda i: i.fitness, reverse=True)][0])
 
-    # Plot the generation
-    ga.visualize_three_generations_sine()
+    # Plot the generations
+    ga.visualize_three_generations()
 
     # Plot the average fitness level of the population for each generation
     generational_average_fitness = []
@@ -35,5 +45,4 @@ if __name__ == "__main__":
             map(lambda individual: individual.fitness, ga.generation_dict[i]))
         generational_average_fitness.append(
             (total_fitness / len(ga.generation_dict[i])) - 1)
-    ga.visualize_generations()
-
+    ga.visualize_generations(signum=-1)
