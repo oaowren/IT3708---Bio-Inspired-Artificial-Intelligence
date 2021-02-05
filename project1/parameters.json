@@ -1,5 +1,5 @@
 {
-  "parent_selection_cutoff": 25,
+  "parent_selection_cutoff": 200,
   "minimum_age_replacement": 5,
   "survivor_age_cutoff": 5,
   "population_size": 1000,

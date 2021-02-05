@@ -52,12 +52,20 @@ class SimpleGenetic():
         return tuple(pop)
 
     def parent_selection(self):
+        population_fitness = [x.fitness for x in self.population]
+        min_fitness = 0
+        if self.fitness_function == "dataset":
+            min_fitness = -min(population_fitness)
+            for i in range(len(population_fitness)):
+                population_fitness[i] += min_fitness
+
         parents = []
-        fitness_sum = sum([x.fitness for x in self.population])
-        roulette_wheel = [self.population[0].fitness / fitness_sum]
+        fitness_sum = sum(population_fitness)
+        roulette_wheel = [
+            (self.population[0].fitness + min_fitness) / fitness_sum]
         for i in range(1, len(self.population)):
             roulette_wheel.append(
-                self.population[i].fitness / fitness_sum +
+                (self.population[i].fitness + min_fitness) / fitness_sum +
                 roulette_wheel[i - 1])
         for i in range(self.parent_cutoff):
             sel = random.random()
@@ -171,7 +179,7 @@ class SimpleGenetic():
         return map(lambda individual: individual.fitness,
                    self.population).sum()
 
-    def visualize_generations(self):
+    def visualize_generations(self, signum=1):
         generational_average = []
         for i in range(1, self.generation + 1):
             generation = sorted(
@@ -179,16 +187,16 @@ class SimpleGenetic():
                 key=lambda i: i.fitness, reverse=True)
             generation = generation[:self.best_n_individuals]
             generational_average.append(
-                sum(map(lambda individual: individual.fitness, generation)) /
+                sum(map(lambda individual: individual.fitness * signum, generation)) /
                 len(generation))
         plt.plot(
             [i for i in range(1, len(generational_average) + 1)],
             generational_average, marker='o')
         plt.xlabel('Generation')
-        plt.ylabel('Average population fitness')
+        plt.ylabel('Average best n individuals fitness')
         plt.show()
 
-    def visualize_all_generations_sine(self):
+    def visualize_all_generations(self, sine=False):
         plt.figure()
         fig, axs = plt.subplots(
             nrows=math.ceil(self.generation / 3),
@@ -199,16 +207,17 @@ class SimpleGenetic():
             x = list(map(lambda individual: individual.scale(),
                          self.generation_dict[i + 1]))
             lin = np.linspace(0, 128, num=1024)
-            axs[i // 3][i % 3].plot(lin, np.sin(lin), color="y")
+            if sine:
+                axs[i // 3][i % 3].plot(lin, np.sin(lin), color="y")
             axs[i // 3][i % 3].scatter(x, y)
             axs[i // 3][i % 3].set_title('Gen: ' + str(i + 1))
 
         for ax in axs.flat:
-            ax.set(xlabel='Value', ylabel='Sine')
+            ax.set(xlabel='Value', ylabel='Sine' if sine else 'Fitness')
 
         plt.show()
 
-    def visualize_three_generations_sine(self):
+    def visualize_three_generations(self, sine=False):
         plt.figure()
         fig, axs = plt.subplots(
             nrows=1,
@@ -222,12 +231,13 @@ class SimpleGenetic():
             x = list(map(lambda individual: individual.scale(),
                          self.generation_dict[plots[i] + 1]))
             lin = np.linspace(0, 128, num=1024)
-            axs[0][i].plot(lin, np.sin(lin), color="y")
+            if sine:
+                axs[0][i].plot(lin, np.sin(lin), color="y")
             axs[0][i].scatter(x, y)
             axs[0][i].set_title('Gen: ' + str(plots[i] + 1))
 
         for ax in axs.flat:
-            ax.set(xlabel='Value', ylabel='Sine')
+            ax.set(xlabel='Value', ylabel='Sine' if sine else 'Fitness')
 
         plt.show()
 
