@@ -4,6 +4,7 @@ from LinReg import LinReg
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import fitness
 
 
 class Parameters:
@@ -12,8 +13,14 @@ class Parameters:
 
 def plot_entropy(entropy_dict1, entropy_dict2):
     plt.title("Entropy per generation")
-    plt.plot(list(entropy_dict1.keys()), list(entropy_dict1.values()), label="Simple Genetic")
-    plt.plot(list(entropy_dict2.keys()), list(entropy_dict2.values()), label="Crowding")
+    plt.plot(
+        list(entropy_dict1.keys()),
+        list(entropy_dict1.values()),
+        label="Simple Genetic")
+    plt.plot(
+        list(entropy_dict2.keys()),
+        list(entropy_dict2.values()),
+        label="Crowding")
     plt.legend()
     plt.show()
 
@@ -25,6 +32,8 @@ if __name__ == "__main__":
         for attr, value in parameter_dict.items():
             setattr(parameters, attr, value)
 
+    print("Fitness no feature selection: ",
+          fitness.get_fitness_no_feat_select())
     ga = SimpleGenetic(parameters)
     current_min = 1000
     exit_threshold = 0.124 if parameters.fitness_function == 'dataset' else parameters.exit_threshold
