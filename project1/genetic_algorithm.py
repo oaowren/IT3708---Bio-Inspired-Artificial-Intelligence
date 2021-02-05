@@ -247,10 +247,8 @@ class SimpleGenetic():
             entropy = 0
             for i in range(self.dna_length):
                 p_i = len([x for x in self.generation_dict[n+1] if x.dna[i] == "1"]) / len(self.generation_dict[n+1])
-                if p_i == 0:
-                    entropy = 0
-                    break
-                entropy -= p_i * math.log2(p_i)
+                if p_i != 0:
+                    entropy -= p_i * math.log2(p_i)
             entropy_dict[n+1] = entropy
         return entropy_dict
 
