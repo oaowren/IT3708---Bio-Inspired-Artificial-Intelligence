@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     print("Fitness no feature selection: ",
           fitness.get_fitness_no_feat_select())
-          
+
     # Initialize genetic algorithm without crowding
     ga = SimpleGenetic(parameters)
     exit_threshold = 0.124 if fitness_func == 'dataset' else parameters.exit_threshold
@@ -54,8 +54,12 @@ if __name__ == "__main__":
     plot_entropy(ga.get_entropy(), ga2.get_entropy())
 
     # Plot the generations
-    ga.visualize_three_generations(sine=fitness_func != "dataset")
-    ga2.visualize_three_generations(sine=fitness_func != "dataset")
+    ga.visualize_three_generations(
+        sine=(fitness_func != "dataset"),
+        title="Simple Genetic Algorithm")
+    ga2.visualize_three_generations(
+        sine=(fitness_func != "dataset"),
+        title="Crowding approach")
 
     # Plot the average fitness level of the population for each generation
     generational_average_fitness = []
@@ -66,5 +70,11 @@ if __name__ == "__main__":
             (total_fitness / len(ga.generation_dict[i])) - 1)
 
     # Vizualise average fitness per generation
-    ga.visualize_generations(signum=-1 if fitness_func == "dataset" else 1)
-    ga2.visualize_generations(signum=-1 if fitness_func == "dataset" else 1)
+    ga.visualize_generations(
+        signum=-1 if fitness_func == "dataset" else 1,
+        title="SGA, average of best " + str(parameters.best_n_individuals) +
+        " individuals per generation")
+    ga2.visualize_generations(
+        signum=-1 if fitness_func == "dataset" else 1,
+        title="Crowding, average of best " +
+        str(parameters.best_n_individuals) + " individuals per generation")

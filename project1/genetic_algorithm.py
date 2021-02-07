@@ -45,9 +45,11 @@ class SimpleGenetic():
         self.generation_dict[self.generation] = self.population
         self.best_individuals_average = self.find_best_individuals_average()
 
+    # Helper function
     def find_best_individuals_average(self):
         return (sum([x.fitness for x in self.survivor_selection_elitism(self.population, self.best_n_individuals)]) / self.best_n_individuals)
 
+    # Oppgave a)
     def generate_initial_pop(self):
         pop = []
         for _ in range(self.pop_size):
@@ -60,22 +62,26 @@ class SimpleGenetic():
                     self.fitness_function))
         return tuple(pop)
 
+    # Oppgave b)
     def parent_selection(self):
         population_fitness = [x.fitness for x in self.population]
         min_fitness = 0
         if self.fitness_function == "dataset":
+            # Negative fitness values are offset to use in probability-calculation
             min_fitness = -min(population_fitness)
             for i in range(len(population_fitness)):
                 population_fitness[i] += min_fitness
-
+        # Roulette wheel-selection
         parents = []
         fitness_sum = sum(population_fitness)
+        # Create cumulative probability distribution, 0-1
         roulette_wheel = [
             (self.population[0].fitness + min_fitness) / fitness_sum]
         for i in range(1, len(self.population)):
             roulette_wheel.append(
                 (self.population[i].fitness + min_fitness) / fitness_sum +
                 roulette_wheel[i - 1])
+        # Select n parents based on distribution
         for i in range(self.parent_cutoff):
             sel = random.random()
             for n in range(len(roulette_wheel)):
@@ -84,7 +90,9 @@ class SimpleGenetic():
                     break
         return tuple(parents)
 
+    # Oppgave c)
     def crossover(self, parent1, parent2):
+        # Create a crossover between parents based on random length
         crossover_length = random.randint(0, self.dna_length)
         offspring1 = list(
             parent1.dna[: crossover_length] + parent2.dna
@@ -96,12 +104,15 @@ class SimpleGenetic():
             "0": "1",
             "1": "0"
         }
+        # Random mutations on genome
         for i in range(len(offspring1)):
             mutation = random.random()
+            # Avoid mutation of the same bit on both offspring
             if mutation > 1 - self.mutation_rate:
                 offspring1[i] = mutation_map[offspring1[i]]
             if mutation < self.mutation_rate:
                 offspring2[i] = mutation_map[offspring2[i]]
+        # Create new individuals with genome, assign parents and children accordingly
         child1, child2 = Individual(
             "".join(offspring1),
             self.dna_length, self.interval, self.fitness_function,
@@ -113,12 +124,14 @@ class SimpleGenetic():
         parent2.children = [child1, child2]
         return child1, child2
 
+    # Oppgave d.1)
     def survivor_selection_elitism(self, population, cutoff):
         return tuple(
             sorted(
                 population, key=lambda individual: individual.fitness,
                 reverse=True)[: cutoff])
 
+    # Oppgave d.2)
     def survivor_selection_age(self, population):
         filtered_pop = tuple(filter(
             lambda individual: individual.age <= self.survivor_age,
@@ -133,6 +146,7 @@ class SimpleGenetic():
                 self.minimum_age_replacement - diff:]
         return tuple(filtered_pop)
 
+    # Oppgave g)
     def crowding(self, population, parents, crowding_func):
         pop = population
         visited_parents = []
@@ -165,12 +179,14 @@ class SimpleGenetic():
                                     children_parents[1]))
         return tuple(pop)
 
+    # Oppgave g.1)
     def crowding_probabilistic(self, parent, child):
         prob = child.fitness / (parent.fitness + child.fitness)
         if random.random() < prob:
             return child
         return parent
 
+    # Oppgave g.2)
     def crowding_deterministic(self, parent, child):
         if parent.fitness > child.fitness:
             return parent
@@ -178,17 +194,61 @@ class SimpleGenetic():
             return random.choice([parent, child])
         return child
 
+    # Hamming distance
     def distance_func(self, i1, i2):
         dist = 0
         for i in range(len(i1.dna)):
             dist += abs(int(i1.dna[i]) - int(i2.dna[i]))
         return dist
 
+    # Oppgave e)
+    def run_generation(self):
+        # Initialize generation
+        self.generation += 1
+        for individual in self.population:
+            individual.grow_older()
+            # Makes it possible to have new children each generation
+            individual.children = None
+        parents = self.parent_selection()
+        new_pop = []
+
+        # Generate new population based on pairs of parents
+        for i in range(len(parents)):
+            for j in range(len(parents)):
+                # Beacuse of implementation of crowding, both parents must not have children
+                if parents[i].children is None and parents[j].children is None:
+                    crossover = random.random()
+                    if crossover < self.crossover_rate:
+                        off1, off2 = self.crossover(parents[i], parents[j])
+                        new_pop.append(off1)
+                        new_pop.append(off2)
+
+        if self.survivor_func == self.survivor_selection_elitism and not self.use_crowding:
+            # Select survivors based on elitism
+            self.population = self.survivor_func(
+                self.population + tuple(new_pop), self.pop_size)
+        elif not self.use_crowding:
+            # Remove oldest individuals, fill with fittest from new genereation
+            old_pop = self.survivor_func(self.population)
+            # Find number of individuals removed
+            diff = len(self.population) - len(old_pop)
+            # Add the best individuals to replace old ones
+            self.population = (
+                old_pop + self.survivor_selection_elitism(new_pop, diff))
+        else:
+            # Use crowding scheme defined by parameters
+            self.population = self.crowding(
+                self.population, parents, self.crowding_func)
+        # Save generation for plots
+        self.generation_dict[self.generation] = self.population
+        # Calculate new best average
+        self.best_individuals_average = self.find_best_individuals_average()
+
     def get_total_generation_fitness(self):
         return map(lambda individual: individual.fitness,
                    self.population).sum()
 
-    def visualize_generations(self, signum=1):
+    def visualize_generations(self, signum=1, title="Default"):
         generational_average = []
         for i in range(1, self.generation + 1):
             generation = sorted(
@@ -198,6 +258,7 @@ class SimpleGenetic():
             generational_average.append(
                 sum(map(lambda individual: individual.fitness * signum, generation)) /
                 len(generation))
+        plt.title(title)
         plt.plot(
             [i for i in range(1, len(generational_average) + 1)],
             generational_average, marker='o')
@@ -226,8 +287,7 @@ class SimpleGenetic():
 
         plt.show()
 
-    def visualize_three_generations(self, sine=False):
-        plt.figure()
+    def visualize_three_generations(self, sine=False, title="Default"):
         fig, axs = plt.subplots(
             nrows=1,
             ncols=3, sharex=True, sharey=True, squeeze=False)
@@ -235,8 +295,11 @@ class SimpleGenetic():
             0, math.floor(math.sqrt(self.generation)),
             self.generation - 1]
         for i in range(len(plots)):
-            y = list(map(lambda individual: individual.fitness - 1,
-                         self.generation_dict[plots[i] + 1]))
+            y = list(
+                map(
+                    lambda individual: individual.fitness - 1
+                    if sine else -individual.fitness, self.generation_dict
+                    [plots[i] + 1]))
             x = list(map(lambda individual: individual.scale(),
                          self.generation_dict[plots[i] + 1]))
             lin = np.linspace(0, 128, num=1024)
@@ -247,7 +310,7 @@ class SimpleGenetic():
 
         for ax in axs.flat:
             ax.set(xlabel='Value', ylabel='Sine' if sine else 'Fitness')
-
+        fig.suptitle(title)
         plt.show()
 
     def get_entropy(self):
@@ -261,41 +324,3 @@ class SimpleGenetic():
                     entropy -= p_i * math.log2(p_i)
             entropy_dict[n + 1] = entropy
         return entropy_dict
-
-    def run_generation(self):
-        self.generation += 1
-        for individual in self.population:
-            individual.grow_older()
-            individual.children = None
-        parents = self.parent_selection()
-        new_pop = []
-
-        # Generate new population based on pairs of parents
-        for i in range(len(parents)):
-            for j in range(len(parents)):
-                if parents[i].children is None and parents[j].children is None:
-                    crossover = random.random()
-                    if crossover < self.crossover_rate:
-                        off1, off2 = self.crossover(parents[i], parents[j])
-                        new_pop.append(off1)
-                        new_pop.append(off2)
-
-        if self.survivor_func == self.survivor_selection_elitism and not self.use_crowding:
-            # Select survivors based on elitism
-            self.population = self.survivor_func(
-                self.population + tuple(new_pop), self.pop_size)
-        elif not self.use_crowding:
-            # Remove oldest individuals, fill with fittest from new genereation
-            old_pop = self.survivor_func(self.population)
-            diff = len(self.population) - len(old_pop)
-            # Add the best individuals to replace old ones
-            self.population = (
-                old_pop + self.survivor_selection_elitism(new_pop, diff))
-        else:
-            # Use crowding scheme defined by parameters
-            self.population = self.crowding(
-                self.population, parents, self.crowding_func)
-        # Save generation for plots
-        self.generation_dict[self.generation] = self.population
-        # Calculate new best average
-        self.best_individuals_average = self.find_best_individuals_average()
