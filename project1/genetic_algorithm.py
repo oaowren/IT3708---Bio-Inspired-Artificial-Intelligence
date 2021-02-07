@@ -244,6 +244,7 @@ class SimpleGenetic():
         # Calculate new best average
         self.best_individuals_average = self.find_best_individuals_average()
 
+    # Plotting functions
     def get_total_generation_fitness(self):
         return map(lambda individual: individual.fitness,
                    self.population).sum()
