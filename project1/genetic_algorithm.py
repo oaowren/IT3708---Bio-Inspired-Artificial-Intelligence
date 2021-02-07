@@ -209,36 +209,46 @@ class SimpleGenetic():
             individual.grow_older()
             # Makes it possible to have new children each generation
             individual.children = None
-        parents = self.parent_selection()
-        new_pop = []
 
-        # Generate new population based on pairs of parents
-        for i in range(len(parents)):
-            for j in range(len(parents)):
-                # Beacuse of implementation of crowding, both parents must not have children
-                if parents[i].children is None and parents[j].children is None:
-                    crossover = random.random()
-                    if crossover < self.crossover_rate:
-                        off1, off2 = self.crossover(parents[i], parents[j])
-                        new_pop.append(off1)
-                        new_pop.append(off2)
-
-        if self.survivor_func == self.survivor_selection_elitism and not self.use_crowding:
-            # Select survivors based on elitism
-            self.population = self.survivor_func(
-                self.population + tuple(new_pop), self.pop_size)
-        elif not self.use_crowding:
-            # Remove oldest individuals, fill with fittest from new genereation
-            old_pop = self.survivor_func(self.population)
-            # Find number of individuals removed
-            diff = len(self.population) - len(old_pop)
-            # Add the best individuals to replace old ones
-            self.population = (
-                old_pop + self.survivor_selection_elitism(new_pop, diff))
+        if not self.use_crowding:
+            parents = self.parent_selection()
+            new_pop = []
+            # Generate new population based on pairs of parents
+            for i in range(len(parents)):
+                for j in range(len(parents)):
+                    # Beacuse of implementation of crowding, both parents must not have children
+                    if parents[i].children is None and parents[j].children is None:
+                        crossover = random.random()
+                        if crossover < self.crossover_rate:
+                            off1, off2 = self.crossover(parents[i], parents[j])
+                            new_pop.append(off1)
+                            new_pop.append(off2)
+            if self.survivor_func == self.survivor_selection_elitism and not self.use_crowding:
+                # Select survivors based on elitism
+                self.population = self.survivor_func(
+                    self.population + tuple(new_pop), self.pop_size)
+            else:
+                # Remove oldest individuals, fill with fittest from new genereation
+                old_pop = self.survivor_func(self.population)
+                # Find number of individuals removed
+                diff = len(self.population) - len(old_pop)
+                # Add the best individuals to replace old ones
+                self.population = (
+                    old_pop + self.survivor_selection_elitism(new_pop, diff))
         else:
+            # Generate new population based on pairs of parents
+            for i in range(len(self.population)):
+                for j in range(len(self.population)):
+                    # Beacuse of implementation of crowding, both parents must not have children
+                    if self.population[i].children is None and self.population[j].children is None:
+                        crossover = random.random()
+                        if crossover < self.crossover_rate:
+                            off1, off2 = self.crossover(
+                                self.population[i],
+                                self.population[j])
             # Use crowding scheme defined by parameters
             self.population = self.crowding(
-                self.population, parents, self.crowding_func)
+                self.population, self.population, self.crowding_func)
         # Save generation for plots
         self.generation_dict[self.generation] = self.population
         # Calculate new best average

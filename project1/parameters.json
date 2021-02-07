@@ -6,10 +6,10 @@
   "dna_length": 101,
   "mutation_rate": 0.01,
   "crossover_rate": 0.4,
-  "best_n_individuals": 10,
+  "best_n_individuals": 30,
   "max_generations": 1000,
   "exit_threshold": 1.998,
   "survivor_func": "el",
   "crowding_func": "det",
-  "fitness_function": "dataset"
+  "fitness_function": "sine"
 }

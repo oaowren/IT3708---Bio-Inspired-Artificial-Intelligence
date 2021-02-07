@@ -44,6 +44,8 @@ if __name__ == "__main__":
             or (-ga.best_individuals_average > exit_threshold)):
         ga.run_generation()
 
+    #parameters.parent_selection_cutoff = 50
+
     # Initialize genetic algorithm with crowding
     ga2 = SimpleGenetic(parameters, use_crowding=True)
     exit_threshold = 0.124 if fitness_func == 'dataset' else parameters.exit_threshold
