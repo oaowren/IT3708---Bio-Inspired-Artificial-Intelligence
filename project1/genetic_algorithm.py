@@ -249,7 +249,7 @@ class SimpleGenetic():
         return map(lambda individual: individual.fitness,
                    self.population).sum()
 
-    def visualize_generations(self, signum=1, title="Default"):
+    def visualize_generations(self, sine=False, title="Default"):
         generational_average = []
         for i in range(1, self.generation + 1):
             generation = sorted(
@@ -257,7 +257,7 @@ class SimpleGenetic():
                 key=lambda i: i.fitness, reverse=True)
             generation = generation[:self.best_n_individuals]
             generational_average.append(
-                sum(map(lambda individual: individual.fitness * signum, generation)) /
+                sum(map(lambda individual: individual.fitness * -1 if not sine else individual.fitness - 1, generation)) /
                 len(generation))
         plt.title(title)
         plt.plot(

@@ -11,5 +11,5 @@
   "exit_threshold": 1.998,
   "survivor_func": "el",
   "crowding_func": "det",
-  "fitness_function": "sine"
+  "fitness_function": "dataset"
 }

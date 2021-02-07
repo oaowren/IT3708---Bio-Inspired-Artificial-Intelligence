@@ -64,17 +64,17 @@ if __name__ == "__main__":
     # Plot the average fitness level of the population for each generation
     generational_average_fitness = []
     for i in range(1, ga.generation + 1):
-        total_fitness = sum(
-            map(lambda individual: individual.fitness, ga.generation_dict[i]))
+        total_fitness = sum(map(lambda individual: individual.fitness if fitness_func ==
+                                'dataset' else individual.fitness - 1, ga.generation_dict[i]))
         generational_average_fitness.append(
             (total_fitness / len(ga.generation_dict[i])) - 1)
 
     # Vizualise average fitness per generation
     ga.visualize_generations(
-        signum=-1 if fitness_func == "dataset" else 1,
+        sine=False if fitness_func == "dataset" else True,
         title="SGA, average of best " + str(parameters.best_n_individuals) +
         " individuals per generation")
     ga2.visualize_generations(
-        signum=-1 if fitness_func == "dataset" else 1,
+        sine=False if fitness_func == "dataset" else True,
         title="Crowding, average of best " +
         str(parameters.best_n_individuals) + " individuals per generation")
