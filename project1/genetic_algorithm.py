@@ -9,15 +9,22 @@ import numpy as np
 class SimpleGenetic():
 
     def __init__(self, parameters, use_crowding=False):
-        # Define parameters
+        # Number of parents selected
         self.parent_cutoff = parameters.parent_selection_cutoff
+        # Minimum number of population replaced with age-function
         self.minimum_age_replacement = parameters.minimum_age_replacement
+        # Maximum age of an individual with age-function
         self.survivor_age = parameters.survivor_age_cutoff
+        # Initial population size, goal to maintain the same size throughout
         self.pop_size = parameters.population_size
+        # Number of bits in genome
         self.dna_length = parameters.dna_length
-        self.mutation_chance = parameters.mutation_chance
-        self.crossover_chance = parameters.crossover_chance
-        self.interval = parameters.interval
+
+        self.mutation_rate = parameters.mutation_rate
+        self.crossover_rate = parameters.crossover_rate
+        # Interval for sine-function
+        self.interval = [0, 128]
+        # Number of individuals used to calculate average
         self.best_n_individuals: int = parameters.best_n_individuals
         self.survivor_func = (
             self.survivor_selection_age
@@ -91,9 +98,9 @@ class SimpleGenetic():
         }
         for i in range(len(offspring1)):
             mutation = random.random()
-            if mutation > 1 - self.mutation_chance:
+            if mutation > 1 - self.mutation_rate:
                 offspring1[i] = mutation_map[offspring1[i]]
-            if mutation < self.mutation_chance:
+            if mutation < self.mutation_rate:
                 offspring2[i] = mutation_map[offspring2[i]]
         child1, child2 = Individual(
             "".join(offspring1),
@@ -248,10 +255,11 @@ class SimpleGenetic():
         for n in range(self.generation):
             entropy = 0
             for i in range(self.dna_length):
-                p_i = len([x for x in self.generation_dict[n+1] if x.dna[i] == "1"]) / len(self.generation_dict[n+1])
+                p_i = len([x for x in self.generation_dict[n + 1]
+                           if x.dna[i] == "1"]) / len(self.generation_dict[n + 1])
                 if p_i != 0:
                     entropy -= p_i * math.log2(p_i)
-            entropy_dict[n+1] = entropy
+            entropy_dict[n + 1] = entropy
         return entropy_dict
 
     def run_generation(self):
@@ -267,7 +275,7 @@ class SimpleGenetic():
             for j in range(len(parents)):
                 if parents[i].children is None and parents[j].children is None:
                     crossover = random.random()
-                    if crossover < self.crossover_chance:
+                    if crossover < self.crossover_rate:
                         off1, off2 = self.crossover(parents[i], parents[j])
                         new_pop.append(off1)
                         new_pop.append(off2)

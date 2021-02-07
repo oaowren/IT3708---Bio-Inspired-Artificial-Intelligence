@@ -33,9 +33,11 @@ if __name__ == "__main__":
             setattr(parameters, attr, value)
 
     fitness_func = parameters.fitness_function
-    # Initialize genetic algorithm without crowding
+
     print("Fitness no feature selection: ",
           fitness.get_fitness_no_feat_select())
+          
+    # Initialize genetic algorithm without crowding
     ga = SimpleGenetic(parameters)
     exit_threshold = 0.124 if fitness_func == 'dataset' else parameters.exit_threshold
     while ((ga.best_individuals_average < exit_threshold and ga.generation < parameters.max_generations and not fitness_func == 'dataset')
