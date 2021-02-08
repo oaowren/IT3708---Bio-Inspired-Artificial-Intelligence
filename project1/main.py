@@ -11,6 +11,7 @@ class Parameters:
     pass
 
 
+# Plotting to visualize entropy between generations
 def plot_entropy(entropy_dict1, entropy_dict2):
     plt.title("Entropy per generation")
     plt.plot(
@@ -34,7 +35,7 @@ if __name__ == "__main__":
 
     fitness_func = parameters.fitness_function
 
-    print("Fitness no feature selection: ",
+    print("Fitness value with no feature selection applied: ",
           fitness.get_fitness_no_feat_select())
 
     # Initialize genetic algorithm without crowding
@@ -44,8 +45,6 @@ if __name__ == "__main__":
             or (-ga.best_individuals_average > exit_threshold)):
         ga.run_generation()
 
-    #parameters.parent_selection_cutoff = 50
-
     # Initialize genetic algorithm with crowding
     ga2 = SimpleGenetic(parameters, use_crowding=True)
     exit_threshold = 0.124 if fitness_func == 'dataset' else parameters.exit_threshold
@@ -53,9 +52,7 @@ if __name__ == "__main__":
             or (-ga2.best_individuals_average > exit_threshold)):
         ga2.run_generation()
 
-    plot_entropy(ga.get_entropy(), ga2.get_entropy())
-
-    # Plot the generations
+    # Begin: visualize all generations
     ga.visualize_three_generations(
         sine=(fitness_func != "dataset"),
         title="Simple Genetic Algorithm")
@@ -63,13 +60,7 @@ if __name__ == "__main__":
         sine=(fitness_func != "dataset"),
         title="Crowding approach")
 
-    # Plot the average fitness level of the population for each generation
-    generational_average_fitness = []
-    for i in range(1, ga.generation + 1):
-        total_fitness = sum(map(lambda individual: individual.fitness if fitness_func ==
-                                'dataset' else individual.fitness - 1, ga.generation_dict[i]))
-        generational_average_fitness.append(
-            (total_fitness / len(ga.generation_dict[i])) - 1)
+    plot_entropy(ga.get_entropy(), ga2.get_entropy())
 
     # Vizualise average fitness per generation
     ga.visualize_generations(

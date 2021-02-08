@@ -4,6 +4,7 @@ from typing import Tuple
 from individual import Individual
 import matplotlib.pyplot as plt
 import numpy as np
+import fitness
 
 
 class SimpleGenetic():
@@ -216,13 +217,11 @@ class SimpleGenetic():
             # Generate new population based on pairs of parents
             for i in range(len(parents)):
                 for j in range(len(parents)):
-                    # Beacuse of implementation of crowding, both parents must not have children
-                    if parents[i].children is None and parents[j].children is None:
-                        crossover = random.random()
-                        if crossover < self.crossover_rate:
-                            off1, off2 = self.crossover(parents[i], parents[j])
-                            new_pop.append(off1)
-                            new_pop.append(off2)
+                    crossover = random.random()
+                    if crossover < self.crossover_rate:
+                        off1, off2 = self.crossover(parents[i], parents[j])
+                        new_pop.append(off1)
+                        new_pop.append(off2)
             if self.survivor_func == self.survivor_selection_elitism and not self.use_crowding:
                 # Select survivors based on elitism
                 self.population = self.survivor_func(
@@ -273,6 +272,8 @@ class SimpleGenetic():
         plt.plot(
             [i for i in range(1, len(generational_average) + 1)],
             generational_average, marker='o')
+        if not sine:
+            plt.axhline(y=fitness.get_fitness_no_feat_select(), color='r', linestyle='-')
         plt.xlabel('Generation')
         plt.ylabel('Average best n individuals fitness')
         plt.show()
