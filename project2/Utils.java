@@ -23,5 +23,17 @@ public class Utils {
         int totalNumOfCustomers = Integer.parseInt(dataSet.get(0).get(1));
         int numberOfDepots = Integer.parseInt(dataSet.get(0).get(2));
     }
+
+    public static void writeResults(List<Depot> depots, String filename){
+        try{
+            for (Depot d:depots){
+                for (Vehicle v:d.getAllVehicles()){
+                    Files.writeString(Paths.get(filename), v.getCustomerSequence()+"\n");
+                }
+            }
+        } catch (IOException error) {
+            System.out.println(error.toString());
+        }
+    }
 }
 

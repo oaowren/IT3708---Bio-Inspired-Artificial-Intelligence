@@ -1,14 +1,19 @@
+import java.util.List;
+import java.util.ArrayList;
+
 class Main{
     public static void main(String[] args){
-        Depot d = new Depot(1, 80, 4);
+        Depot d = new Depot(1, 60, 4, 80, 40, 40);
+        List<Depot> depots = new ArrayList<Depot>();
         Vehicle v = new Vehicle(1, 80);
+        Vehicle v1 = new Vehicle(2, 90);
         d.addVehicle(v);
-        Vehicle v1 = d.getVehicleById(2);
-        System.out.println(v1);
+        d.addVehicle(v1);
+        depots.add(d);
         Customer c = new Customer(1, 40, 40, 0, 17);
         Customer c2 = new Customer(2, 50, 50, 0, 17);
-        v1.visitCustomer(c.id);
+        v.visitCustomer(c.id);
         v1.visitCustomer(c2.id);
-        System.out.println(v1.getCustomerSequence());
+        Utils.writeResults(depots, "testorama.txt");
     }
 }
