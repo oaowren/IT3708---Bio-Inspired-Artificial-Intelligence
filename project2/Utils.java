@@ -22,6 +22,10 @@ public class Utils {
         int maxNumOfVehicles = Integer.parseInt(dataSet.get(0).get(0));
         int totalNumOfCustomers = Integer.parseInt(dataSet.get(0).get(1));
         int numberOfDepots = Integer.parseInt(dataSet.get(0).get(2));
+
+        for (int i = 1; i <= numberOfDepots; i++) {
+            
+        }
     }
 }
 
