@@ -5,7 +5,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Utils {
 
@@ -45,12 +47,11 @@ public class Utils {
     }
 
     public static void writeResults(List<Depot> depots, String filename){
+        List<String> lines = depots.stream()
+                                    .flatMap(d -> d.getVehicleRoutes().stream())
+                                    .collect(Collectors.toList());
         try{
-            for (Depot d:depots){
-                for (Vehicle v:d.getAllVehicles()){
-                    Files.writeString(Paths.get(filename), v.getCustomerSequence()+"\n");
-                }
-            }
+            Files.write(Paths.get(filename), lines);
         } catch (IOException error) {
             System.out.println(error.toString());
         }

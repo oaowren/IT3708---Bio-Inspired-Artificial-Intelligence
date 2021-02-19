@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Depot {
 
@@ -32,7 +33,15 @@ public class Depot {
         if (this.vehicles.size() >= this.maxVehicles){
             throw new IllegalStateException("Too many vehicles");
         }
+        v.setDepot(this);
         this.vehicles.add(v);
+    }
+
+    public List<String> getVehicleRoutes(){
+        return this.getAllVehicles()
+                    .stream()
+                    .map(v -> v.getCustomerSequence())
+                    .collect(Collectors.toList());
     }
 
 

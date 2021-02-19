@@ -10,10 +10,11 @@ class Main{
         d.addVehicle(v);
         d.addVehicle(v1);
         depots.add(d);
-        Customer c = new Customer(1, 40, 40, 0, 17);
+        Customer c = new Customer(1, 30, 30, 0, 17);
         Customer c2 = new Customer(2, 50, 50, 0, 17);
-        v.visitCustomer(c.id);
-        v1.visitCustomer(c2.id);
+        v.visitCustomer(c);
+        v.visitCustomer(c2);
+        v1.visitCustomer(c2);
         Utils.writeResults(depots, "testorama.txt");
     }
 }
