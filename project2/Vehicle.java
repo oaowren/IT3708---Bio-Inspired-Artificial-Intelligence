@@ -1,5 +1,3 @@
-import org.graalvm.compiler.debug.CSVUtil.Escape;
-
 public class Vehicle {
     
     public final int id, maxLoad;

@@ -35,5 +35,14 @@ public class Depot {
         this.vehicles.add(v);
     }
 
+    @Override
+    public String toString() {
+        return String.format(
+            """
+            Depot ID: %d
+            Depot x: %d
+            Depot y: %d
+            """, id, x, y);
+    }
 
 }
