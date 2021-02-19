@@ -3,12 +3,13 @@ import java.util.List;
 
 public class Depot {
 
-    public final int id, maxLoad, maxVehicles;
+    public final int id, maxLoad, maxVehicles, maxDuration;
     private List<Vehicle> vehicles = new ArrayList<Vehicle>();
     
-    public Depot(int id, int maxLoad, int maxVehicles){
+    public Depot(int id, int maxVehicles, int maxDuration, int maxLoad){
         this.id = id;
         this.maxLoad = maxLoad;
+        this.maxDuration = maxDuration;
         this.maxVehicles = maxVehicles;
     }
 
