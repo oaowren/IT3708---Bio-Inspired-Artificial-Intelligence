@@ -14,5 +14,9 @@ public class Depot {
         return this.id;
     }
 
+    public Vehicle getVehicleById(int id){
+        
+    }
+
 
 }
