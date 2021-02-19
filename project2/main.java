@@ -14,6 +14,6 @@ class Main{
         Customer c2 = new Customer(2, 50, 50, 0, 17);
         v.visitCustomer(c.id);
         v1.visitCustomer(c2.id);
-        Utils.writeResults(depots, "testorama.txt");
+        DataSetIo.writeResults(depots, "testorama.txt");
     }
 }
