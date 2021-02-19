@@ -34,7 +34,7 @@ public class Utils {
         for (int i = 1; i <= numberOfDepots; i++) {
             int maxRouteDuration = dataSet.get(i).get(0);
             int maxVehicleLoad = dataSet.get(i).get(1);
-            depots.add(new Depot(i, maxNumOfVehicles, maximumRouteDuration, maxVehicleLoad));
+            depots.add(new Depot(i, maxNumOfVehicles, maxRouteDuration, maxVehicleLoad));
         }
     }
 }
