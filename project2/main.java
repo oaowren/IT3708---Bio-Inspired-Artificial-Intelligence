@@ -15,6 +15,6 @@ class Main{
         v.visitCustomer(c);
         v.visitCustomer(c2);
         v1.visitCustomer(c2);
-        Utils.writeResults(depots, "testorama.txt");
+        DataSetIo.writeResults(depots, "testorama.txt");
     }
 }

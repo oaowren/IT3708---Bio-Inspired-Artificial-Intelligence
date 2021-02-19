@@ -8,4 +8,15 @@ public final class Customer {
         this.serviceDuration = serviceDuration;
         this.demand = demand;
     }
+
+    @Override
+    public String toString() {
+        return String.format(
+            """
+            Customer ID: %d
+            Depot x: %d
+            Depot y: %d
+            """, id, x, y);
+    }
+
 }
