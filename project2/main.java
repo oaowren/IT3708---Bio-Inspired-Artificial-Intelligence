@@ -1,21 +1,17 @@
-import java.util.List;
-import java.util.ArrayList;
+import java.util.HashMap;
+import DataClasses.Customer;
 
 class Main{
     public static void main(String[] args){
-        Depot d = new Depot(1, 60, 4, 80, 40, 40);
-        List<Depot> depots = new ArrayList<Depot>();
-        Vehicle v = new Vehicle(1, 80);
-        Vehicle v1 = new Vehicle(2, 90);
-        d.addVehicle(v);
-        d.addVehicle(v1);
-        depots.add(d);
-        Customer c = new Customer(1, 30, 30, 0, 17);
-        Customer c2 = new Customer(2, 50, 50, 0, 17);
-        v.visitCustomer(c);
-        v.visitCustomer(c2);
-        v1.visitCustomer(c2);
-        DataSetIo.writeResults(depots, "testorama.txt");
+        HashMap<Integer, Customer> customers = new HashMap<>();
+        Customer c1 = new Customer(10,10,50);
+        Customer c2 = new Customer(20,20,60);
+        customers.put(1, c1);
+        customers.put(2, c2);
+        Fitness f = new Fitness(customers);
+        Depot d = new Depot(1, 60, 4, 80, 0, 0);
+        double x = f.getVehicleFitness("1 2", d);
+        System.out.println(x);
     }
 
     /*TODO:
