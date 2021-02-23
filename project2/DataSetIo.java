@@ -3,19 +3,23 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import DataClasses.Customer;
 
 public class DataSetIo {
     
-    List<Depot> depots;
-    List<Customer> customers;
+    private List<List<Integer>> dataSet;
+    private int maxNumOfVehicles;
+    private int numOfCustomers;
+    private int numberOfDepots;
+    private int depotIndexStartEnd;
 
-    public static List<List<Integer>> readDataFile(String filename) {
+    public void readDataFile(String filename) {
         try {
             List<String> lines = Files.readAllLines(Paths.get(filename));
-            return lines.stream()
+            this.dataSet = lines.stream()
                     .map(line -> 
                         Arrays.asList(line.trim().split("\s+"))
                               .stream()
@@ -23,30 +27,28 @@ public class DataSetIo {
                               .collect(Collectors.toList())
                     )
                     .collect(Collectors.toList());
+            this.maxNumOfVehicles = dataSet.get(0).get(0);
+            this.numOfCustomers = dataSet.get(0).get(1);
+            this.numberOfDepots = dataSet.get(0).get(2);
+            this.depotIndexStartEnd = dataSet.size() - numberOfDepots;
         } catch (IOException error) {
             System.out.println(error.toString());
-            return null;
         }
     }
 
-    public static void writeResults(List<Depot> depots, String filename){
-        List<String> lines = depots.stream()
-                                    .flatMap(d -> d.getVehicleRoutes().stream())
-                                    .collect(Collectors.toList());
-        try{
+    public static void writeResults(List<Depot> depots, String filename) {
+        List<String> lines = depots.stream().flatMap(d -> d.getVehicleRoutes().stream()).collect(Collectors.toList());
+        try {
             Files.write(Paths.get(filename), lines);
         } catch (IOException error) {
             System.out.println(error.toString());
         }
     }
     
-    public void processDataSet(List<List<Integer>> dataSet) {
-        int maxNumOfVehicles = dataSet.get(0).get(0);
-        int numOfCustomers = dataSet.get(0).get(1);
-        int numberOfDepots = dataSet.get(0).get(2);
-        int depotIndexStartEnd = dataSet.size() - numberOfDepots;
 
-        depots = new ArrayList<>();
+    
+    public List<Depot> getDepots() {
+        List<Depot> depots = new ArrayList<>();
         for (int i = 1; i <= numberOfDepots; i++) {
             int endIndex = depotIndexStartEnd + i - 1;
             int maxRouteDuration = dataSet.get(i).get(0);
@@ -54,19 +56,20 @@ public class DataSetIo {
             depots.add(new Depot(i, maxNumOfVehicles, maxRouteDuration, maxVehicleLoad, dataSet.get(endIndex).get(1),
                     dataSet.get(endIndex).get(2)));
         }
+        return depots;
+    }
 
-        customers = new ArrayList<>();
-        for (List<Integer> customerRow : dataSet.subList(numberOfDepots + 1, depotIndexStartEnd)) {
-            customers.add(new Customer(customerRow.get(0), customerRow.get(1), customerRow.get(2), customerRow.get(3),
-                    customerRow.get(4)));
-        }
+    public HashMap<Integer, Customer> getCustomers() {
+        return (HashMap<Integer, Customer>) dataSet.subList(numberOfDepots + 1, depotIndexStartEnd).stream()
+                .collect(Collectors.toMap(customerRow -> customerRow.get(0),
+                        customerRow -> new Customer(customerRow.get(1), customerRow.get(2), customerRow.get(3))));
     }
 
     public static void main(String[] args) {
         DataSetIo dataSet = new DataSetIo();
-        dataSet.processDataSet(DataSetIo.readDataFile("project2/Data Files/p01"));
-        System.out.println(dataSet.depots);
-        System.out.println(dataSet.customers);
+        dataSet.readDataFile("project2/Data Files/p01");
+        System.out.println(dataSet.getDepots());
+        System.out.println(dataSet.getCustomers());
     }
 }
 
