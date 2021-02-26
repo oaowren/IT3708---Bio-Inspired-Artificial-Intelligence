@@ -33,7 +33,8 @@ public class Population {
         Individual newIndividual = null;
         for (int i = 0; i < Parameters.populationSize; i++) {
             newIndividual = new Individual(depots, this.maxNumOfVehicles, fitnessfunc);
-            //this.individuals.add()
+            newIndividual.createRandomIndividual(customers);
+            this.individuals.add(newIndividual);
         }
     }
 
