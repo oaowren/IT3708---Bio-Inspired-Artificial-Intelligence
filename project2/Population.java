@@ -2,13 +2,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
-import DataClasses.Customer;
+import DataClasses.*;
 
 public class Population {
     
-    private List<Individual> individuals = new ArrayList<>();
+	private List<Individual> individuals = new ArrayList<>();
     private int maxNumOfVehicles;
     private Fitness fitnessfunc;
 
@@ -80,6 +81,25 @@ public class Population {
             }
         }
         return parents; 
+    }
+
+    public void setNewPopulation(List<Individual> population){
+        this.individuals = population;
+    }
+
+    public List<Individual> crossover(List<Individual> parents){
+        List<Individual> new_population = new ArrayList<>();
+        Random rand = new Random();
+        while (new_population.size() < Parameters.populationSize){
+            Individual parent1 = parents.get(rand.nextInt(parents.size()));
+            Individual parent2 = parents.get(rand.nextInt(parents.size()));
+            Tuple<Individual, Individual> offspring = parent1.crossover(parent2);
+            if (!Objects.isNull(offspring)){
+                new_population.add(offspring.x);
+                new_population.add(offspring.y);
+            }
+        }
+        return new_population;
     }
 
 }

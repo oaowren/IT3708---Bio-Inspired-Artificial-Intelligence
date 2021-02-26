@@ -1,9 +1,11 @@
 import java.util.HashMap;
 import java.util.List;
+import java.io.Serializable;
 import DataClasses.*;
 
-public class Fitness {
+public class Fitness implements Serializable{
 
+    private static final long serialVersionUID = -7579207148043499139L;
     // Memoize distance of route from/to a given depot
     private HashMap<Tuple<String, Depot>, Double> routeMemo = new HashMap<>();
     // Memoize euclidian distance between two points
@@ -43,10 +45,14 @@ public class Fitness {
                 numberOfActiveVehicles += v.isActive()?1:0;
             }
         }
-        double fitness = depots.stream()
-                               .map(depot -> this.getDepotFitness(depot))
-                               .reduce(0.0, (subtotal, depot) -> subtotal + depot);
+        double fitness = getIndividualRouteFitness(individual);
         return Parameters.alpha * numberOfActiveVehicles + Parameters.beta * fitness;
+    }
+
+    public Double getIndividualRouteFitness(Individual individual){
+        return individual.getDepots().stream()
+                                     .map(depot -> this.getDepotFitness(depot))
+                                     .reduce(0.0, (subtotal, depot) -> subtotal + depot);
     }
 
     public Double getDepotFitness(Depot depot){

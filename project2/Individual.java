@@ -1,11 +1,20 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.Random;
 import DataClasses.Customer;
+import DataClasses.Tuple;
 
-public class Individual {
-    private List<Depot> depots;    
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+public class Individual implements Serializable {
+    private static final long serialVersionUID = 971312240056082661L;
+    private List<Depot> depots;
     private int maxVehicles;
     private double fitness;
     private Fitness fitnessfunc; 
@@ -25,14 +34,28 @@ public class Individual {
     }
 
     public List<Depot> createDepots(List<Depot> depots){
+        List<Depot> depotResults = new ArrayList<>();
         for (Depot d: depots){
-            int vcount = d.getAllVehicles().size();
+            Depot depotCopy = (Depot) deepCopy(d);
+            int vcount = depotCopy.getAllVehicles().size();
             for (int i = 0;i < this.maxVehicles - vcount ;i++){
                 Vehicle v = new Vehicle(i, d.maxLoad);
-                d.addVehicle(v);
+                depotCopy.addVehicle(v);
+            }
+            depotResults.add(depotCopy);
+        }
+        return depotResults;
+    }
+
+    public int numberOfCustomers(){
+        /* Used for debugging :):) */
+        int cust = 0;
+        for (Depot d: this.depots){
+            for (Vehicle v: d.getAllVehicles()){
+                cust += v.getCustomers().size();
             }
         }
-        return depots;
+        return cust;
     }
 
     public void createRandomIndividual(HashMap<Integer, Customer> customers){
@@ -52,5 +75,64 @@ public class Individual {
         }
         this.fitness = this.fitnessfunc.getIndividualFitness(this);
     }
+
+    public void removeCustomerById(int id){
+        for (Depot d: this.depots){
+            boolean removed = d.removeCustomerById(id);
+            if (removed){
+                return;
+            }
+        }
+    }
+
+    public Tuple<Individual, Individual> crossover(Individual i){
+        Individual offspring1 = (Individual) deepCopy(this);
+        Individual offspring2 = (Individual) deepCopy(i);
+        Random rand = new Random();
+        // Select a random depot for each offspring
+        Depot depot1 = offspring1.getDepots().get(rand.nextInt(offspring1.getDepots().size()));
+        Depot depot2 = offspring2.getDepots().get(rand.nextInt(offspring2.getDepots().size()));
+        // Select a random route for each depot
+        Vehicle vehicle1 = depot1.getAllVehicles().get(rand.nextInt(depot1.getAllVehicles().size()));
+        Vehicle vehicle2 = depot2.getAllVehicles().get(rand.nextInt(depot2.getAllVehicles().size()));
+        // Remove customers from opposite route, insert new at most feasible location
+        List<Customer> c1 = vehicle1.getCustomers();
+        List<Customer> c2 = vehicle2.getCustomers();
+        for (Customer c: c1){
+            offspring2.removeCustomerById(c.id);
+        }
+        for (Customer c: c2){
+            offspring1.removeCustomerById(c.id);
+        }
+        for (Customer c: c1){
+            boolean inserted = depot2.insertAtMostFeasible(c, this.fitnessfunc);
+            if (!inserted){
+                return null;
+            }
+        }
+        for (Customer c: c2){
+            boolean inserted = depot1.insertAtMostFeasible(c, this.fitnessfunc);
+            if (!inserted){
+                return null;
+            }
+        }
+
+        return new Tuple<>(offspring1, offspring2);
+    }
+
+    private static Object deepCopy(Object object) {
+        try {
+          ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+          ObjectOutputStream outputStrm = new ObjectOutputStream(outputStream);
+          outputStrm.writeObject(object);
+          ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+          ObjectInputStream objInputStream = new ObjectInputStream(inputStream);
+          return objInputStream.readObject();
+        }
+        catch (Exception e) {
+          e.printStackTrace();
+          return null;
+        }
+      }
 
 }

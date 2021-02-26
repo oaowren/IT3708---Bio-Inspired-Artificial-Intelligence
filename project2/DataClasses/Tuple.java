@@ -1,9 +1,12 @@
 package DataClasses;
 
 import java.util.Objects;
+import java.io.Serializable;
 
-public class Tuple<X, Y> {
-    public final X x; 
+public class Tuple<X, Y> implements Serializable {
+
+    private static final long serialVersionUID = -6488429050034814203L;
+    public final X x;
     public final Y y; 
     public Tuple(X x, Y y) { 
       this.x = x; 

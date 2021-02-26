@@ -3,8 +3,15 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class Depot {
+import DataClasses.Customer;
+import DataClasses.Tuple;
 
+import java.io.Serializable;
+import java.lang.management.BufferPoolMXBean;
+
+public class Depot implements Serializable{
+
+    private static final long serialVersionUID = 1651490905845421268L;
     public final int id, maxLoad, maxVehicles, maxDuration, x, y;
     private List<Vehicle> vehicles = new ArrayList<Vehicle>();
     
@@ -24,6 +31,39 @@ public class Depot {
             }
         }
         return null;
+    }
+
+    public boolean removeCustomerById(int id){
+        for (Vehicle v: this.vehicles){
+            boolean removed = v.removeCustomerById(id);
+            if (removed){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean insertAtMostFeasible(Customer customer, Fitness f){
+        Vehicle vehicle = null;
+        int maxFeasible = -1;
+        double minFitness = Integer.MAX_VALUE;
+        for (int i=0; i<this.vehicles.size(); i++){
+            try{
+                Tuple<Integer, Double> best = this.vehicles.get(i).feasibleInsertions(customer, f).get(0);
+                if (best.y < minFitness){
+                    vehicle = this.vehicles.get(i);
+                    minFitness = best.y;
+                    maxFeasible = best.x;
+                }
+            } catch(Exception e){
+                ;
+            }
+        }
+        if (maxFeasible == -1){
+            return false;
+        }
+        vehicle.insertCustomer(customer, maxFeasible);
+        return true;
     }
 
     public List<Vehicle> getAllVehicles(){
