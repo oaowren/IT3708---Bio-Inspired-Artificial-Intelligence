@@ -14,7 +14,7 @@ public class Vehicle {
     }
 
     public void visitCustomer(int customer, int demand){
-        if (this.load + demand > this.maxLoad){
+        if (this.load + demand > this.maxLoad) {
             throw new IllegalStateException("Too much load for current route");
         }
         this.load += demand;
