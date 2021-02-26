@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.Objects;
 import java.util.ArrayList;
 
 public class Vehicle {
@@ -7,7 +8,7 @@ public class Vehicle {
     private int load = 0;
     private List<Integer> customers = new ArrayList<Integer>();
 
-    public Vehicle(int id, int maxLoad){
+    public Vehicle(int id, int maxLoad) {
         this.id = id;
         this.maxLoad = maxLoad;
     }
@@ -28,6 +29,21 @@ public class Vehicle {
 
     public List<Integer> getCustomers(){
         return this.customers;
+    }
+
+    public boolean isActive() {
+        return this.customers.size() > 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Vehicle)) {
+            return false;
+        }
+        Vehicle vehicle = (Vehicle) o;
+        return id == vehicle.id && maxLoad == vehicle.maxLoad && load == vehicle.load && Objects.equals(customers, vehicle.customers);
     }
 
 }

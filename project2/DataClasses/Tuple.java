@@ -1,3 +1,5 @@
+package DataClasses;
+
 import java.util.Objects;
 
 public class Tuple<X, Y> {
@@ -21,11 +23,6 @@ public class Tuple<X, Y> {
         return Objects.equals(c.x, this.x) && Objects.equals(c.y, this.y);
     } 
 
-    /**
-     * Compute a hash code using the hash codes of the underlying objects
-     *
-     * @return a hashcode of the Pair
-     */
     @Override
     public int hashCode() {
         return (x == null ? 0 : x.hashCode()) ^ (y == null ? 0 : y.hashCode());
