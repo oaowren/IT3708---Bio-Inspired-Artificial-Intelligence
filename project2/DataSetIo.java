@@ -60,7 +60,7 @@ public class DataSetIo {
     public HashMap<Integer, Customer> getCustomers() {
         return (HashMap<Integer, Customer>) dataSet.subList(numberOfDepots + 1, depotIndexStartEnd).stream()
                 .collect(Collectors.toMap(customerRow -> customerRow.get(0),
-                        customerRow -> new Customer(customerRow.get(1), customerRow.get(2), customerRow.get(3))));
+                        customerRow -> new Customer(customerRow.get(0), customerRow.get(1), customerRow.get(2), customerRow.get(3))));
     }
 
 

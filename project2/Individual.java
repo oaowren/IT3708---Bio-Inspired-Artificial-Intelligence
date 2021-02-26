@@ -43,7 +43,7 @@ public class Individual {
             while (!success){
                 try{
                     Depot depot = this.depots.get(rand.nextInt(this.depots.size()));
-                    depot.getVehicleById(rand.nextInt(depot.getAllVehicles().size())).visitCustomer(c, customers.get(c).demand);
+                    depot.getVehicleById(rand.nextInt(depot.getAllVehicles().size())).visitCustomer(customers.get(c));
                     success = true;
                 } catch (IllegalStateException e) {
                     success = false;

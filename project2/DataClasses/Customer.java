@@ -3,11 +3,13 @@ package DataClasses;
 import java.util.Objects;
 
 public class Customer {
+    public final int id;
     public final int x;
     public final int y;
     public final int demand;
     
-    public Customer(int x, int y, int demand) {
+    public Customer(int id, int x, int y, int demand) {
+        this.id = id;
         this.x = x;
         this.y = y;
         this.demand = demand;

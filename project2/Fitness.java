@@ -24,7 +24,7 @@ public class Fitness {
             return 0.0;
         }
         Double distance = 0.0;
-        List<Integer> vehicleCustomers = vehicle.getCustomers();
+        List<Integer> vehicleCustomers = vehicle.getCustomersId();
         int final_ind = vehicleCustomers.size()-1;
         distance += this.getDistance(depot.x, this.customers.get(vehicleCustomers.get(0)).x, depot.y, this.customers.get(vehicleCustomers.get(0)).y);
         for (int i = 0;i<final_ind;i++){
