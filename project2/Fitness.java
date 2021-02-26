@@ -15,19 +15,22 @@ public class Fitness {
     }
 
     // Memoized in routeMemo
-    public Double getVehicleFitness(Vehicle route, Depot depot){
-        Tuple<String, Depot> pair = new Tuple<>(route.getCustomerSequence(), depot);
+    public Double getVehicleFitness(Vehicle vehicle, Depot depot){
+        Tuple<String, Depot> pair = new Tuple<>(vehicle.getCustomerSequence(), depot);
         if (this.routeMemo.containsKey(pair)){
             return this.routeMemo.get(pair);
         }
-        Double distance = 0.0;
-        List<Integer> routeCustomers = route.getCustomers();
-        int final_ind = routeCustomers.size()-1;
-        distance += this.getDistance(depot.x, this.customers.get(routeCustomers.get(0)).x, depot.y, this.customers.get(routeCustomers.get(0)).y);
-        for (int i = 0;i<final_ind;i++){
-            distance += this.getDistance(this.customers.get(routeCustomers.get(i)).x, this.customers.get(routeCustomers.get(i+1)).x, this.customers.get(routeCustomers.get(i)).y, this.customers.get(routeCustomers.get(i+1)).y);
+        if (!vehicle.isActive()){
+            return 0.0;
         }
-        distance += this.getDistance(depot.x, this.customers.get(routeCustomers.get(final_ind)).x, depot.y, this.customers.get(routeCustomers.get(0)).y);
+        Double distance = 0.0;
+        List<Integer> vehicleCustomers = vehicle.getCustomers();
+        int final_ind = vehicleCustomers.size()-1;
+        distance += this.getDistance(depot.x, this.customers.get(vehicleCustomers.get(0)).x, depot.y, this.customers.get(vehicleCustomers.get(0)).y);
+        for (int i = 0;i<final_ind;i++){
+            distance += this.getDistance(this.customers.get(vehicleCustomers.get(i)).x, this.customers.get(vehicleCustomers.get(i+1)).x, this.customers.get(vehicleCustomers.get(i)).y, this.customers.get(vehicleCustomers.get(i+1)).y);
+        }
+        distance += this.getDistance(depot.x, this.customers.get(vehicleCustomers.get(final_ind)).x, depot.y, this.customers.get(vehicleCustomers.get(0)).y);
         this.routeMemo.put(pair, distance);
         return distance;
     }

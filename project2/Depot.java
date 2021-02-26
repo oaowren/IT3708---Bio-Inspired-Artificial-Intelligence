@@ -46,12 +46,8 @@ public class Depot {
 
     @Override
     public String toString() {
-        return String.format(
-            """
-            Depot ID: %d
-            Depot x: %d
-            Depot y: %d
-            """, id, x, y);
+        String output = "Depot ID" + id + "\n Depot x:" + x + "\n Depot y:" + y;
+        return output;
     }
 
 }

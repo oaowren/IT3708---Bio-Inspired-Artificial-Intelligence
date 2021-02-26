@@ -11,9 +11,9 @@ public class Individual {
     private Fitness fitnessfunc; 
 
     public Individual(List<Depot> depots, int maxVehicles, Fitness fitnessfunc) {
-        this.depots = depots;
         this.maxVehicles = maxVehicles;
         this.fitnessfunc = fitnessfunc;
+        this.depots = this.createDepots(depots);
     }
     
     public List<Depot> getDepots() {
@@ -24,14 +24,15 @@ public class Individual {
         return this.fitness;
     }
 
-    public void createDepots(List<Depot> depots){
+    public List<Depot> createDepots(List<Depot> depots){
         for (Depot d: depots){
-            for (int i = 0;i<this.maxVehicles;i++){
+            int vcount = d.getAllVehicles().size();
+            for (int i = 0;i < this.maxVehicles - vcount ;i++){
                 Vehicle v = new Vehicle(i, d.maxLoad);
                 d.addVehicle(v);
             }
         }
-        this.depots = depots;
+        return depots;
     }
 
     public void createRandomIndividual(HashMap<Integer, Customer> customers){

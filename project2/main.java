@@ -5,19 +5,10 @@ class Main{
     public static void main(String[] args){
         DataSetIo dataSet = new DataSetIo();
         dataSet.readDataFile("project2/Data Files/p01");
-        Population.setCustomers(dataSet.getCustomers());
-        Population.setDepots(dataSet.getDepots());
         Fitness f = new Fitness(dataSet.getCustomers());
-        Population population = new Population(dataSet.getMaxNumOfVehicles());
-
-        //Customer c1 = new Customer(10,10,50);
-        //Customer c2 = new Customer(20,20,60);
-        //customers.put(1, c1);
-        //customers.put(2, c2);
-        Depot d = new Depot(1, 60, 4, 80, 0, 0);
-        Vehicle v = new Vehicle(1, 80);
-        double x = f.getVehicleFitness(v, d);
-        System.out.println(x);
+        Individual i = new Individual(dataSet.getDepots(), dataSet.getMaxNumOfVehicles(), f);
+        i.createRandomIndividual(dataSet.getCustomers());
+        System.out.println(i.getFitness());
     }
 
     /*TODO:
