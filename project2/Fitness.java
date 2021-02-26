@@ -36,10 +36,17 @@ public class Fitness {
     }
 
     public Double getIndividualFitness(Individual individual) {
-        return individual.getDepots()
-                         .stream()
-                         .map(depot -> this.getDepotFitness(depot))
-                         .reduce(0.0, (subtotal, depot) -> subtotal + depot);
+        int numberOfActiveVehicles = 0;
+        List<Depot> depots = individual.getDepots();
+        for (Depot d: depots){
+            for (Vehicle v: d.getAllVehicles()){
+                numberOfActiveVehicles += v.isActive()?1:0;
+            }
+        }
+        double fitness = depots.stream()
+                               .map(depot -> this.getDepotFitness(depot))
+                               .reduce(0.0, (subtotal, depot) -> subtotal + depot);
+        return Parameters.alpha * numberOfActiveVehicles + Parameters.beta * fitness;
     }
 
     public Double getDepotFitness(Depot depot){
