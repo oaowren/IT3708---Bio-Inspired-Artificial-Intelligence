@@ -45,8 +45,6 @@ public class DataSetIo {
         }
     }
     
-
-    
     public List<Depot> getDepots() {
         List<Depot> depots = new ArrayList<>();
         for (int i = 1; i <= numberOfDepots; i++) {
@@ -65,11 +63,18 @@ public class DataSetIo {
                         customerRow -> new Customer(customerRow.get(1), customerRow.get(2), customerRow.get(3))));
     }
 
-    public static void main(String[] args) {
-        DataSetIo dataSet = new DataSetIo();
-        dataSet.readDataFile("project2/Data Files/p01");
-        System.out.println(dataSet.getDepots());
-        System.out.println(dataSet.getCustomers());
+
+    public int getMaxNumOfVehicles() {
+        return this.maxNumOfVehicles;
     }
+
+    public int getNumOfCustomers() {
+        return this.numOfCustomers;
+    }
+
+    public int getNumberOfDepots() {
+        return this.numberOfDepots;
+    }
+
 }
 

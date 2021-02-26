@@ -7,6 +7,7 @@ public class Vehicle {
     public final int id, maxLoad;
     private int load = 0;
     private List<Integer> customers = new ArrayList<Integer>();
+    private Depot depot;
 
     public Vehicle(int id, int maxLoad) {
         this.id = id;
@@ -19,6 +20,10 @@ public class Vehicle {
         }
         this.load += demand;
         this.customers.add(customer);
+    }
+
+    public void setDepot(Depot depot){
+        this.depot = depot;
     }
 
     public String getCustomerSequence(){

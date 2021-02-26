@@ -14,14 +14,6 @@ public class Fitness {
         this.customers = customers;
     }
 
-    public Double getDepotFitness(Depot depot){
-        Double distance = 0.0;
-        for (Vehicle v: depot.getAllVehicles()){
-            distance += getVehicleFitness(v, depot);
-        }
-        return distance;
-    }
-
     // Memoized in routeMemo
     public Double getVehicleFitness(Vehicle route, Depot depot){
         Tuple<String, Depot> pair = new Tuple<>(route.getCustomerSequence(), depot);
@@ -41,7 +33,18 @@ public class Fitness {
     }
 
     public Double getIndividualFitness(Individual individual) {
-        return individual.getDepots().stream().map(depot -> this.getDepotFitness(depot)).reduce(0.0, (subtotal, depot) -> subtotal + depot);
+        return individual.getDepots()
+                         .stream()
+                         .map(depot -> this.getDepotFitness(depot))
+                         .reduce(0.0, (subtotal, depot) -> subtotal + depot);
+    }
+
+    public Double getDepotFitness(Depot depot){
+        Double distance = 0.0;
+        for (Vehicle v: depot.getAllVehicles()){
+            distance += getVehicleFitness(v, depot);
+        }
+        return distance;
     }
 
     // Memoized in pairMemo
