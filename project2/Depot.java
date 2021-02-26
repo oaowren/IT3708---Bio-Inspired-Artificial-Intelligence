@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class Depot {
@@ -37,11 +38,34 @@ public class Depot {
         this.vehicles.add(v);
     }
 
-    public List<String> getVehicleRoutes(){
-        return this.getAllVehicles()
-                    .stream()
-                    .map(v -> v.getCustomerSequence())
-                    .collect(Collectors.toList());
+    public List<String> getVehicleRoutes() {
+        return this.getAllVehicles().stream().map(v -> v.getCustomerSequence()).collect(Collectors.toList());
+    }
+    
+    public void intraDepotMutation() {
+        Random rand = new Random();
+        int randInt = rand.nextInt(2);
+        if (randInt == 0) {
+            reversalMutation();
+        } else if (randInt == 1) {
+            singleCustomerRerouting();
+        } else {
+            swapping();
+        }
+    }
+
+    private void reversalMutation() {
+        Random rand = new Random();
+        List<String> vehicleRoutes = getVehicleRoutes();
+        int cutPoint1 = rand.nextInt(2);
+        int cutPoint2 = rand.nextInt(2);
+
+    }
+    private void singleCustomerRerouting() {
+
+    }
+    private void swapping() {
+        
     }
 
     @Override
