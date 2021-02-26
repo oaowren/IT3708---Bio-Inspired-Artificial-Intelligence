@@ -1,7 +1,5 @@
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 import DataClasses.*;
 
 public class Fitness {
@@ -16,20 +14,29 @@ public class Fitness {
         this.customers = customers;
     }
 
+    public Double getDepotFitness(Depot depot){
+        Double distance = 0.0;
+        for (Vehicle v: depot.getAllVehicles()){
+            distance += getVehicleFitness(v, depot);
+        }
+        return distance;
+    }
+
     // Memoized in routeMemo
-    public Double getVehicleFitness(String route, Depot depot){
-        Tuple<String, Depot> pair = new Tuple<>(route, depot);
+    public Double getVehicleFitness(Vehicle vehicle, Depot depot){
+        Tuple<String, Depot> pair = new Tuple<>(vehicle.getCustomerSequence(), depot);
         if (this.routeMemo.containsKey(pair)){
             return this.routeMemo.get(pair);
         }
         Double distance = 0.0;
-        List<Integer> routeCustomers = Arrays.asList(route.split("\s+")).stream().map(c->Integer.parseInt(c)).collect(Collectors.toList());
+        List<Integer> routeCustomers = vehicle.getCustomers();
         int final_ind = routeCustomers.size()-1;
         distance += this.getDistance(depot.x, this.customers.get(routeCustomers.get(0)).x, depot.y, this.customers.get(routeCustomers.get(0)).y);
         for (int i = 0;i<final_ind;i++){
             distance += this.getDistance(this.customers.get(routeCustomers.get(i)).x, this.customers.get(routeCustomers.get(i+1)).x, this.customers.get(routeCustomers.get(i)).y, this.customers.get(routeCustomers.get(i+1)).y);
         }
         distance += this.getDistance(depot.x, this.customers.get(routeCustomers.get(final_ind)).x, depot.y, this.customers.get(routeCustomers.get(0)).y);
+        this.routeMemo.put(pair, distance);
         return distance;
     }
 

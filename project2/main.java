@@ -10,6 +10,7 @@ class Main{
         customers.put(2, c2);
         Fitness f = new Fitness(customers);
         Depot d = new Depot(1, 60, 4, 80, 0, 0);
+        Vehicle v = new Vehicle(1, 80);
         double x = f.getVehicleFitness("1 2", d);
         System.out.println(x);
     }
