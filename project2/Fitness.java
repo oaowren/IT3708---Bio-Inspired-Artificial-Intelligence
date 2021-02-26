@@ -41,7 +41,7 @@ public class Fitness {
     }
 
     public Double getIndividualFitness(Individual individual) {
-        return individual.getDepots().stream().reduce(0.0, (subtotal, depot) -> subtotal + this.getDepotFitness(depot));
+        return individual.getDepots().stream().map(depot -> this.getDepotFitness(depot)).reduce(0.0, (subtotal, depot) -> subtotal + depot);
     }
 
     // Memoized in pairMemo
