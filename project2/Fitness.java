@@ -33,6 +33,10 @@ public class Fitness {
         return distance;
     }
 
+    public Double getIndividualFitness(Individual individual) {
+        return individual.getDepots().stream().reduce(0, (subtotal, depot) -> subtotal + this.getDepotFitness(depot));
+    }
+
     // Memoized in pairMemo
     private Double getDistance(int x1, int x2, int y1, int y2){
         int x = Math.abs(x1-x2);
