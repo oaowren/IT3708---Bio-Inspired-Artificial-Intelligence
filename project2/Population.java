@@ -29,7 +29,7 @@ public class Population {
         return this.individuals;
     }
 
-    public void createRandomPopulation() {
+    public void generatePopulation() {
         Individual newIndividual = null;
         for (int i = 0; i < Parameters.populationSize; i++) {
             newIndividual = new Individual(depots, this.maxNumOfVehicles, fitnessfunc);
