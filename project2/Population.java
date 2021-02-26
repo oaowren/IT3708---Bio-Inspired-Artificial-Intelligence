@@ -1,6 +1,8 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import DataClasses.Customer;
 
@@ -35,6 +37,48 @@ public class Population {
             newIndividual = new Individual(depots, this.maxNumOfVehicles, fitnessfunc);
             //this.individuals.add()
         }
+    }
+
+    public List<Individual> tournamentSelection(){
+        Random rand = new Random();
+        int popSize = this.individuals.size();
+        List<Individual> parents = new ArrayList<>();
+        // Create parents list of given parentSelectionSize in parameters
+        while (parents.size() < Parameters.parentSelectionSize){
+            List<Individual> selectedInds = new ArrayList<>();
+            // Create individual-list of size defined by tournamentSize
+            while (selectedInds.size() < Parameters.tournamentSize){
+                Individual i = this.individuals.get(rand.nextInt(popSize));
+                // Make sure that an individual does not compete with itself, can still be selected multiple times for parent
+                if (!selectedInds.contains(i)){
+                    selectedInds.add(i);
+                }
+            }
+            // Sort by fitness
+            selectedInds.sort(Comparator.comparingDouble(Individual::getFitness));
+            double randselect = rand.nextDouble();
+            double p = Parameters.tournamentProb;
+            /* Calculate a cumulative probability such that you get: 
+            Best individual with probability p*(1-p)^0 = p
+            Second best individual with probability p*(1-p)
+            Third best individual with probability p*(1-p)^2
+            And so on, which means that one of the individuals selected for tournament will be chosen with prob = 1*/
+            double cumulativeP = 0.0;
+            for (int i=0; i< Parameters.tournamentSize; i++){
+                // If no selection has been done yet (improbable), default to the worst individual in tournament
+                if (i == Parameters.tournamentSize - 1){
+                    parents.add(selectedInds.get(i));
+                    break;
+                } else {
+                    cumulativeP += p*Math.pow((1-p), i);
+                    if (randselect < cumulativeP){
+                        parents.add(selectedInds.get(i));
+                        break;
+                    }
+                }
+            }
+        }
+        return parents; 
     }
 
 }

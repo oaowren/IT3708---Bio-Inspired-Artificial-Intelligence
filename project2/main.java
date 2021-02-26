@@ -4,7 +4,7 @@ import DataClasses.Customer;
 class Main{
     public static void main(String[] args){
         DataSetIo dataSet = new DataSetIo();
-        dataSet.readDataFile("project2/Data Files/p01");
+        dataSet.readDataFile("project2/Data Files/p23");
         Fitness f = new Fitness(dataSet.getCustomers());
         Individual i = new Individual(dataSet.getDepots(), dataSet.getMaxNumOfVehicles(), f);
         i.createRandomIndividual(dataSet.getCustomers());
