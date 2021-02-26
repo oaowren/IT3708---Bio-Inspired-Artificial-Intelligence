@@ -50,7 +50,7 @@ public class Population {
             // Create individual-list of size defined by tournamentSize
             while (selectedInds.size() < Parameters.tournamentSize){
                 Individual i = this.individuals.get(rand.nextInt(popSize));
-                // Make sure that an individual does not compete with itself, can still be selected multiple times for parent
+                // Make sure that an individual does not compete with itself, can still be selected in multiple different tournaments
                 if (!selectedInds.contains(i)){
                     selectedInds.add(i);
                 }
