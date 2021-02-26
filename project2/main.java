@@ -1,14 +1,20 @@
 import java.util.HashMap;
+import java.util.List;
 import DataClasses.Customer;
 
 class Main{
     public static void main(String[] args){
         DataSetIo dataSet = new DataSetIo();
         dataSet.readDataFile("project2/Data Files/p23");
-        Fitness f = new Fitness(dataSet.getCustomers());
-        Individual i = new Individual(dataSet.getDepots(), dataSet.getMaxNumOfVehicles(), f);
-        i.createRandomIndividual(dataSet.getCustomers());
-        System.out.println(i.getFitness());
+        HashMap<Integer, Customer> customers = dataSet.getCustomers();
+        List<Depot> depots = dataSet.getDepots();
+        Fitness f = new Fitness(customers);
+        Population p = new Population(dataSet.getMaxNumOfVehicles(), f);
+        p.setCustomers(customers);
+        p.setDepots(depots);
+        p.generatePopulation();
+        List<Individual> parents = p.tournamentSelection();
+        System.out.println(parents);
     }
 
     /*TODO:

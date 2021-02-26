@@ -15,10 +15,10 @@ public class Population {
     public static List<Depot> depots;
     public static HashMap<Integer, Customer> customers;
 
-    public static void setDepots(List<Depot> newDepots) {
+    public void setDepots(List<Depot> newDepots) {
         depots = newDepots;
     }
-    public static void setCustomers(HashMap<Integer, Customer> newCustomers) {
+    public void setCustomers(HashMap<Integer, Customer> newCustomers) {
         customers = newCustomers;
     }
     
