@@ -27,6 +27,13 @@ public class Vehicle{
         this.depot = vehicle.getDepot();
     }
 
+    public Vehicle(Vehicle vehicle, List<Customer> customers){
+        this.id = vehicle.id;
+        this.maxLoad = vehicle.maxLoad;
+        this.depot = vehicle.getDepot();
+        addCustomersToRoute(customers, 0);
+    }
+
     public void visitCustomer(Customer customer){
         if (this.load + customer.demand > this.maxLoad) {
             throw new IllegalStateException("Too much load for current route");
@@ -71,14 +78,14 @@ public class Vehicle{
         return removedCustomers;
     }
 
-    public Tuple<Integer, Double> mostFeasibleInsertion(Customer customer, Fitness f){
+    public Tuple<Integer, Double> mostFeasibleInsertion(Customer customer){
         int lengthOfRoute = this.customers.size();
         List<Tuple<Integer, Double>> indexAndFitness = new ArrayList<>();
         for (int i=0; i< lengthOfRoute + 1;i++){
             Vehicle copy = this.clone();
             try{
                 copy.insertCustomer(customer, i);
-                indexAndFitness.add(new Tuple<>(i, f.getVehicleFitness(copy, copy.depot)));
+                indexAndFitness.add(new Tuple<>(i, Fitness.getVehicleFitness(copy, copy.depot)));
             } catch (Exception e){
                 ;
             }

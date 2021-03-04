@@ -10,11 +10,9 @@ public class Individual{
     private List<Depot> depots;
     private int maxVehicles;
     private double fitness;
-    private Fitness fitnessfunc; 
 
-    public Individual(List<Depot> depots, int maxVehicles, Fitness fitnessfunc) {
+    public Individual(List<Depot> depots, int maxVehicles) {
         this.maxVehicles = maxVehicles;
-        this.fitnessfunc = fitnessfunc;
         this.depots = this.createDepots(depots);
     }
     
@@ -66,7 +64,7 @@ public class Individual{
                 }
             }
         }
-        this.fitness = this.fitnessfunc.getIndividualFitness(this);
+        this.fitness = Fitness.getIndividualFitness(this);
     }
 
     public boolean removeCustomer(Customer c){
@@ -105,13 +103,13 @@ public class Individual{
             }
         }
         for (Customer c: c1){
-            boolean inserted = depot2.insertAtMostFeasible(c, this.fitnessfunc);
+            boolean inserted = depot2.insertAtMostFeasible(c);
             if (!inserted){
                 return null;
             }
         }
         for (Customer c: c2){
-            boolean inserted = depot1.insertAtMostFeasible(c, this.fitnessfunc);
+            boolean inserted = depot1.insertAtMostFeasible(c);
             if (!inserted){
                 return null;
             }
@@ -125,7 +123,7 @@ public class Individual{
         for (Depot d:this.depots){
             depots.add(d.clone());
         }
-        return new Individual(depots, this.maxVehicles, this.fitnessfunc);
+        return new Individual(depots, this.maxVehicles);
     }
 
 }
