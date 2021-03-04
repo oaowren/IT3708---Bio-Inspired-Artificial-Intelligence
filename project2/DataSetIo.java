@@ -23,7 +23,7 @@ public class DataSetIo {
                     .map(line -> 
                         Arrays.asList(line.trim().split("\s+"))
                               .stream()
-                              .map(string -> Integer.parseInt(string))
+                              .map(Integer::parseInt)
                               .collect(Collectors.toList())
                     )
                     .collect(Collectors.toList());

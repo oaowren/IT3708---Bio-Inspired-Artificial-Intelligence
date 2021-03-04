@@ -50,7 +50,7 @@ public class Fitness{
 
     public static Double getIndividualRouteFitness(Individual individual){
         return individual.getDepots().stream()
-                                     .map(depot -> getDepotFitness(depot))
+                                     .map(Fitness::getDepotFitness)
                                      .reduce(0.0, (subtotal, depot) -> subtotal + depot);
     }
 
