@@ -10,9 +10,9 @@ public class Fitness{
     private static final HashMap<Tuple<Integer, Integer>, Double> pairMemo = new HashMap<>();
     private static final HashMap<Integer, Customer> customers = new HashMap<>();
     
-    public static void populateCustomers(HashMap<Integer, Customer> customers){
+    public static void populateCustomers(HashMap<Integer, Customer> newCustomers){
         customers.clear();
-        customers.putAll(customers);
+        customers.putAll(newCustomers);
     }
 
     // Memoized in routeMemo

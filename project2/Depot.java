@@ -148,7 +148,7 @@ public class Depot{
         Vehicle randVehicle = vehicles.get(rand.nextInt(vehicles.size()));
         Customer randCustomer = randVehicle.getCustomers().get(rand.nextInt(randVehicle.getCustomers().size()));
 
-        // TODO: Remove customer first
+        randVehicle.removeCustomer(randCustomer);
         insertAtMostFeasible(randCustomer);
     }
 

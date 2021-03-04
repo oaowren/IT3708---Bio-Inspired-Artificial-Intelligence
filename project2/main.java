@@ -24,7 +24,9 @@ class Main{
             System.out.println(i);
             List<Individual> parents = p.tournamentSelection();
             List<Individual> offspring = p.crossover(parents);
-            System.out.println(p.getIndividuals().stream().map(n->n.numberOfCustomers()).collect(Collectors.toList()));
+            System.out.println(p.getIndividuals().stream()
+                                                 .map(Individual::numberOfCustomers)
+                                                 .collect(Collectors.toList()));
             List<Individual> new_pop = p.survivor_selection(parents, offspring);
             p.setNewPopulation(new_pop);
         }
