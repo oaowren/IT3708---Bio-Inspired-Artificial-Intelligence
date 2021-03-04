@@ -2,7 +2,7 @@ package DataClasses;
 
 import java.util.Objects;
 
-public class Customer {
+public class Customer{
     public final int id;
     public final int x;
     public final int y;
@@ -23,12 +23,12 @@ public class Customer {
             return false;
         }
         Customer customer = (Customer) o;
-        return x == customer.x && y == customer.y && demand == customer.demand;
+        return id == customer.id && x == customer.x && y == customer.y && demand == customer.demand;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y, demand);
+        return Objects.hash(id, x, y, demand);
     }
     
 }

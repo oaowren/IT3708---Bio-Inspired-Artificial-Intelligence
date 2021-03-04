@@ -4,8 +4,9 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import DataClasses.Customer;
+import DataClasses.Tuple;
 
-public class Depot {
+public class Depot{
 
     public final int id, maxLoad, maxVehicles, maxDuration, x, y;
     private List<Vehicle> vehicles = new ArrayList<Vehicle>();
@@ -19,6 +20,16 @@ public class Depot {
         this.y = y;
     }
 
+    public Depot(Depot depot, List<Vehicle> vehicles){
+        this.id = depot.id;
+        this.maxLoad = depot.maxLoad;
+        this.maxDuration = depot.maxDuration;
+        this.maxVehicles = depot.maxVehicles;
+        this.x = depot.x;
+        this.y = depot.y;
+        this.vehicles = vehicles;
+    }
+
     public Vehicle getVehicleById(int id){
         for (Vehicle v: this.vehicles){
             if (v.id == id){
@@ -26,6 +37,35 @@ public class Depot {
             }
         }
         return null;
+    }
+
+    public boolean removeCustomerById(int id){
+        for (Vehicle v: this.vehicles){
+            boolean removed = v.removeCustomerById(id);
+            if (removed){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean insertAtMostFeasible(Customer customer, Fitness f){
+        Vehicle vehicle = null;
+        int maxFeasible = -1;
+        double minFitness = Integer.MAX_VALUE;
+        for (int i=0; i<this.vehicles.size(); i++){
+            Tuple<Integer, Double> best = this.vehicles.get(i).mostFeasibleInsertion(customer, f);
+            if (best!=null && best.y < minFitness){
+                vehicle = this.vehicles.get(i);
+                minFitness = best.y;
+                maxFeasible = best.x;                
+            }
+        }
+        if (maxFeasible == -1){
+            return false;
+        }
+        vehicle.insertCustomer(customer, maxFeasible);
+        return true;
     }
 
     public List<Vehicle> getAllVehicles(){
@@ -102,6 +142,15 @@ public class Depot {
     public String toString() {
         String output = "Depot ID" + id + "\n Depot x:" + x + "\n Depot y:" + y;
         return output;
+    }
+
+    @Override
+    public Depot clone(){
+        List<Vehicle> vehicles = new ArrayList<>();
+        for (Vehicle v: this.vehicles){
+            vehicles.add(v.clone());
+        }
+        return new Depot(this, vehicles);
     }
 
 }

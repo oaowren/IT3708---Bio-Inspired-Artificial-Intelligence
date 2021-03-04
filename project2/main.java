@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 import DataClasses.Customer;
 
 class Main{
@@ -13,8 +14,15 @@ class Main{
         p.setCustomers(customers);
         p.setDepots(depots);
         p.generatePopulation();
-        List<Individual> parents = p.tournamentSelection();
-        System.out.println(parents.size());
+        System.out.println(p.getIndividuals().stream().map(ind->f.getIndividualRouteFitness(ind)).collect(Collectors.toList()));
+        for (int i=0; i< 10; i++){
+            System.out.println(i);
+            List<Individual> parents = p.tournamentSelection();
+            System.out.println(parents.stream().map(ind->ind.numberOfCustomers()).collect(Collectors.toList()));
+            List<Individual> new_pop = p.crossover(parents);
+            p.setNewPopulation(new_pop);
+        }
+        System.out.println(p.getIndividuals().stream().map(ind->f.getIndividualRouteFitness(ind)).collect(Collectors.toList()));
     }
 
     /*TODO:
