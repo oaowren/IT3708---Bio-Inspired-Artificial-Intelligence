@@ -91,12 +91,16 @@ public class Population {
         List<Individual> new_population = new ArrayList<>();
         Random rand = new Random();
         while (new_population.size() < Parameters.populationSize){
-            Individual parent1 = parents.get(rand.nextInt(parents.size()));
-            Individual parent2 = parents.get(rand.nextInt(parents.size()));
-            Tuple<Individual, Individual> offspring = parent1.crossover(parent2);
-            if (!Objects.isNull(offspring)){
-                if (offspring.x.numberOfCustomers() == customers.size()){new_population.add(offspring.x);}
-                if (offspring.y.numberOfCustomers() == customers.size() && new_population.size() < Parameters.populationSize){new_population.add(offspring.y);}
+            for (Individual p1: parents){
+                for (Individual p2:parents){
+                    if (rand.nextDouble()<Parameters.crossoverProbability){
+                        Tuple<Individual, Individual> offspring = p1.crossover(p2);
+                        if (!Objects.isNull(offspring)){
+                            if (offspring.x.numberOfCustomers() == customers.size()){new_population.add(offspring.x);}
+                            if (offspring.y.numberOfCustomers() == customers.size() && new_population.size() < Parameters.populationSize){new_population.add(offspring.y);}
+                        }
+                    }
+                }
             }
         }
         return new_population;

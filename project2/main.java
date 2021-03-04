@@ -21,11 +21,7 @@ class Main{
             List<Individual> new_pop = p.crossover(parents);
             p.setNewPopulation(new_pop);
         }
-        for (Depot d: p.getIndividuals().get(0).getDepots()){
-            for (Vehicle v: d.getAllVehicles()){
-                System.out.println(v.getCustomerSequence());
-            }
-        }
+        System.out.println(p.getIndividuals().stream().map(ind->f.getIndividualRouteFitness(ind)).collect(Collectors.toList()));
     }
 
     /*TODO:
