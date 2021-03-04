@@ -99,6 +99,10 @@ public class Depot{
         }
     }
 
+    /**
+     * Two cutpoints are selected in the chromosome associated with the depot, 
+     * and the genetic material between these two cutpoints is reversed.
+     */
     private void reversalMutation() {
         Random rand = new Random();
         List<Integer> vehicleIndices = new ArrayList<>();
@@ -133,6 +137,12 @@ public class Depot{
         }
     }
 
+    /**
+     * Re-routing involves randomly selecting one customer, and removing that customer from the existing route. 
+     * The customer is then inserted in the best feasible insertion location within the entire chromosome. 
+     * This involves computing the total cost of insertion at every insertion locale, 
+     * which finally re-inserts the customer in the most feasible location.
+     */
     private void singleCustomerRerouting() {
         Random rand = new Random();
         Vehicle randVehicle = vehicles.get(rand.nextInt(vehicles.size()));
@@ -141,6 +151,10 @@ public class Depot{
         // TODO
     }
 
+    /** 
+     * This simple mutation operator selects two random routes and 
+     * swaps one randomly chosen customer from one route to another.
+    */
     private void swapping() {
         // Generate two random numbers to pick routes
         Random rand = new Random();
@@ -160,9 +174,9 @@ public class Depot{
             randCustomer2 = rand.nextInt(vehicle2.getCustomers().size());
         }
 
+        // Swap customers
         Customer customer1 = vehicle1.getCustomers().get(randCustomer1);
         Customer customer2 = vehicle2.getCustomers().get(randCustomer2);
-        
         vehicle1.getCustomers().set(randCustomer1, customer2);
         vehicle2.getCustomers().set(randCustomer2, customer1);
     }
