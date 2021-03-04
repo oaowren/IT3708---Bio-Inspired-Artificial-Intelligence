@@ -3,6 +3,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import DataClasses.Customer;
+
 public class Depot {
 
     public final int id, maxLoad, maxVehicles, maxDuration, x, y;
@@ -61,11 +63,39 @@ public class Depot {
         int cutPoint2 = rand.nextInt(2);
 
     }
-    private void singleCustomerRerouting() {
 
+    private void singleCustomerRerouting() {
+        Random rand = new Random();
+        Vehicle randVehicle = vehicles.get(rand.nextInt(vehicles.size()));
+        Customer randCustomer = randVehicle.getCustomers().get(rand.nextInt(randVehicle.getCustomers().size()));
+
+        // TODO
     }
+
     private void swapping() {
+        // Generate two random numbers to pick routes
+        Random rand = new Random();
+        int randVehicle1 = rand.nextInt(vehicles.size());
+        int randVehicle2 = rand.nextInt(vehicles.size());
+        while(randVehicle1 == randVehicle2) {
+            randVehicle1 = rand.nextInt(vehicles.size());
+        }
+
+        Vehicle vehicle1 = vehicles.get(randVehicle1);
+        Vehicle vehicle2 = vehicles.get(randVehicle2);
+
+        // Generate two random numbers to pick customers to swap
+        int randCustomer1 = rand.nextInt(vehicle1.getCustomers().size());
+        int randCustomer2 = rand.nextInt(vehicle2.getCustomers().size());
+        while(randCustomer1 == randCustomer2) {
+            randCustomer2 = rand.nextInt(vehicle2.getCustomers().size());
+        }
+
+        Customer customer1 = vehicle1.getCustomers().get(randCustomer1);
+        Customer customer2 = vehicle2.getCustomers().get(randCustomer2);
         
+        vehicle1.getCustomers().set(randCustomer1, customer2);
+        vehicle2.getCustomers().set(randCustomer2, customer1);
     }
 
     @Override
