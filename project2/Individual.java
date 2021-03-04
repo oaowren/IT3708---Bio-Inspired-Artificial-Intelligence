@@ -6,14 +6,7 @@ import java.util.Random;
 import DataClasses.Customer;
 import DataClasses.Tuple;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-
-public class Individual implements Serializable {
-    private static final long serialVersionUID = 971312240056082661L;
+public class Individual{
     private List<Depot> depots;
     private int maxVehicles;
     private double fitness;
@@ -36,7 +29,7 @@ public class Individual implements Serializable {
     public List<Depot> createDepots(List<Depot> depots){
         List<Depot> depotResults = new ArrayList<>();
         for (Depot d: depots){
-            Depot depotCopy = (Depot) deepCopy(d);
+            Depot depotCopy = d.clone();
             int vcount = depotCopy.getAllVehicles().size();
             for (int i = 0;i < this.maxVehicles - vcount ;i++){
                 Vehicle v = new Vehicle(i, d.maxLoad);
@@ -86,8 +79,8 @@ public class Individual implements Serializable {
     }
 
     public Tuple<Individual, Individual> crossover(Individual i){
-        Individual offspring1 = (Individual) deepCopy(this);
-        Individual offspring2 = (Individual) deepCopy(i);
+        Individual offspring1 = this.clone();
+        Individual offspring2 = i.clone();
         Random rand = new Random();
         // Select a random depot for each offspring
         Depot depot1 = offspring1.getDepots().get(rand.nextInt(offspring1.getDepots().size()));
@@ -96,8 +89,8 @@ public class Individual implements Serializable {
         Vehicle vehicle1 = depot1.getAllVehicles().get(rand.nextInt(depot1.getAllVehicles().size()));
         Vehicle vehicle2 = depot2.getAllVehicles().get(rand.nextInt(depot2.getAllVehicles().size()));
         // Remove customers from opposite route, insert new at most feasible location
-        List<Customer> c1 = vehicle1.getCustomers();
-        List<Customer> c2 = vehicle2.getCustomers();
+        List<Customer> c1 = new ArrayList<>(vehicle1.getCustomers());
+        List<Customer> c2 = new ArrayList<>(vehicle2.getCustomers());
         for (Customer c: c1){
             offspring2.removeCustomerById(c.id);
         }
@@ -120,19 +113,13 @@ public class Individual implements Serializable {
         return new Tuple<>(offspring1, offspring2);
     }
 
-    private static Object deepCopy(Object object) {
-        try {
-          ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-          ObjectOutputStream outputStrm = new ObjectOutputStream(outputStream);
-          outputStrm.writeObject(object);
-          ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
-          ObjectInputStream objInputStream = new ObjectInputStream(inputStream);
-          return objInputStream.readObject();
+    @Override
+    public Individual clone(){
+        List<Depot> depots = new ArrayList<>();
+        for (Depot d:this.depots){
+            depots.add(d.clone());
         }
-        catch (Exception e) {
-          e.printStackTrace();
-          return null;
-        }
-      }
+        return new Individual(depots, this.maxVehicles, this.fitnessfunc);
+    }
 
 }

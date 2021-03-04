@@ -1,10 +1,8 @@
 package DataClasses;
 
 import java.util.Objects;
-import java.io.Serializable;
 
-public class Customer implements Serializable {
-    private static final long serialVersionUID = 2668613946000040734L;
+public class Customer{
     public final int id;
     public final int x;
     public final int y;

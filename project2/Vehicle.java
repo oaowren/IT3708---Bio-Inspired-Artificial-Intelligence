@@ -2,20 +2,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
-import java.util.Comparator;
 
 import DataClasses.Customer;
 import DataClasses.Tuple;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 
-public class Vehicle implements Serializable{
+public class Vehicle{
     
-    private static final long serialVersionUID = -7246255012616061278L;
     public final int id, maxLoad;
     private int load = 0;
     private List<Customer> customers = new ArrayList<>();
@@ -24,6 +17,14 @@ public class Vehicle implements Serializable{
     public Vehicle(int id, int maxLoad) {
         this.id = id;
         this.maxLoad = maxLoad;
+    }
+
+    public Vehicle(Vehicle vehicle){
+        this.id = vehicle.id;
+        this.maxLoad = vehicle.maxLoad;
+        this.load = vehicle.getLoad();
+        this.customers = vehicle.getCustomers();
+        this.depot = vehicle.getDepot();
     }
 
     public void visitCustomer(Customer customer){
@@ -71,11 +72,11 @@ public class Vehicle implements Serializable{
         return removedCustomers;
     }
 
-    public List<Tuple<Integer, Double>> feasibleInsertions(Customer customer, Fitness f){
+    public Tuple<Integer, Double> mostFeasibleInsertion(Customer customer, Fitness f){
         int lengthOfRoute = this.customers.size();
         List<Tuple<Integer, Double>> indexAndFitness = new ArrayList<>();
         for (int i=0; i< lengthOfRoute + 1;i++){
-            Vehicle copy = (Vehicle) deepCopy(this);
+            Vehicle copy = this.clone();
             try{
                 copy.insertCustomer(customer, i);
                 indexAndFitness.add(new Tuple<>(i, f.getVehicleFitness(copy, copy.depot)));
@@ -84,7 +85,12 @@ public class Vehicle implements Serializable{
             }
         }
         indexAndFitness.sort((a,b) -> a.y > b.y ? 1 : -1);
-        return indexAndFitness;
+        try{
+            return indexAndFitness.get(0);
+        } catch (IndexOutOfBoundsException e){
+            return null;
+        }
+        
     }
 
     public void setDepot(Depot depot){
@@ -113,6 +119,10 @@ public class Vehicle implements Serializable{
         return this.customers.size() > 0;
     }
 
+    public int getLoad(){
+        return this.load;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == this)
@@ -124,19 +134,8 @@ public class Vehicle implements Serializable{
         return id == vehicle.id && maxLoad == vehicle.maxLoad && load == vehicle.load && Objects.equals(customers, vehicle.customers);
     }
 
-    private static Object deepCopy(Object object) {
-        try {
-          ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-          ObjectOutputStream outputStrm = new ObjectOutputStream(outputStream);
-          outputStrm.writeObject(object);
-          ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
-          ObjectInputStream objInputStream = new ObjectInputStream(inputStream);
-          return objInputStream.readObject();
-        }
-        catch (Exception e) {
-          e.printStackTrace();
-          return null;
-        }
-      }
-
+    @Override
+    public Vehicle clone(){
+        return new Vehicle(this);
+    }
 }

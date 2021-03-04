@@ -1,11 +1,9 @@
 import java.util.HashMap;
 import java.util.List;
-import java.io.Serializable;
 import DataClasses.*;
 
-public class Fitness implements Serializable{
+public class Fitness{
 
-    private static final long serialVersionUID = -7579207148043499139L;
     // Memoize distance of route from/to a given depot
     private HashMap<Tuple<String, Depot>, Double> routeMemo = new HashMap<>();
     // Memoize euclidian distance between two points
