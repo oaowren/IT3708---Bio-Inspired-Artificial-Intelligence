@@ -1,10 +1,10 @@
 public class Parameters {
     
-    static final int populationSize = 100;
+    static final int populationSize = 10;
     static final int generationSpan = 50;
     static final int eliteSize = 4;
     static final int tournamentSize = 6;
-    static final int parentSelectionSize = 20;
+    static final int parentSelectionSize = 5;
     static final double tournamentProb = 0.9;
     static final double crossoverProbability = 0.60;
     static final double intraDepotMutationProbability = 0.20;

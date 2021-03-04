@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import DataClasses.Customer;
 import java.util.Comparator;
@@ -20,6 +21,7 @@ class Main{
             System.out.println(i);
             List<Individual> parents = p.tournamentSelection();
             List<Individual> offspring = p.crossover(parents);
+            System.out.println(p.getIndividuals().stream().map(n->n.numberOfCustomers()).collect(Collectors.toList()));
             List<Individual> new_pop = p.survivor_selection(parents, offspring);
             p.setNewPopulation(new_pop);
         }
