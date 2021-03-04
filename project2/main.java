@@ -9,12 +9,14 @@ class Main{
         dataSet.readDataFile("project2/Data Files/p01");
         HashMap<Integer, Customer> customers = dataSet.getCustomers();
         List<Depot> depots = dataSet.getDepots();
-        Fitness f = new Fitness(customers);
-        Population p = new Population(dataSet.getMaxNumOfVehicles(), f);
+        Fitness.populateCustomers(customers);
+        Population p = new Population(dataSet.getMaxNumOfVehicles());
         p.setCustomers(customers);
         p.setDepots(depots);
         p.generatePopulation();
-        System.out.println(p.getIndividuals().stream().map(ind->f.getIndividualRouteFitness(ind)).collect(Collectors.toList()));
+        System.out.println(p.getIndividuals().stream()
+                                             .map(Fitness::getIndividualRouteFitness)
+                                             .collect(Collectors.toList()));
         for (int i=0; i< Parameters.generationSpan; i++){
             System.out.println(i);
             List<Individual> parents = p.tournamentSelection();

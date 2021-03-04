@@ -11,7 +11,6 @@ public class Population {
     
 	private List<Individual> individuals = new ArrayList<>();
     private int maxNumOfVehicles;
-    private Fitness fitnessfunc;
 
     public static List<Depot> depots;
     public static HashMap<Integer, Customer> customers;
@@ -23,9 +22,8 @@ public class Population {
         customers = newCustomers;
     }
     
-    public Population(int maxNumOfVehicles, Fitness fitnessfunc) {
+    public Population(int maxNumOfVehicles) {
         this.maxNumOfVehicles = maxNumOfVehicles;
-        this.fitnessfunc = fitnessfunc;
     }
 
     public List<Individual> getIndividuals(){
@@ -35,7 +33,7 @@ public class Population {
     public void generatePopulation() {
         Individual newIndividual = null;
         for (int i = 0; i < Parameters.populationSize; i++) {
-            newIndividual = new Individual(depots, this.maxNumOfVehicles, fitnessfunc);
+            newIndividual = new Individual(depots, this.maxNumOfVehicles);
             newIndividual.createRandomIndividual(customers);
             this.individuals.add(newIndividual);
         }

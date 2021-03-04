@@ -50,12 +50,12 @@ public class Depot{
         return false;
     }
 
-    public boolean insertAtMostFeasible(Customer customer, Fitness f){
+    public boolean insertAtMostFeasible(Customer customer){
         Vehicle vehicle = null;
         int maxFeasible = -1;
         double minFitness = Integer.MAX_VALUE;
         for (int i=0; i<this.vehicles.size(); i++){
-            Tuple<Integer, Double> best = this.vehicles.get(i).mostFeasibleInsertion(customer, f);
+            Tuple<Integer, Double> best = this.vehicles.get(i).mostFeasibleInsertion(customer);
             if (best!=null && best.y < minFitness){
                 vehicle = this.vehicles.get(i);
                 minFitness = best.y;
