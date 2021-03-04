@@ -63,7 +63,7 @@ public class Fitness{
     }
 
     // Memoized in pairMemo
-    private static Double getDistance(int x1, int x2, int y1, int y2){
+    public static Double getDistance(int x1, int x2, int y1, int y2){
         int x = Math.abs(x1-x2);
         int y = Math.abs(y1-y2);
         Tuple<Integer, Integer> pair = new Tuple<>(x,y);
