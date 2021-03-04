@@ -23,7 +23,7 @@ public class Vehicle{
         this.id = vehicle.id;
         this.maxLoad = vehicle.maxLoad;
         this.load = vehicle.getLoad();
-        this.customers = vehicle.getCustomers();
+        this.customers = new ArrayList<>(vehicle.getCustomers());
         this.depot = vehicle.getDepot();
     }
 
@@ -54,7 +54,8 @@ public class Vehicle{
 
     public boolean removeCustomerById(int id){
         try{
-            Customer customer = this.customers.stream().filter(c-> c.id == id).collect(Collectors.toList()).get(0);
+            List<Customer> customersFiltered = this.customers.stream().filter(c-> c.id == id).collect(Collectors.toList());
+            Customer customer = customersFiltered.get(0);
             this.load -= customer.demand;
             this.customers.remove(customer);
             return true;

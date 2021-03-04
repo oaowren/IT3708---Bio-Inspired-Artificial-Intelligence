@@ -69,13 +69,14 @@ public class Individual{
         this.fitness = this.fitnessfunc.getIndividualFitness(this);
     }
 
-    public void removeCustomerById(int id){
+    public boolean removeCustomerById(int id){
         for (Depot d: this.depots){
             boolean removed = d.removeCustomerById(id);
             if (removed){
-                return;
+                return true;
             }
         }
+        return false;
     }
 
     public Tuple<Individual, Individual> crossover(Individual i){
@@ -89,13 +90,19 @@ public class Individual{
         Vehicle vehicle1 = depot1.getAllVehicles().get(rand.nextInt(depot1.getAllVehicles().size()));
         Vehicle vehicle2 = depot2.getAllVehicles().get(rand.nextInt(depot2.getAllVehicles().size()));
         // Remove customers from opposite route, insert new at most feasible location
-        List<Customer> c1 = new ArrayList<>(vehicle1.getCustomers());
-        List<Customer> c2 = new ArrayList<>(vehicle2.getCustomers());
+        List<Customer> c1 = vehicle1.getCustomers();
+        List<Customer> c2 = vehicle2.getCustomers();
         for (Customer c: c1){
-            offspring2.removeCustomerById(c.id);
+            boolean removed = offspring2.removeCustomerById(c.id);
+            if (!removed){
+                return null;
+            }
         }
         for (Customer c: c2){
-            offspring1.removeCustomerById(c.id);
+            boolean removed = offspring1.removeCustomerById(c.id);
+            if (!removed){
+                return null;
+            }
         }
         for (Customer c: c1){
             boolean inserted = depot2.insertAtMostFeasible(c, this.fitnessfunc);
@@ -109,7 +116,6 @@ public class Individual{
                 return null;
             }
         }
-
         return new Tuple<>(offspring1, offspring2);
     }
 

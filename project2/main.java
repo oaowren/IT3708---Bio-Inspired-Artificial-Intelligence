@@ -15,14 +15,17 @@ class Main{
         p.setDepots(depots);
         p.generatePopulation();
         System.out.println(p.getIndividuals().stream().map(ind->f.getIndividualRouteFitness(ind)).collect(Collectors.toList()));
-        for (int i=0; i< 10; i++){
+        for (int i=0; i< Parameters.generationSpan; i++){
             System.out.println(i);
             List<Individual> parents = p.tournamentSelection();
-            System.out.println(parents.stream().map(ind->ind.numberOfCustomers()).collect(Collectors.toList()));
             List<Individual> new_pop = p.crossover(parents);
             p.setNewPopulation(new_pop);
         }
-        System.out.println(p.getIndividuals().stream().map(ind->f.getIndividualRouteFitness(ind)).collect(Collectors.toList()));
+        for (Depot d: p.getIndividuals().get(0).getDepots()){
+            for (Vehicle v: d.getAllVehicles()){
+                System.out.println(v.getCustomerSequence());
+            }
+        }
     }
 
     /*TODO:

@@ -95,8 +95,8 @@ public class Population {
             Individual parent2 = parents.get(rand.nextInt(parents.size()));
             Tuple<Individual, Individual> offspring = parent1.crossover(parent2);
             if (!Objects.isNull(offspring)){
-                new_population.add(offspring.x);
-                new_population.add(offspring.y);
+                if (offspring.x.numberOfCustomers() == customers.size()){new_population.add(offspring.x);}
+                if (offspring.y.numberOfCustomers() == customers.size() && new_population.size() < Parameters.populationSize){new_population.add(offspring.y);}
             }
         }
         return new_population;
