@@ -8,7 +8,7 @@ import java.util.Comparator;
 class Main{
     public static void main(String[] args){
         DataSetIo dataSet = new DataSetIo();
-        dataSet.readDataFile("project2/Data Files/p01");
+        dataSet.readDataFile("project2/Data Files/p02");
         HashMap<Integer, Customer> customers = dataSet.getCustomers();
         List<Depot> depots = dataSet.getDepots();
         Fitness.populateCustomers(customers);
@@ -19,6 +19,7 @@ class Main{
         System.out.println(p.getIndividuals().stream()
                                              .map(Fitness::getIndividualRouteFitness)
                                              .collect(Collectors.toList()));
+        System.out.println(p.getIndividuals().stream().map(n->n.numberOfCustomers()).collect(Collectors.toList()));
         for (int i=0; i< Parameters.generationSpan; i++){
             System.out.println(i);
             List<Individual> parents = p.tournamentSelection();

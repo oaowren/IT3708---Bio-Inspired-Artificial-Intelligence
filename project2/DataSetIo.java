@@ -40,7 +40,7 @@ public class DataSetIo {
         List<Depot> depots = individual.getDepots();
 
         List<String> lines = new ArrayList<>();
-        lines.add(Double.toString(individual.getFitness()));
+        lines.add(Double.toString(Fitness.getIndividualRouteFitness(individual)));
         lines.addAll(depots.stream().flatMap(d -> d.getVehicleRoutes().stream()).collect(Collectors.toList()));
         try {
             Files.write(Paths.get(filename), lines);
