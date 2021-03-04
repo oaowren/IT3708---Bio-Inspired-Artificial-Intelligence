@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -81,7 +82,9 @@ public class Depot{
     }
 
     public List<String> getVehicleRoutes() {
-        return this.getAllVehicles().stream().map(v -> v.getCustomerSequence()).collect(Collectors.toList());
+        return this.getAllVehicles().stream()
+                                    .map(Vehicle::getCustomerSequence)
+                                    .collect(Collectors.toList());
     }
     
     public void intraDepotMutation() {
@@ -98,10 +101,36 @@ public class Depot{
 
     private void reversalMutation() {
         Random rand = new Random();
-        List<String> vehicleRoutes = getVehicleRoutes();
-        int cutPoint1 = rand.nextInt(2);
-        int cutPoint2 = rand.nextInt(2);
-
+        List<Integer> vehicleIndices = new ArrayList<>();
+        List<Customer> allCustomersFromAllVehicles = new ArrayList<>();
+        /* 
+        *  Iterate through all vehicles and flatten to 1D list of all customers, while tracking which
+        *  vehicles should contain which customers after mutation 
+        */
+        for (Vehicle vehicle : vehicles) {
+            allCustomersFromAllVehicles.addAll(vehicle.getCustomers());
+            vehicleIndices.add(allCustomersFromAllVehicles.size()); // Keep indices for vehicles for permutation
+        }
+        // Select two random (inequal) cutpoints in the list of all customers.
+        int cutPoint1 = rand.nextInt(allCustomersFromAllVehicles.size());
+        int cutPoint2 = rand.nextInt(allCustomersFromAllVehicles.size());
+        while(cutPoint1 == cutPoint2) {
+            cutPoint2 = rand.nextInt(allCustomersFromAllVehicles.size());
+        }
+        // Swap each i-th customer from each cutpoint
+        for (int i = (cutPoint1 < cutPoint2 ? cutPoint1 : cutPoint2); i < (cutPoint1 < cutPoint2 ? cutPoint2 : cutPoint1); i++) {
+            Customer customer1 = allCustomersFromAllVehicles.get(i);
+            Customer customer2 = allCustomersFromAllVehicles.get(cutPoint2-i);
+            allCustomersFromAllVehicles.set(i, customer2);
+            allCustomersFromAllVehicles.set(cutPoint2-i, customer1);
+        }
+        // Iterate through all vehicles and add their corresponding new customers
+        List<Vehicle> mutatedVehicleList = new ArrayList<>();
+        Iterator<Vehicle> vehicleIterator = vehicles.iterator();
+        int prevIndex = 0;
+        for (Integer index : vehicleIndices) {
+            mutatedVehicleList.add(new Vehicle(vehicleIterator.next(), allCustomersFromAllVehicles.subList(prevIndex, index)));
+        }
     }
 
     private void singleCustomerRerouting() {

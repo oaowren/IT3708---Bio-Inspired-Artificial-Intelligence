@@ -27,6 +27,13 @@ public class Vehicle{
         this.depot = vehicle.getDepot();
     }
 
+    public Vehicle(Vehicle vehicle, List<Customer> customers){
+        this.id = vehicle.id;
+        this.maxLoad = vehicle.maxLoad;
+        this.depot = vehicle.getDepot();
+        addCustomersToRoute(customers, 0);
+    }
+
     public void visitCustomer(Customer customer){
         if (this.load + customer.demand > this.maxLoad) {
             throw new IllegalStateException("Too much load for current route");
