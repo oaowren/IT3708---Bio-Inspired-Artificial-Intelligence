@@ -52,12 +52,10 @@ public class Vehicle{
         this.customers.addAll(index, customers);
     }
 
-    public boolean removeCustomerById(int id){
+    public boolean removeCustomer(Customer customer){
         try{
-            List<Customer> customersFiltered = this.customers.stream().filter(c-> c.id == id).collect(Collectors.toList());
-            Customer customer = customersFiltered.get(0);
-            this.load -= customer.demand;
             this.customers.remove(customer);
+            this.load -= customer.demand;
             return true;
         } catch (IndexOutOfBoundsException e){
             return false;

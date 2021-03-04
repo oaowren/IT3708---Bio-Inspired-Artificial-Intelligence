@@ -39,9 +39,9 @@ public class Depot{
         return null;
     }
 
-    public boolean removeCustomerById(int id){
+    public boolean removeCustomer(Customer c){
         for (Vehicle v: this.vehicles){
-            boolean removed = v.removeCustomerById(id);
+            boolean removed = v.removeCustomer(c);
             if (removed){
                 return true;
             }

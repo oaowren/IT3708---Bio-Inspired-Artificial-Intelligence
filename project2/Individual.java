@@ -69,9 +69,9 @@ public class Individual{
         this.fitness = this.fitnessfunc.getIndividualFitness(this);
     }
 
-    public boolean removeCustomerById(int id){
+    public boolean removeCustomer(Customer c){
         for (Depot d: this.depots){
-            boolean removed = d.removeCustomerById(id);
+            boolean removed = d.removeCustomer(c);
             if (removed){
                 return true;
             }
@@ -93,13 +93,13 @@ public class Individual{
         List<Customer> c1 = vehicle1.getCustomers();
         List<Customer> c2 = vehicle2.getCustomers();
         for (Customer c: c1){
-            boolean removed = offspring2.removeCustomerById(c.id);
+            boolean removed = offspring2.removeCustomer(c);
             if (!removed){
                 return null;
             }
         }
         for (Customer c: c2){
-            boolean removed = offspring1.removeCustomerById(c.id);
+            boolean removed = offspring1.removeCustomer(c);
             if (!removed){
                 return null;
             }

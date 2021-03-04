@@ -36,8 +36,12 @@ public class DataSetIo {
         }
     }
 
-    public static void writeResults(List<Depot> depots, String filename) {
-        List<String> lines = depots.stream().flatMap(d -> d.getVehicleRoutes().stream()).collect(Collectors.toList());
+    public static void writeResults(Individual individual, String filename) {
+        List<Depot> depots = individual.getDepots();
+
+        List<String> lines = new ArrayList<>();
+        lines.add(Double.toString(individual.getFitness()));
+        lines.addAll(depots.stream().flatMap(d -> d.getVehicleRoutes().stream()).collect(Collectors.toList()));
         try {
             Files.write(Paths.get(filename), lines);
         } catch (IOException error) {

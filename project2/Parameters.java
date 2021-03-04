@@ -1,7 +1,7 @@
 public class Parameters {
     
     static final int populationSize = 100;
-    static final int generationSpan = 500;
+    static final int generationSpan = 50;
     static final int eliteSize = 4;
     static final int tournamentSize = 6;
     static final int parentSelectionSize = 20;
