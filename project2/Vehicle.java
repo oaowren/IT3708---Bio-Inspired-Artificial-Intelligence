@@ -2,6 +2,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import DataClasses.Customer;
 import DataClasses.Tuple;
@@ -90,7 +91,7 @@ public class Vehicle{
                 ;
             }
         }
-        indexAndFitness.sort((a,b) -> a.y > b.y ? 1 : -1);
+        indexAndFitness.sort(Comparator.comparingDouble(Tuple<Integer, Double>::getY));
         try{
             return indexAndFitness.get(0);
         } catch (IndexOutOfBoundsException e){

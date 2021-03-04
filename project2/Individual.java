@@ -15,6 +15,10 @@ public class Individual{
         this.maxVehicles = maxVehicles;
         this.depots = this.createDepots(depots);
     }
+
+    public void calculateFitness(){
+        this.fitness = Fitness.getIndividualFitness(this);
+    }
     
     public List<Depot> getDepots() {
         return this.depots;
@@ -28,10 +32,13 @@ public class Individual{
         List<Depot> depotResults = new ArrayList<>();
         for (Depot d: depots){
             Depot depotCopy = d.clone();
-            int vcount = depotCopy.getAllVehicles().size();
-            for (int i = 0;i < this.maxVehicles - vcount ;i++){
-                Vehicle v = new Vehicle(i, d.maxLoad);
-                depotCopy.addVehicle(v);
+            for (int i = 0;i < this.maxVehicles ;i++){
+                Vehicle v = new Vehicle(i+1, d.maxLoad);
+                try{
+                    depotCopy.addVehicle(v);
+                } catch (IllegalStateException e){
+                    ;
+                }
             }
             depotResults.add(depotCopy);
         }
@@ -57,14 +64,14 @@ public class Individual{
             while (!success){
                 try{
                     Depot depot = this.depots.get(rand.nextInt(this.depots.size()));
-                    depot.getVehicleById(rand.nextInt(depot.getAllVehicles().size())).visitCustomer(customers.get(c));
+                    depot.getVehicleById(rand.nextInt(depot.getAllVehicles().size())+1).visitCustomer(customers.get(c));
                     success = true;
                 } catch (IllegalStateException e) {
                     success = false;
                 }
             }
         }
-        this.fitness = Fitness.getIndividualFitness(this);
+        this.calculateFitness();
     }
 
     public boolean removeCustomer(Customer c){
@@ -114,6 +121,8 @@ public class Individual{
                 return null;
             }
         }
+        offspring1.calculateFitness();
+        offspring2.calculateFitness();
         return new Tuple<>(offspring1, offspring2);
     }
 

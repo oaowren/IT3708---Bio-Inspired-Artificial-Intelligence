@@ -38,10 +38,15 @@ public class DataSetIo {
 
     public static void writeResults(Individual individual, String filename) {
         List<Depot> depots = individual.getDepots();
-
         List<String> lines = new ArrayList<>();
-        lines.add(Double.toString(Fitness.getIndividualRouteFitness(individual)));
-        lines.addAll(depots.stream().flatMap(d -> d.getVehicleRoutes().stream()).collect(Collectors.toList()));
+        lines.add(String.format("%.2f", Fitness.getIndividualRouteFitness(individual)));
+        for (Depot d: depots){
+            for (Vehicle v: d.getAllVehicles()){
+                if (v.isActive()){
+                    lines.add(String.format("%d\t%d\t%.2f\t%d\t%d %s %d", d.id, v.id, Fitness.getVehicleFitness(v, d), v.getLoad(), d.id, v.getCustomerSequence(), d.id));
+                }
+            }
+        }
         try {
             Files.write(Paths.get(filename), lines);
         } catch (IOException error) {
@@ -64,7 +69,7 @@ public class DataSetIo {
     public HashMap<Integer, Customer> getCustomers() {
         return (HashMap<Integer, Customer>) dataSet.subList(numberOfDepots + 1, depotIndexStartEnd).stream()
                 .collect(Collectors.toMap(customerRow -> customerRow.get(0),
-                        customerRow -> new Customer(customerRow.get(0), customerRow.get(1), customerRow.get(2), customerRow.get(3))));
+                        customerRow -> new Customer(customerRow.get(0), customerRow.get(1), customerRow.get(2), customerRow.get(4))));
     }
 
 
