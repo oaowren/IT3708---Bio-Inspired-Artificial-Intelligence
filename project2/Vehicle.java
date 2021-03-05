@@ -61,13 +61,12 @@ public class Vehicle{
     }
 
     public boolean removeCustomer(Customer customer){
-        try{
-            this.customers.remove(customer);
+        boolean removed = this.customers.remove(customer);
+        if (removed){
             this.load -= customer.demand;
             return true;
-        } catch (IndexOutOfBoundsException e){
-            return false;
         }
+        return false;
     }
 
     public List<Customer> removeCustomersFromRoute(int startIndex, int endIndex){

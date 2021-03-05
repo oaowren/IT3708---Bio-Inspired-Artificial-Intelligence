@@ -94,8 +94,12 @@ public class Population {
                     if (rand.nextDouble()<Parameters.crossoverProbability){
                         Tuple<Individual, Individual> offspring = p1.crossover(p2);
                         if (!Objects.isNull(offspring)){
-                            if (offspring.x.numberOfCustomers() == customers.size()){new_population.add(offspring.x);}
-                            if (offspring.y.numberOfCustomers() == customers.size()){new_population.add(offspring.y);}
+                            if (offspring.x.numberOfCustomers() == customers.size()){
+                                new_population.add(offspring.x);
+                            }
+                            if (offspring.y.numberOfCustomers() == customers.size()){
+                                new_population.add(offspring.y);
+                            }
                         }
                     }
                 }

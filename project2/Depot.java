@@ -50,16 +50,26 @@ public class Depot{
         return false;
     }
 
+    public void removeVehicleById(int id){
+        this.vehicles = this.vehicles.stream().filter(v->v.id != id).collect(Collectors.toList());
+    }
+
     public boolean insertAtMostFeasible(Customer customer){
         Vehicle vehicle = null;
         int maxFeasible = -1;
         double minFitness = Integer.MAX_VALUE;
         for (int i=0; i<this.vehicles.size(); i++){
-            Tuple<Integer, Double> best = this.vehicles.get(i).mostFeasibleInsertion(customer);
-            if (best!=null && best.y < minFitness){
-                vehicle = this.vehicles.get(i);
-                minFitness = best.y;
-                maxFeasible = best.x;                
+            Depot depotClone = this.clone();
+            Vehicle v = depotClone.getAllVehicles().get(i);
+            Tuple<Integer, Double> best = v.mostFeasibleInsertion(customer);
+            if (best != null){
+                v.insertCustomer(customer, best.x);
+                Double newFitness = Fitness.getDepotFitness(depotClone);
+                if (newFitness < minFitness){
+                    vehicle = this.vehicles.get(i);
+                    minFitness = newFitness;
+                    maxFeasible = best.x;            
+                }
             }
         }
         if (maxFeasible == -1){
@@ -182,6 +192,16 @@ public class Depot{
         vehicle2.getCustomers().set(randCustomer2, customer1);
     }
 
+    public boolean hasActiveVehicles(){
+        for (Vehicle v: this.vehicles){
+            if (v.isActive()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     @Override
     public String toString() {
         String output = "Depot ID" + id + "\n Depot x:" + x + "\n Depot y:" + y;
@@ -191,10 +211,11 @@ public class Depot{
     @Override
     public Depot clone(){
         List<Vehicle> vehicles = new ArrayList<>();
+        Depot depot = new Depot(this, vehicles);
         for (Vehicle v: this.vehicles){
-            vehicles.add(v.clone());
+            depot.addVehicle(v.clone());
         }
-        return new Depot(this, vehicles);
+        return depot;
     }
 
 }

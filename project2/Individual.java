@@ -90,10 +90,23 @@ public class Individual{
         Random rand = new Random();
         // Select a random depot for each offspring
         Depot depot1 = offspring1.getDepots().get(rand.nextInt(offspring1.getDepots().size()));
+        while (!depot1.hasActiveVehicles()){
+            depot1 = offspring1.getDepots().get(rand.nextInt(offspring1.getDepots().size()));
+        }
         Depot depot2 = offspring2.getDepots().get(rand.nextInt(offspring2.getDepots().size()));
-        // Select a random route for each depot
+        while (!depot2.hasActiveVehicles()){
+            depot2 = offspring2.getDepots().get(rand.nextInt(offspring2.getDepots().size()));
+        }
+        // Select a random route for each depot, empty routes can not be selected
         Vehicle vehicle1 = depot1.getAllVehicles().get(rand.nextInt(depot1.getAllVehicles().size()));
+        while (!vehicle1.isActive()){
+
+            vehicle1 = depot1.getAllVehicles().get(rand.nextInt(depot1.getAllVehicles().size()));
+        };
         Vehicle vehicle2 = depot2.getAllVehicles().get(rand.nextInt(depot2.getAllVehicles().size()));
+        while (!vehicle2.isActive()){
+            vehicle2 = depot2.getAllVehicles().get(rand.nextInt(depot2.getAllVehicles().size()));
+        }
         // Remove customers from opposite route, insert new at most feasible location
         List<Customer> c1 = vehicle1.getCustomers();
         List<Customer> c2 = vehicle2.getCustomers();

@@ -43,7 +43,7 @@ public class DataSetIo {
         for (Depot d: depots){
             for (Vehicle v: d.getAllVehicles()){
                 if (v.isActive()){
-                    lines.add(String.format("%d\t%d\t%.2f\t%d\t%d %s %d", d.id, v.id, Fitness.getVehicleFitness(v, d), v.getLoad(), d.id, v.getCustomerSequence(), d.id));
+                    lines.add(String.format("%d\t%d\t%.2f\t%d\t%d %s %d", d.id, v.id, Fitness.getVehicleFitness(v, d), v.getLoad(), 0, v.getCustomerSequence(), 0));
                 }
             }
         }
