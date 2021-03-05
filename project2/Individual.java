@@ -63,7 +63,10 @@ public class Individual{
             boolean success = false;
             while (!success){
                 try {
-                    Depot depot = customers.get(c).getClosestDepot();
+                    Depot depot = depots.stream()
+                                        .filter((d) -> d.id == customers.get(c).getClosestDepot())
+                                        .findFirst()
+                                        .orElseThrow(() -> new IllegalArgumentException("Depot was not found!"));
                     depot.getVehicleById(rand.nextInt(depot.getAllVehicles().size())+1).visitCustomer(customers.get(c));
                     success = true;
                 } catch (IllegalStateException e) {
