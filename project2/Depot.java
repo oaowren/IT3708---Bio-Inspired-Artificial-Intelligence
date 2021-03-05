@@ -200,12 +200,7 @@ public class Depot{
     }
 
     public boolean hasActiveVehicles(){
-        for (Vehicle v: this.vehicles){
-            if (v.isActive()){
-                return true;
-            }
-        }
-        return false;
+        return vehicles.stream().anyMatch(Vehicle::isActive);
     }
 
 
@@ -223,8 +218,7 @@ public class Depot{
 
     @Override
     public String toString() {
-        String output = "Depot ID" + id + "\n Depot x:" + x + "\n Depot y:" + y;
-        return output;
+        return "Depot ID" + id + "\n Depot x:" + x + "\n Depot y:" + y;
     }
 
     @Override
