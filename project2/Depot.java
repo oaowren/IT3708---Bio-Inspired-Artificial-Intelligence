@@ -33,26 +33,21 @@ public class Depot{
     }
 
     public Vehicle getVehicleById(int id){
-        for (Vehicle v: this.vehicles){
-            if (v.id == id){
-                return v;
-            }
-        }
-        return null;
+        return vehicles.stream()
+                       .filter(v -> v.id == id)
+                       .findAny()
+                       .orElse(null);
     }
 
     public boolean removeCustomer(Customer c){
-        for (Vehicle v: this.vehicles){
-            boolean removed = v.removeCustomer(c);
-            if (removed){
-                return true;
-            }
-        }
-        return false;
+        return vehicles.stream()
+                       .anyMatch(vehicle -> vehicle.removeCustomer(c));
     }
 
     public void removeVehicleById(int id){
-        this.vehicles = this.vehicles.stream().filter(v->v.id != id).collect(Collectors.toList());
+        vehicles = vehicles.stream()
+                            .filter(v -> v.id != id)
+                            .collect(Collectors.toList());
     }
 
     public boolean insertAtMostFeasible(Customer customer){
