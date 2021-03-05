@@ -22,7 +22,7 @@ class Main{
         for (int i=0; i< Parameters.generationSpan; i++){
             System.out.println(i+1);
             List<Individual> parents = p.tournamentSelection();
-            List<Individual> offspring = p.crossover(parents);
+            List<Individual> offspring = p.crossover(parents, i);
             List<Individual> new_pop = p.survivor_selection(parents, offspring);
             p.setNewPopulation(new_pop);
         }

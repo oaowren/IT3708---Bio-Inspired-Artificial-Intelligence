@@ -85,7 +85,7 @@ public class Population {
         this.individuals = population;
     }
 
-    public List<Individual> crossover(List<Individual> parents){
+    public List<Individual> crossover(List<Individual> parents, int generationCount){
         List<Individual> new_population = new ArrayList<>();
         Random rand = new Random();
         while (new_population.size() < Parameters.populationSize){
@@ -103,6 +103,17 @@ public class Population {
                         }
                     }
                 }
+            }
+        }
+
+        for (Individual individual : new_population) {
+            if (rand.nextDouble() >= Parameters.mutationProbability) {
+                if (generationCount % 10 == 0) {
+                    individual.interDepotMutation();
+                } else {
+                    individual.getDepots().get(rand.nextInt(individual.getDepots().size())).intraDepotMutation();
+                }
+                individual.calculateFitness();
             }
         }
         return new_population;
