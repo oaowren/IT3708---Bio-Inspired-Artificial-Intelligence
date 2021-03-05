@@ -91,16 +91,17 @@ public class Individual{
         // Select a random depot for each offspring
         Depot depot1 = offspring1.getDepots().get(rand.nextInt(offspring1.getDepots().size()));
         while (!depot1.hasActiveVehicles()){
+            System.out.println("No active vehicles 1");
             depot1 = offspring1.getDepots().get(rand.nextInt(offspring1.getDepots().size()));
         }
         Depot depot2 = offspring2.getDepots().get(rand.nextInt(offspring2.getDepots().size()));
         while (!depot2.hasActiveVehicles()){
+            System.out.println("No active vehicles 2");
             depot2 = offspring2.getDepots().get(rand.nextInt(offspring2.getDepots().size()));
         }
         // Select a random route for each depot, empty routes can not be selected
         Vehicle vehicle1 = depot1.getAllVehicles().get(rand.nextInt(depot1.getAllVehicles().size()));
         while (!vehicle1.isActive()){
-
             vehicle1 = depot1.getAllVehicles().get(rand.nextInt(depot1.getAllVehicles().size()));
         };
         Vehicle vehicle2 = depot2.getAllVehicles().get(rand.nextInt(depot2.getAllVehicles().size()));

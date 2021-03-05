@@ -28,6 +28,7 @@ public class Depot{
         this.maxVehicles = depot.maxVehicles;
         this.x = depot.x;
         this.y = depot.y;
+        this.swappableCustomers = depot.getSwappableCustomers();
         this.vehicles = vehicles;
     }
 
@@ -208,6 +209,10 @@ public class Depot{
         } else {
             throw new IllegalArgumentException("Customer should not be added as a swappable customer to a Depot more than once!");
         }
+    }
+
+    public List<Customer> getSwappableCustomers(){
+        return this.swappableCustomers;
     }
 
     @Override

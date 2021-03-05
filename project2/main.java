@@ -9,11 +9,11 @@ class Main{
         dataSet.readDataFile("project2/Data Files/"+Parameters.problem);
         HashMap<Integer, Customer> customers = dataSet.getCustomers();
         List<Depot> depots = dataSet.getDepots();
-        GeneticAlgorithm.initialDepotClustering(depots, customers.values());
         Fitness.populateCustomers(customers);
         Population p = new Population(dataSet.getMaxNumOfVehicles());
         p.setCustomers(customers);
         p.setDepots(depots);
+        GeneticAlgorithm.initialDepotClustering(depots, customers.values());
         p.generatePopulation();
         System.out.println(p.getIndividuals().stream()
                                              .map(Fitness::getIndividualRouteFitness)

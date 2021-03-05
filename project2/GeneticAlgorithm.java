@@ -23,7 +23,7 @@ public class GeneticAlgorithm {
                 // "Using Genetic Algorithms for Multi-depot Vehicle Routing" p. 90:
                 if (((distance_c_d - closestDistance)/closestDistance) <= Parameters.swappableCustomerDistance) {
                     c.candidateList.add(depots.get(i));
-                    closestDepot.addSwappableCustomer(c);
+                    depots.get(i).addSwappableCustomer(c);
                 }
             }
         }
