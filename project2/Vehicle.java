@@ -107,13 +107,15 @@ public class Vehicle{
     }
 
     public String getCustomerSequence(){
-        return this.customers.stream()
-                            .map(c -> Integer.toString(c.id))
-                            .reduce("", (output, c) -> output + (output.matches("")? "":" ") + c);
+        return customers.stream()
+                        .map(c -> Integer.toString(c.id))
+                        .reduce("", (output, c) -> output + (output.matches("")? "":" ") + c);
     }
 
     public List<Integer> getCustomersId(){
-        return this.customers.stream().map(c->c.id).collect(Collectors.toList());
+        return customers.stream()
+                        .map(c->c.id)
+                        .collect(Collectors.toList());
     }
 
     public List<Customer> getCustomers(){
