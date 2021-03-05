@@ -16,7 +16,7 @@ public class Fitness{
     }
 
     // Memoized in routeMemo
-    public static Double getVehicleFitness(Vehicle vehicle, Depot depot){
+    public static double getVehicleFitness(Vehicle vehicle, Depot depot){
         Tuple<String, Depot> pair = new Tuple<>(vehicle.getCustomerSequence(), depot);
         if (routeMemo.containsKey(pair)){
             return routeMemo.get(pair);
@@ -24,7 +24,7 @@ public class Fitness{
         if (!vehicle.isActive()){
             return 0.0;
         }
-        Double distance = 0.0;
+        double distance = 0.0;
         List<Integer> vehicleCustomers = vehicle.getCustomersId();
         int final_ind = vehicleCustomers.size()-1;
         distance += getDistance(depot.x, customers.get(vehicleCustomers.get(0)).x, depot.y, customers.get(vehicleCustomers.get(0)).y);
@@ -36,7 +36,7 @@ public class Fitness{
         return distance;
     }
 
-    public static Double getIndividualFitness(Individual individual) {
+    public static double getIndividualFitness(Individual individual) {
         int numberOfActiveVehicles = 0;
         List<Depot> depots = individual.getDepots();
         for (Depot d: depots){
@@ -48,14 +48,14 @@ public class Fitness{
         return Parameters.alpha * numberOfActiveVehicles + Parameters.beta * fitness;
     }
 
-    public static Double getIndividualRouteFitness(Individual individual){
+    public static double getIndividualRouteFitness(Individual individual){
         return individual.getDepots().stream()
                                      .map(Fitness::getDepotFitness)
                                      .reduce(0.0, (subtotal, depot) -> subtotal + depot);
     }
 
-    public static Double getDepotFitness(Depot depot){
-        Double distance = 0.0;
+    public static double getDepotFitness(Depot depot){
+        double distance = 0.0;
         for (Vehicle v: depot.getAllVehicles()){
             distance += getVehicleFitness(v, depot);
         }
@@ -70,9 +70,15 @@ public class Fitness{
         if (pairMemo.containsKey(pair)){
             return pairMemo.get(pair);
         }
-        Double result = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
+        double result = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
         pairMemo.put(pair, result);
         return result;
+    }
+    public static double getDistance(Customer customer, Depot depot) {
+        return getDistance(customer.x, depot.x, customer.y, depot.y);
+    }
+    public static double getDistance(Depot depot1, Depot depot2) {
+        return getDistance(depot1.x, depot2.x, depot1.y, depot2.y);
     }
 }
 

@@ -194,6 +194,12 @@ public class Depot{
         vehicle2.getCustomers().set(randCustomer2, customer1);
     }
 
+    public List<Customer> getAllCustomersInVehicles() {
+        return vehicles.stream()
+                       .flatMap(v -> v.getCustomers().stream())
+                       .collect(Collectors.toList());
+    }
+
     public boolean hasActiveVehicles(){
         for (Vehicle v: this.vehicles){
             if (v.isActive()){

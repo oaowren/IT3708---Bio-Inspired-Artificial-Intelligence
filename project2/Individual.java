@@ -1,8 +1,9 @@
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.Random;
 import DataClasses.Tuple;
@@ -59,20 +60,27 @@ public class Individual{
     }
 
     public void createRandomIndividual(HashMap<Integer, Customer> customers){
-        Set<Integer> customerIds = customers.keySet();
+        Collection<Customer> customerValues = customers.values();
+        Collections.shuffle(new ArrayList<>(customerValues));
         Random rand = new Random();
-        for (int c: customerIds){
-            boolean success = false;
-            while (!success){
-                try {
-                    Depot depot = depots.stream()
-                                        .filter((d) -> d.id == customers.get(c).getClosestDepot())
-                                        .findFirst()
-                                        .orElseThrow(() -> new IllegalArgumentException("Depot was not found!"));
-                    depot.getVehicleById(rand.nextInt(depot.getAllVehicles().size())+1).visitCustomer(customers.get(c));
-                    success = true;
-                } catch (IllegalStateException e) {
-                    success = false;
+        for (Customer c: customerValues){
+            List<Depot> validDepots = depots.stream()
+                                            .filter((d) -> c.candidateList.contains(d.id))
+                                            .collect(Collectors.toList());
+            for (Depot depot : validDepots) {
+                boolean notAssigned = true;
+                int vehicleId = depot.getAllVehicles().size();
+                while (notAssigned) {
+                    try {
+                        depot.getVehicleById(vehicleId).visitCustomer(c);
+                        notAssigned = false;
+                    } catch(IllegalStateException e) {
+                        vehicleId--;
+                        if (vehicleId <= 0) break;
+                    }
+                }
+                if (!notAssigned) {
+                    break;
                 }
             }
         }
@@ -129,6 +137,16 @@ public class Individual{
         offspring1.calculateFitness();
         offspring2.calculateFitness();
         return new Tuple<>(offspring1, offspring2);
+    }
+
+    public void interDepotMutation() {
+        Random rand = new Random();
+        Depot randomDepot1 = getDepots().get(rand.nextInt(getDepots().size()));
+        Depot randomDepot2 = getDepots().get(rand.nextInt(getDepots().size()));
+        while(randomDepot1 == randomDepot2) {
+            randomDepot2 = getDepots().get(rand.nextInt(getDepots().size()));
+        }
+        // TODO:
     }
 
     @Override
