@@ -15,7 +15,7 @@ public class GeneticAlgorithm {
             }
             c.candidateList.add(closestDepot.id);
             closestDepot.addSwappableCustomer(c);
-            for (int i = 1; i < depots.size(); i++) {
+            for (int i = 0; i < depots.size(); i++) {
                 if (depots.get(i) == closestDepot) {
                     continue;
                 }

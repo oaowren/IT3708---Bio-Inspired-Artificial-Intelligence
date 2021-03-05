@@ -1,11 +1,11 @@
 public class Parameters {
     
-    static final String problem = "p23";
-    static final int populationSize = 50;
+    static final String problem = "p01";
+    static final int populationSize = 2;
     static final int generationSpan = 50;
-    static final int eliteSize = 5;
-    static final int tournamentSize = 6;
-    static final int parentSelectionSize = 20;
+    static final int eliteSize = 0;
+    static final int tournamentSize = 2;
+    static final int parentSelectionSize = 2;
     static final double tournamentProb = 0.85;
     static final double crossoverProbability = 0.60;
     static final double intraDepotMutationProbability = 0.20;
