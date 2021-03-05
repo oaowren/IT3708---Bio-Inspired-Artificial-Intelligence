@@ -3,10 +3,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.Random;
-import DataClasses.Customer;
 import DataClasses.Tuple;
 
 public class Individual{
+
     private List<Depot> depots;
     private int maxVehicles;
     private double fitness;
@@ -62,8 +62,8 @@ public class Individual{
         for (int c: customerIds){
             boolean success = false;
             while (!success){
-                try{
-                    Depot depot = this.depots.get(rand.nextInt(this.depots.size()));
+                try {
+                    Depot depot = customers.get(c).getClosestDepot();
                     depot.getVehicleById(rand.nextInt(depot.getAllVehicles().size())+1).visitCustomer(customers.get(c));
                     success = true;
                 } catch (IllegalStateException e) {

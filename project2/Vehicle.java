@@ -4,7 +4,6 @@ import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-import DataClasses.Customer;
 import DataClasses.Tuple;
 
 

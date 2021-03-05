@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import DataClasses.Customer;
 import DataClasses.Tuple;
 
 public class Depot{
 
     public final int id, maxLoad, maxVehicles, maxDuration, x, y;
-    private List<Vehicle> vehicles = new ArrayList<Vehicle>();
+    private List<Vehicle> vehicles = new ArrayList<>();
+    private List<Customer> swappableCustomers = new ArrayList<>();
     
     public Depot(int id, int maxVehicles, int maxDuration, int maxLoad, int x, int y){
         this.id = id;
@@ -201,6 +201,14 @@ public class Depot{
         return false;
     }
 
+
+    public void addSwappableCustomer(Customer customer) {
+        if (!swappableCustomers.contains(customer)) {
+            swappableCustomers.add(customer);
+        } else {
+            throw new IllegalArgumentException("Customer should not be added as a swappable customer to a Depot more than once!");
+        }
+    }
 
     @Override
     public String toString() {

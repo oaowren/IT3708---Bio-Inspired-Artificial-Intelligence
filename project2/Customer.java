@@ -1,5 +1,5 @@
-package DataClasses;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Customer{
@@ -7,12 +7,17 @@ public class Customer{
     public final int x;
     public final int y;
     public final int demand;
-    
+    public final List<Depot> candidateList = new ArrayList<>();
+
     public Customer(int id, int x, int y, int demand) {
         this.id = id;
         this.x = x;
         this.y = y;
         this.demand = demand;
+    }
+
+    public Depot getClosestDepot() {
+        return candidateList.get(0);
     }
 
     @Override
