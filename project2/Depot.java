@@ -12,7 +12,7 @@ public class Depot{
     private List<Vehicle> vehicles = new ArrayList<>();
     private List<Customer> swappableCustomers = new ArrayList<>();
     
-    public Depot(int id, int maxVehicles, int maxDuration, int maxLoad, int x, int y){
+    public Depot(int id, int maxVehicles, int maxDuration, int maxLoad, int x, int y) {
         this.id = id;
         this.maxLoad = maxLoad;
         this.maxDuration = maxDuration;
@@ -21,7 +21,7 @@ public class Depot{
         this.y = y;
     }
 
-    public Depot(Depot depot, List<Vehicle> vehicles){
+    public Depot(Depot depot, List<Vehicle> vehicles) {
         this.id = depot.id;
         this.maxLoad = depot.maxLoad;
         this.maxDuration = depot.maxDuration;
@@ -32,55 +32,55 @@ public class Depot{
         this.vehicles = vehicles;
     }
 
-    public Vehicle getVehicleById(int id){
+    public Vehicle getVehicleById(int id) {
         return vehicles.stream()
                        .filter(v -> v.id == id)
                        .findAny()
                        .orElse(null);
     }
 
-    public boolean removeCustomer(Customer c){
+    public boolean removeCustomer(Customer c) {
         return vehicles.stream()
                        .anyMatch(vehicle -> vehicle.removeCustomer(c));
     }
 
-    public void removeVehicleById(int id){
+    public void removeVehicleById(int id) {
         vehicles = vehicles.stream()
                            .filter(v -> v.id != id)
                            .collect(Collectors.toList());
     }
 
-    public boolean insertAtMostFeasible(Customer customer){
+    public boolean insertAtMostFeasible(Customer customer) {
         Vehicle vehicle = null;
         int maxFeasible = -1;
         double minFitness = Integer.MAX_VALUE;
-        for (int i=0; i<this.vehicles.size(); i++){
+        for (int i=0; i<this.vehicles.size(); i++) {
             Depot depotClone = this.clone();
             Vehicle v = depotClone.getAllVehicles().get(i);
             Tuple<Integer, Double> best = v.mostFeasibleInsertion(customer);
-            if (best != null){
+            if (best != null) {
                 v.insertCustomer(customer, best.x);
                 Double newFitness = Fitness.getDepotFitness(depotClone);
-                if (newFitness < minFitness){
+                if (newFitness < minFitness) {
                     vehicle = this.vehicles.get(i);
                     minFitness = newFitness;
                     maxFeasible = best.x;            
                 }
             }
         }
-        if (maxFeasible == -1){
+        if (maxFeasible == -1) {
             return false;
         }
         vehicle.insertCustomer(customer, maxFeasible);
         return true;
     }
 
-    public List<Vehicle> getAllVehicles(){
+    public List<Vehicle> getAllVehicles() {
         return this.vehicles;
     }
 
-    public void addVehicle(Vehicle v){
-        if (this.vehicles.size() >= this.maxVehicles){
+    public void addVehicle(Vehicle v) {
+        if (this.vehicles.size() >= this.maxVehicles) {
             throw new IllegalStateException("Too many vehicles");
         }
         v.setDepot(this);
@@ -194,7 +194,7 @@ public class Depot{
                        .collect(Collectors.toList());
     }
 
-    public boolean hasActiveVehicles(){
+    public boolean hasActiveVehicles() {
         return vehicles.stream().anyMatch(Vehicle::isActive);
     }
 
@@ -207,7 +207,7 @@ public class Depot{
         }
     }
 
-    public List<Customer> getSwappableCustomers(){
+    public List<Customer> getSwappableCustomers() {
         return this.swappableCustomers;
     }
 
@@ -217,10 +217,10 @@ public class Depot{
     }
 
     @Override
-    public Depot clone(){
+    public Depot clone() {
         List<Vehicle> vehicles = new ArrayList<>();
         Depot depot = new Depot(this, vehicles);
-        for (Vehicle v: this.vehicles){
+        for (Vehicle v: this.vehicles) {
             depot.addVehicle(v.clone());
         }
         return depot;
