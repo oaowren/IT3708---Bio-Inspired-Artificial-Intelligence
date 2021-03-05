@@ -13,7 +13,7 @@ public class GeneticAlgorithm {
                     closestDistance = Fitness.getDistance(c.x, c.y, closestDepot.x, closestDepot.y);
                 }
             }
-            c.candidateList.add(closestDepot);
+            c.candidateList.add(closestDepot.id);
             closestDepot.addSwappableCustomer(c);
             for (int i = 1; i < depots.size(); i++) {
                 if (depots.get(i) == closestDepot) {
@@ -22,7 +22,7 @@ public class GeneticAlgorithm {
                 double distance_c_d = Fitness.getDistance(c.x, c.y, depots.get(i).x, depots.get(i).y);
                 // "Using Genetic Algorithms for Multi-depot Vehicle Routing" p. 90:
                 if (((distance_c_d - closestDistance)/closestDistance) <= Parameters.swappableCustomerDistance) {
-                    c.candidateList.add(depots.get(i));
+                    c.candidateList.add(depots.get(i).id);
                     depots.get(i).addSwappableCustomer(c);
                 }
             }

@@ -7,7 +7,7 @@ public class Customer{
     public final int x;
     public final int y;
     public final int demand;
-    public final List<Depot> candidateList = new ArrayList<>();
+    public final List<Integer> candidateList = new ArrayList<>(); // List of depot IDs
 
     public Customer(int id, int x, int y, int demand) {
         this.id = id;
@@ -16,7 +16,7 @@ public class Customer{
         this.demand = demand;
     }
 
-    public Depot getClosestDepot() {
+    public int getClosestDepot() {
         return candidateList.get(0);
     }
 
