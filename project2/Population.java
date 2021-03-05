@@ -101,29 +101,24 @@ public class Population {
                     if (rand.nextDouble()<Parameters.crossoverProbability){
                         Tuple<Individual, Individual> offspring = p1.crossover(p2);
                         if (!Objects.isNull(offspring)){
-                            // System.out.println(offspring.x.numberOfCustomers());
-                            if (offspring.x.numberOfCustomers() == customers.size()){
-                                new_population.add(offspring.x);
-                            }
-                            if (offspring.y.numberOfCustomers() == customers.size()){
-                                new_population.add(offspring.y);
-                            }
+                            new_population.add(offspring.x);
+                            new_population.add(offspring.y);
                         }
                     }
                 }
             }
         }
 
-        for (Individual individual : new_population) {
-            if (rand.nextDouble() >= Parameters.mutationProbability) {
-                if (generationCount % 10 == 0) {
-                    individual.interDepotMutation();
-                } else {
-                    individual.getDepots().get(rand.nextInt(individual.getDepots().size())).intraDepotMutation();
-                }
-                individual.calculateFitness();
-            }
-        }
+        // for (Individual individual : new_population) {
+        //     if (rand.nextDouble() >= Parameters.mutationProbability) {
+        //         if (generationCount % 10 == 0) {
+        //             individual.interDepotMutation();
+        //         } else {
+        //             individual.getDepots().get(rand.nextInt(individual.getDepots().size())).intraDepotMutation();
+        //         }
+        //         individual.calculateFitness();
+        //     }
+        // }
         return new_population;
     }
 

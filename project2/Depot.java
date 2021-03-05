@@ -73,7 +73,6 @@ public class Depot{
                 }
             }
         }
-        // System.out.println("Insert "+customer.id);
         if (maxFeasible == -1){
             return false;
         }

@@ -61,8 +61,7 @@ public class Individual{
 
     public void createRandomIndividual(HashMap<Integer, Customer> customers){
         Collection<Customer> customerValues = customers.values();
-        Collections.shuffle(new ArrayList<>(customerValues));
-        Random rand = new Random();
+        Collections.shuffle(new ArrayList<>(customerValues), new Random());
         for (Customer c: customerValues){
             List<Depot> validDepots = depots.stream()
                                             .filter((d) -> c.candidateList.contains(d.id))

@@ -21,7 +21,7 @@ class Main{
         System.out.println(p.getIndividuals().stream()
                                              .map(Fitness::getIndividualRouteFitness)
                                              .collect(Collectors.toList()));
-        System.out.println(p.getIndividuals().stream().map(n->n.numberOfCustomers()).collect(Collectors.toList()));
+        gFitness.add(new Tuple<>(0, Fitness.getIndividualRouteFitness(p.getFittestIndividual(true))));
         for (int i=0; i< Parameters.generationSpan; i++){
             System.out.println(i+1);
             List<Individual> parents = p.tournamentSelection();
@@ -31,11 +31,6 @@ class Main{
             gFitness.add(new Tuple<>(i+1, Fitness.getIndividualRouteFitness(p.getFittestIndividual(true))));
         }
         DataSetIo.writeResults(p.getFittestIndividual(true), "project2/Results/"+Parameters.problem);
-        DataSetIo.writeGenerations(gFitness, "testorama.txt");
+        DataSetIo.writeGenerations(gFitness, "project2/Generations/"+Parameters.problem);
     }
-
-    /*TODO:
-    - Mutation (intra-depot and inter-depot)
-     - Intra-depot e.g. inverse-mutation (reverse subset of route)
-     - Inter-depot find example*/
 }
