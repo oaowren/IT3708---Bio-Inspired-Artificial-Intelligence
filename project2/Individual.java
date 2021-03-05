@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,8 +61,8 @@ public class Individual{
     }
 
     public void createRandomIndividual(HashMap<Integer, Customer> customers){
-        Collection<Customer> customerValues = customers.values();
-        Collections.shuffle(new ArrayList<>(customerValues), new Random());
+        List<Customer> customerValues = new ArrayList<>(customers.values());
+        Collections.shuffle(customerValues);
         for (Customer c: customerValues){
             List<Depot> validDepots = depots.stream()
                                             .filter((d) -> c.candidateList.contains(d.id))
