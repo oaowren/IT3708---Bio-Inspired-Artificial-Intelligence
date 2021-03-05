@@ -30,6 +30,13 @@ public class Population {
         return this.individuals;
     }
 
+    public Individual getFittestIndividual(boolean route){
+        // route denotes whether to only calculate based on pure route or fitness-measure with number of routes as well
+        this.individuals.sort((a,b) -> route ? (Fitness.getIndividualRouteFitness(a) > Fitness.getIndividualFitness(b) ? 1 : -1) : (a.getFitness() > b.getFitness() ? 1 : -1));
+        return this.individuals.get(0);
+        
+    }
+
     public void generatePopulation() {
         Individual newIndividual = null;
         for (int i = 0; i < Parameters.populationSize; i++) {
@@ -94,6 +101,7 @@ public class Population {
                     if (rand.nextDouble()<Parameters.crossoverProbability){
                         Tuple<Individual, Individual> offspring = p1.crossover(p2);
                         if (!Objects.isNull(offspring)){
+                            // System.out.println(offspring.x.numberOfCustomers());
                             if (offspring.x.numberOfCustomers() == customers.size()){
                                 new_population.add(offspring.x);
                             }

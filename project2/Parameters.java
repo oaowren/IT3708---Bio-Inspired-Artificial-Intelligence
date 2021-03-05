@@ -1,6 +1,6 @@
 public class Parameters {
     
-    static final String problem = "p23";
+    static final String problem = "p02";
     static final int populationSize = 70;
     static final int generationSpan = 50;
     static final int eliteSize = 3;

@@ -2,9 +2,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Comparator;
+import java.util.ArrayList;
+import DataClasses.*;
 
 class Main{
     public static void main(String[] args){
+        List<Tuple<Integer, Double>> gFitness = new ArrayList<>();
         DataSetIo dataSet = new DataSetIo();
         dataSet.readDataFile("project2/Data Files/"+Parameters.problem);
         HashMap<Integer, Customer> customers = dataSet.getCustomers();
@@ -25,10 +28,10 @@ class Main{
             List<Individual> offspring = p.crossover(parents);
             List<Individual> new_pop = p.survivor_selection(parents, offspring);
             p.setNewPopulation(new_pop);
+            gFitness.add(new Tuple<>(i+1, Fitness.getIndividualRouteFitness(p.getFittestIndividual(true))));
         }
-        List<Individual> pop = p.getIndividuals();
-        pop.sort(Comparator.comparingDouble(Individual::getFitness));
-        DataSetIo.writeResults(pop.get(0), "project2/Results/"+Parameters.problem);
+        DataSetIo.writeResults(p.getFittestIndividual(true), "project2/Results/"+Parameters.problem);
+        DataSetIo.writeGenerations(gFitness, "testorama.txt");
     }
 
     /*TODO:

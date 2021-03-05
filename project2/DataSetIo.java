@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import DataClasses.Tuple;
+
 public class DataSetIo {
     
     private List<List<Integer>> dataSet;
@@ -49,6 +51,15 @@ public class DataSetIo {
         try {
             Files.write(Paths.get(filename), lines);
         } catch (IOException error) {
+            System.out.println(error.toString());
+        }
+    }
+
+    public static void writeGenerations(List<Tuple<Integer, Double>> generationalFitness, String filename){
+        List<String> lines = generationalFitness.stream().map(gf->String.format("%d\t%.2f", gf.x, gf.y)).collect(Collectors.toList());
+        try{
+            Files.write(Paths.get(filename), lines);
+        } catch (IOException error){
             System.out.println(error.toString());
         }
     }
