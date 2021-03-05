@@ -6,11 +6,12 @@ public class GeneticAlgorithm {
     public static void initialDepotClustering(List<Depot> depots, Collection<Customer> customers) {
         for (Customer c : customers) {
             Depot closestDepot = depots.get(0);
-            double closestDistance = Fitness.getDistance(c.x, c.y, closestDepot.x, closestDepot.y);
+            double closestDistance = Fitness.getDistance(c.x, closestDepot.x, c.y, closestDepot.y);
             for (int i = 1; i < depots.size(); i++) {
-                if (Fitness.getDistance(c.x, c.y, depots.get(i).x, depots.get(i).y) < closestDistance) {
+                Double fitness = Fitness.getDistance(c.x, depots.get(i).x, c.y, depots.get(i).y);
+                if (fitness < closestDistance) {
                     closestDepot = depots.get(i);
-                    closestDistance = Fitness.getDistance(c.x, c.y, closestDepot.x, closestDepot.y);
+                    closestDistance = Fitness.getDistance(c.x,closestDepot.x, c.y, closestDepot.y);
                 }
             }
             c.candidateList.add(closestDepot.id);
