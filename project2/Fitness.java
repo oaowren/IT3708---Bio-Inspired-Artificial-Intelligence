@@ -27,23 +27,21 @@ public class Fitness{
         double distance = 0.0;
         List<Integer> vehicleCustomers = vehicle.getCustomersId();
         int final_ind = vehicleCustomers.size()-1;
-        distance += getDistance(depot.x, customers.get(vehicleCustomers.get(0)).x, depot.y, customers.get(vehicleCustomers.get(0)).y);
+        distance += getDistance(customers.get(vehicleCustomers.get(0)), depot);
         for (int i = 0;i<final_ind;i++){
-            distance += getDistance(customers.get(vehicleCustomers.get(i)).x, customers.get(vehicleCustomers.get(i+1)).x, customers.get(vehicleCustomers.get(i)).y, customers.get(vehicleCustomers.get(i+1)).y);
+            distance += getDistance(customers.get(vehicleCustomers.get(i)), customers.get(vehicleCustomers.get(i+1)));
         }
-        distance += getDistance(depot.x, customers.get(vehicleCustomers.get(final_ind)).x, depot.y, customers.get(vehicleCustomers.get(0)).y);
+        distance += getDistance(customers.get(vehicleCustomers.get(final_ind)), depot);
         routeMemo.put(pair, distance);
         return distance;
     }
 
     public static double getIndividualFitness(Individual individual) {
-        int numberOfActiveVehicles = 0;
         List<Depot> depots = individual.getDepots();
-        for (Depot d: depots){
-            for (Vehicle v: d.getAllVehicles()){
-                numberOfActiveVehicles += v.isActive()?1:0;
-            }
-        }
+        int numberOfActiveVehicles = depots.stream()
+                                           .flatMap(depot -> depot.getAllVehicles().stream())
+                                           .map(vehicle -> vehicle.isActive() ? 1 : 0)
+                                           .reduce(0, (subtotal, element) -> subtotal + element);
         double fitness = getIndividualRouteFitness(individual);
         return Parameters.alpha * numberOfActiveVehicles + Parameters.beta * fitness;
     }
@@ -51,15 +49,13 @@ public class Fitness{
     public static double getIndividualRouteFitness(Individual individual){
         return individual.getDepots().stream()
                                      .map(Fitness::getDepotFitness)
-                                     .reduce(0.0, (subtotal, depot) -> subtotal + depot);
+                                     .reduce(0.0, (subtotal, element) -> subtotal + element);
     }
 
     public static double getDepotFitness(Depot depot){
-        double distance = 0.0;
-        for (Vehicle v: depot.getAllVehicles()){
-            distance += getVehicleFitness(v, depot);
-        }
-        return distance;
+        return depot.getAllVehicles().stream()
+                                     .map(vehicle -> getVehicleFitness(vehicle, depot))
+                                     .reduce(0.0, (subtotal, element) -> subtotal + element);
     }
 
     // Memoized in pairMemo
@@ -74,9 +70,15 @@ public class Fitness{
         pairMemo.put(pair, result);
         return result;
     }
+    
+    public static double getDistance(Customer customer1, Customer customer2) {
+        return getDistance(customer1.x, customer2.x, customer1.y, customer2.y);
+    }
+
     public static double getDistance(Customer customer, Depot depot) {
         return getDistance(customer.x, depot.x, customer.y, depot.y);
     }
+
     public static double getDistance(Depot depot1, Depot depot2) {
         return getDistance(depot1.x, depot2.x, depot1.y, depot2.y);
     }

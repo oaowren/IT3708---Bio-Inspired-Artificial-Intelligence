@@ -46,8 +46,8 @@ public class Depot{
 
     public void removeVehicleById(int id){
         vehicles = vehicles.stream()
-                            .filter(v -> v.id != id)
-                            .collect(Collectors.toList());
+                           .filter(v -> v.id != id)
+                           .collect(Collectors.toList());
     }
 
     public boolean insertAtMostFeasible(Customer customer){
