@@ -16,6 +16,10 @@ public class Customer{
         this.demand = demand;
     }
 
+    public Depot getClosestDepot() {
+        return candidateList.get(0);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == this)

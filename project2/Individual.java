@@ -7,8 +7,6 @@ import DataClasses.Tuple;
 
 public class Individual{
 
-    private static final HashMap<Customer, Depot> closestDepotMemo = new HashMap<>();
-
     private List<Depot> depots;
     private int maxVehicles;
     private double fitness;
@@ -64,21 +62,8 @@ public class Individual{
         for (int c: customerIds){
             boolean success = false;
             while (!success){
-                try{
-                    Depot depot;
-                    if (closestDepotMemo.containsKey(customers.get(c))) {
-                        depot = closestDepotMemo.get(customers.get(c));
-                    } else {
-                        Depot closestDepot = depots.get(0);
-                        double closestDistance = Fitness.getDistance(customers.get(c).x, customers.get(c).y, closestDepot.x, closestDepot.y);
-                        for (int i = 1; i < depots.size(); i++) {
-                            if (Fitness.getDistance(customers.get(c).x, customers.get(c).y, depots.get(i).x, depots.get(i).y) < closestDistance) {
-                                closestDepot = depots.get(i);
-                                closestDistance = Fitness.getDistance(customers.get(c).x, customers.get(c).y, closestDepot.x, closestDepot.y);
-                            }
-                        }
-                        depot = closestDepot;
-                    }
+                try {
+                    Depot depot = customers.get(c).getClosestDepot();
                     depot.getVehicleById(rand.nextInt(depot.getAllVehicles().size())+1).visitCustomer(customers.get(c));
                     success = true;
                 } catch (IllegalStateException e) {
