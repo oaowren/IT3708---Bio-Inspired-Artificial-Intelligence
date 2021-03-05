@@ -1,7 +1,6 @@
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-import DataClasses.Customer;
 import java.util.Comparator;
 
 class Main{
@@ -10,6 +9,7 @@ class Main{
         dataSet.readDataFile("project2/Data Files/"+Parameters.problem);
         HashMap<Integer, Customer> customers = dataSet.getCustomers();
         List<Depot> depots = dataSet.getDepots();
+        GeneticAlgorithm.initialDepotClustering(depots, customers.values());
         Fitness.populateCustomers(customers);
         Population p = new Population(dataSet.getMaxNumOfVehicles());
         p.setCustomers(customers);

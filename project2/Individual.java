@@ -3,7 +3,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.Random;
-import DataClasses.Customer;
 import DataClasses.Tuple;
 
 public class Individual{
