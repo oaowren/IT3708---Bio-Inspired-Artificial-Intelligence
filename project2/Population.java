@@ -102,7 +102,7 @@ public class Population {
                         Tuple<Individual, Individual> offspring = p1.crossover(p2);
                         if (!Objects.isNull(offspring)){
                             new_population.add(offspring.x);
-                                new_population.add(offspring.y);
+                            new_population.add(offspring.y);
                         }
                     }
                 }

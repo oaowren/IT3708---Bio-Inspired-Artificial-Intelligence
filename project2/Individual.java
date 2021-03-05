@@ -1,10 +1,7 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.Random;
 import DataClasses.Tuple;
@@ -26,6 +23,10 @@ public class Individual{
     
     public List<Depot> getDepots() {
         return this.depots;
+    }
+
+    public Depot getDepotById(int id){
+        return this.depots.stream().filter(d-> d.id == id).findFirst().orElseThrow(() -> new IllegalArgumentException("Depot not found"));
     }
 
     public double getFitness(){
@@ -50,7 +51,6 @@ public class Individual{
     }
 
     public int numberOfCustomers(){
-        /* Used for debugging :):) */
         int cust = 0;
         for (Depot d: this.depots){
             for (Vehicle v: d.getAllVehicles()){
@@ -64,11 +64,9 @@ public class Individual{
         List<Customer> customerValues = new ArrayList<>(customers.values());
         Collections.shuffle(customerValues);
         for (Customer c: customerValues){
-            List<Depot> validDepots = depots.stream()
-                                            .filter((d) -> c.candidateList.contains(d.id))
-                                            .collect(Collectors.toList());
-            for (Depot depot : validDepots) {
+            for (int id : c.candidateList) {
                 boolean notAssigned = true;
+                Depot depot = this.getDepotById(id);
                 int vehicleId = depot.getAllVehicles().size();
                 while (notAssigned) {
                     try {
@@ -146,7 +144,6 @@ public class Individual{
         while(randomDepot1 == randomDepot2) {
             randomDepot2 = getDepots().get(rand.nextInt(getDepots().size()));
         }
-        // TODO:
     }
 
     @Override
