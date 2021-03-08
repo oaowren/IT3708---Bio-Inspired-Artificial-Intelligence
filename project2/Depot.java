@@ -97,7 +97,6 @@ public class Depot{
     public void intraDepotMutation() {
         Random rand = new Random();
         int randInt = rand.nextInt(3);
-        System.out.println(randInt);
         if (randInt == 0) {
             /*boolean mutationSuccessful = false;
             while (!mutationSuccessful) {
@@ -136,8 +135,6 @@ public class Depot{
         }
         int lowerBound = cutPoint1 < cutPoint2 ? cutPoint1 : cutPoint2;
         int upperBound = lowerBound == cutPoint1 ? cutPoint2 : cutPoint1;
-        System.out.println(lowerBound);
-        System.out.println(upperBound);
         // Swap each i-th customer from each cutpoint
         for (int i = 0; i < upperBound-lowerBound; i++) {
             Customer customer1 = allCustomersFromAllVehicles.get(lowerBound+i);
@@ -171,8 +168,6 @@ public class Depot{
 
         randVehicle.removeCustomer(randCustomer);
         insertAtMostFeasible(randCustomer);
-
-        System.out.println("REROUTE SUCCESSFUL");
     }
 
     /** 
@@ -209,7 +204,6 @@ public class Depot{
         randVehicle1.getCustomers().set(randCustomer1, customer2);
         randVehicle2.getCustomers().set(randCustomer2, customer1);
 
-        System.out.println("SWAP SUCCESSFUL");
     }
 
     public List<Customer> getAllCustomersInVehicles() {
