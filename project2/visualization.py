@@ -87,6 +87,6 @@ def visualize_generations(filename):
 
 
 if __name__ == '__main__':
-    problem = "p01"
+    problem = "p23"
     visualize_generations(problem)
     visualize_routes(problem)

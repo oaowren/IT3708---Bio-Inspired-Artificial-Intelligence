@@ -6,6 +6,7 @@ public class Fitness{
 
     // Memoize distance of route from/to a given depot
     private static final HashMap<Tuple<String, Depot>, Double> routeMemo = new HashMap<>();
+    private static final HashMap<Tuple<String, Depot>, Integer> routeAge = new HashMap<>();
     // Memoize euclidian distance between two points
     private static final HashMap<Tuple<Integer, Integer>, Double> pairMemo = new HashMap<>();
     private static final HashMap<Integer, Customer> customers = new HashMap<>();
@@ -15,10 +16,17 @@ public class Fitness{
         customers.putAll(newCustomers);
     }
 
+    public static void removeOldRoutes(){
+        routeMemo.entrySet().removeIf(v-> routeAge.get(v.getKey()) > Parameters.memoCacheMaxAge);
+        routeAge.entrySet().removeIf(v->v.getValue() > Parameters.memoCacheMaxAge);
+        routeAge.replaceAll((k,v) -> v + 1);
+    }
+
     // Memoized in routeMemo
     public static double getVehicleFitness(Vehicle vehicle, Depot depot) {
         Tuple<String, Depot> pair = new Tuple<>(vehicle.getCustomerSequence(), depot);
         if (routeMemo.containsKey(pair)) {
+            routeAge.put(pair, 0);
             return routeMemo.get(pair);
         }
         if (!vehicle.isActive()) {
@@ -33,6 +41,7 @@ public class Fitness{
         }
         distance += getDistance(customers.get(vehicleCustomers.get(final_ind)), depot);
         routeMemo.put(pair, distance);
+        routeAge.put(pair, 0);
         return distance;
     }
 

@@ -48,7 +48,7 @@ public class Population {
         return this.individuals;
     }
 
-    public Individual getFittestIndividual(){
+    public Individual getIndividualByRank(int index){
         // route denotes whether to only calculate based on pure route or fitness-measure with number of routes as well
         this.individuals.sort((a,b) -> {
             if (Fitness.getIndividualRouteFitness(a) > Fitness.getIndividualRouteFitness(b)){
@@ -58,7 +58,7 @@ public class Population {
             }
             return 0;
         });
-        return this.individuals.get(0);
+        return this.individuals.get(index);
         
     }
 
