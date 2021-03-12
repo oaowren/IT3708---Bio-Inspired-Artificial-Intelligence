@@ -141,6 +141,9 @@ public class Depot{
             allCustomersFromAllVehicles.addAll(vehicle.getCustomers());
             vehicleIndices.add(allCustomersFromAllVehicles.size()-1); // Keep indices for vehicles for permutation
         }
+        if (allCustomersFromAllVehicles.size() <= 1){
+            throw new IllegalStateException("If depot only has 1 vehicle then cutpoint will be equal");
+        }
         // Select two random (inequal) cutpoints in the list of all customers.
         int cutPoint1 = rand.nextInt(allCustomersFromAllVehicles.size());
         int cutPoint2 = rand.nextInt(allCustomersFromAllVehicles.size());

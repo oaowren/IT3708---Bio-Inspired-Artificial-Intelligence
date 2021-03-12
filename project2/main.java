@@ -20,16 +20,16 @@ class Main{
         System.out.println(p.getIndividuals().stream()
                                              .map(Fitness::getIndividualRouteFitness)
                                              .collect(Collectors.toList()));
-        gFitness.add(new Tuple<>(0, Fitness.getIndividualRouteFitness(p.getFittestIndividual(true))));
+        gFitness.add(new Tuple<>(0, Fitness.getIndividualRouteFitness(p.getFittestIndividual())));
         for (int i=0; i< Parameters.generationSpan; i++){
             System.out.println(i+1);
             List<Individual> parents = p.tournamentSelection();
             List<Individual> offspring = p.crossover(parents, i);
             List<Individual> new_pop = p.survivor_selection(parents, offspring);
             p.setNewPopulation(new_pop);
-            gFitness.add(new Tuple<>(i+1, Fitness.getIndividualRouteFitness(p.getFittestIndividual(true))));
+            gFitness.add(new Tuple<>(i+1, Fitness.getIndividualRouteFitness(p.getFittestIndividual())));
         }
-        DataSetIo.writeResults(p.getFittestIndividual(true), "project2/Results/"+Parameters.problem);
+        DataSetIo.writeResults(p.getFittestIndividual(), "project2/Results/"+Parameters.problem);
         DataSetIo.writeGenerations(gFitness, "project2/Generations/"+Parameters.problem);
     }
 }

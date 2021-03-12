@@ -48,9 +48,16 @@ public class Population {
         return this.individuals;
     }
 
-    public Individual getFittestIndividual(boolean route){
+    public Individual getFittestIndividual(){
         // route denotes whether to only calculate based on pure route or fitness-measure with number of routes as well
-        this.individuals.sort((a,b) -> route ? (Fitness.getIndividualRouteFitness(a) > Fitness.getIndividualFitness(b) ? 1 : -1) : (a.getFitness() > b.getFitness() ? 1 : -1));
+        this.individuals.sort((a,b) -> {
+            if (Fitness.getIndividualRouteFitness(a) > Fitness.getIndividualRouteFitness(b)){
+                return 1;
+            } else if(Fitness.getIndividualRouteFitness(a) < Fitness.getIndividualRouteFitness(b)){
+                return -1;
+            }
+            return 0;
+        });
         return this.individuals.get(0);
         
     }
@@ -66,7 +73,7 @@ public class Population {
 
     public List<Individual> tournamentSelection(){
         Random rand = new Random();
-        int popSize = this.individuals.size();
+        int popSize = Parameters.populationSize;
         List<Individual> parents = new ArrayList<>();
         // Create parents list of given parentSelectionSize in parameters
         while (parents.size() < Parameters.parentSelectionSize){
@@ -85,6 +92,7 @@ public class Population {
             for (int i=0;i<this.tournamentProbs.size();i++){
                 if (randselect < this.tournamentProbs.get(i)){
                     parents.add(selectedInds.get(i));
+                    break;
                 }
             }
             if (randselect > this.tournamentProbs.get(this.tournamentProbs.size()-1)){
