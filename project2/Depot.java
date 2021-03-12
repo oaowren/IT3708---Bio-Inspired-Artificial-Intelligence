@@ -165,6 +165,7 @@ public class Depot{
         }
         mutatedVehicleList.addAll(emptyVehicles);
         vehicles = mutatedVehicleList;
+        System.out.println("Reversed " + this.id + " sliced " + cutPoint1 + " to " + cutPoint2);
     }
 
     /**
@@ -183,6 +184,7 @@ public class Depot{
 
         randVehicle.removeCustomer(randCustomer);
         insertAtMostFeasible(randCustomer);
+        System.out.println("Rerouted in depot " + this.id + " rerouted " + randCustomer.id + " from " + randVehicle.id);
     }
 
     /** 
@@ -216,6 +218,7 @@ public class Depot{
         randVehicle1.getCustomers().set(randCustomer1, customer2);
         randVehicle2.getCustomers().set(randCustomer2, customer1);
 
+        System.out.println("Swapped in depot " + this.id + " swapped " + customer1.id + " and " + customer2.id);
     }
 
     public List<Customer> getAllCustomersInVehicles() {
