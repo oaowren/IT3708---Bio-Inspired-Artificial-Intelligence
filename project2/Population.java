@@ -117,7 +117,7 @@ public class Population {
         }
 
         for (Individual individual : new_population) {
-            if (rand.nextDouble() >= Parameters.mutationProbability) {
+            if (rand.nextDouble() <= Parameters.mutationProbability) {
                 if (generationCount % 10 == 0 && generationCount != 0) {
                     individual.interDepotMutation();
                 } else {
