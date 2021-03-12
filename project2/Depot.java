@@ -108,7 +108,6 @@ public class Depot{
                     tries++;
                 }
             }
-            // FIXME: MAGNUS 
         } else if (randInt == 1) {
             singleCustomerRerouting();
         } else {
