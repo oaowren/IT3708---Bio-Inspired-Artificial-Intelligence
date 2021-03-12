@@ -114,7 +114,11 @@ public class Population {
                 if (generationCount % 10 == 0 && generationCount != 0) {
                     individual.interDepotMutation();
                 } else {
-                    individual.getDepots().get(rand.nextInt(individual.getDepots().size())).intraDepotMutation();
+                    Depot randomDepot = individual.getDepots().get(rand.nextInt(individual.getDepots().size()));
+                    while (randomDepot.getAllCustomersFromAllVehicles().size() < 1) {
+                        randomDepot = individual.getDepots().get(rand.nextInt(individual.getDepots().size()));
+                    }
+                    randomDepot.intraDepotMutation();
                 }
                 individual.calculateFitness();
             }
