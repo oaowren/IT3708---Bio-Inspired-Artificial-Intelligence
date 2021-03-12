@@ -130,7 +130,7 @@ public class Population {
                     individual.interDepotMutation();
                 } else {
                     Depot randomDepot = individual.getDepots().get(rand.nextInt(individual.getDepots().size()));
-                    while (randomDepot.getAllCustomersFromAllVehicles().size() < 1) {
+                    while (randomDepot.getAllCustomersInVehicles().size() < 1) {
                         randomDepot = individual.getDepots().get(rand.nextInt(individual.getDepots().size()));
                     }
                     randomDepot.intraDepotMutation();

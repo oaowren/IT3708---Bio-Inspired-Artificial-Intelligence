@@ -138,15 +138,39 @@ public class Individual{
         return new Tuple<>(offspring1, offspring2);
     }
 
+    private List<Customer> allSwappableCustomers(Depot depot) {
+        List<Customer> allCustomersInDepot1 = depot.getAllCustomersInVehicles();
+        return depot.getSwappableCustomers().stream()
+                                            .filter(c -> allCustomersInDepot1.contains(c))
+                                            .collect(Collectors.toList());
+    }
+
     public void interDepotMutation() {
         Random rand = new Random();
+
         Depot randomDepot1 = getDepots().get(rand.nextInt(getDepots().size()));
-        while (randomDepot1.getAllCustomersFromAllVehicles().size() < 1) {
+        List<Customer> allSwappableCustomersDepot1 = allSwappableCustomers(randomDepot1);
+
+        while (allSwappableCustomersDepot1.size() < 1) {
             randomDepot1 = getDepots().get(rand.nextInt(getDepots().size()));
+            allSwappableCustomersDepot1 = allSwappableCustomers(randomDepot1);
         }
-        List<Customer> allCustomersDepot1 = randomDepot1.getAllCustomersFromAllVehicles();
-        Customer randomCustomer1 = allCustomersDepot1.get(rand.nextInt(allCustomersDepot1.size()));
-        Integer randomCandidateDepotId = randomCustomer1.candidateList.get(rand.nextInt(randomCustomer1.candidateList.size()));
+        /*
+        Customer randomCustomer1 = Utils.randomPick(allSwappableCustomersDepot1, (customer -> customer.candidateList.size() <= 1));
+        if (randomCustomer1 == null) return;
+*/
+        Customer randomCustomer1 = 
+            allSwappableCustomersDepot1.get(rand.nextInt(allSwappableCustomersDepot1.size()));
+        while (randomCustomer1.candidateList.size() <= 1) {
+            randomCustomer1 = 
+                allSwappableCustomersDepot1.get(rand.nextInt(allSwappableCustomersDepot1.size()));
+        }
+        Integer randomCandidateDepotId = 
+            randomCustomer1.candidateList.get(rand.nextInt(randomCustomer1.candidateList.size()));
+        while (randomCandidateDepotId.intValue() == randomDepot1.id) {
+            randomCandidateDepotId = 
+                randomCustomer1.candidateList.get(rand.nextInt(randomCustomer1.candidateList.size()));
+        }
         Map<Integer, Depot> depotMap = depots.stream()
                                              .collect(Collectors.toMap(depot -> depot.id, depot -> depot));
         Depot randomDepot2 = depotMap.get(randomCandidateDepotId);
@@ -160,6 +184,10 @@ public class Individual{
                 randomDepot1.removeCustomer(randomCustomer1);
                 // System.out.println("Moved " + randomCustomer1.id + " from " + randomDepot1.id + " to " + randomDepot2.id);
                 break;
+            } else {
+                while (randomCandidateDepotId.intValue() == randomDepot1.id) {
+                    randomCandidateDepotId = randomCustomer1.candidateList.get(rand.nextInt(randomCustomer1.candidateList.size()));
+                }
             }
             tries++;
         }
