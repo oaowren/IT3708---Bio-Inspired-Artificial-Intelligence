@@ -109,16 +109,16 @@ public class Population {
             }
         }
 
-        // for (Individual individual : new_population) {
-        //     if (rand.nextDouble() >= Parameters.mutationProbability) {
-        //         if (generationCount % 10 == 0) {
-        //             individual.interDepotMutation();
-        //         } else {
-        //             individual.getDepots().get(rand.nextInt(individual.getDepots().size())).intraDepotMutation();
-        //         }
-        //         individual.calculateFitness();
-        //     }
-        // }
+        for (Individual individual : new_population) {
+            if (rand.nextDouble() >= Parameters.mutationProbability) {
+                /*if (generationCount % 10 == 0) {
+                    individual.interDepotMutation();
+                } else {*/
+                    individual.getDepots().get(rand.nextInt(individual.getDepots().size())).intraDepotMutation();
+                //}
+                individual.calculateFitness();
+            }
+        }
         return new_population;
     }
 

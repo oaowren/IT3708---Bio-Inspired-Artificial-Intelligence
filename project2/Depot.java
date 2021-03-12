@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -95,9 +96,18 @@ public class Depot{
     
     public void intraDepotMutation() {
         Random rand = new Random();
-        int randInt = rand.nextInt(2);
+        int randInt = rand.nextInt(3);
         if (randInt == 0) {
-            reversalMutation();
+            boolean mutationSuccessful = false;
+            int tries = 0;
+            while (!mutationSuccessful && tries < 10) {
+                try {
+                    reversalMutation();
+                    mutationSuccessful = true;
+                } catch (IllegalStateException e) {
+                    tries++;
+                }
+            }
         } else if (randInt == 1) {
             singleCustomerRerouting();
         } else {
@@ -113,13 +123,18 @@ public class Depot{
         Random rand = new Random();
         List<Integer> vehicleIndices = new ArrayList<>();
         List<Customer> allCustomersFromAllVehicles = new ArrayList<>();
+        List<Vehicle> emptyVehicles = new ArrayList<>();
         /* 
         *  Iterate through all vehicles and flatten to 1D list of all customers, while tracking which
         *  vehicles should contain which customers after mutation 
         */
         for (Vehicle vehicle : vehicles) {
+            if (vehicle.getCustomers().size() < 1) {
+                emptyVehicles.add(vehicle);
+                continue;
+            }
             allCustomersFromAllVehicles.addAll(vehicle.getCustomers());
-            vehicleIndices.add(allCustomersFromAllVehicles.size()); // Keep indices for vehicles for permutation
+            vehicleIndices.add(allCustomersFromAllVehicles.size()-1); // Keep indices for vehicles for permutation
         }
         // Select two random (inequal) cutpoints in the list of all customers.
         int cutPoint1 = rand.nextInt(allCustomersFromAllVehicles.size());
@@ -127,12 +142,14 @@ public class Depot{
         while(cutPoint1 == cutPoint2) {
             cutPoint2 = rand.nextInt(allCustomersFromAllVehicles.size());
         }
+        int lowerBound = cutPoint1 < cutPoint2 ? cutPoint1 : cutPoint2;
+        int upperBound = lowerBound == cutPoint1 ? cutPoint2 : cutPoint1;
         // Swap each i-th customer from each cutpoint
-        for (int i = (cutPoint1 < cutPoint2 ? cutPoint1 : cutPoint2); i < (cutPoint1 < cutPoint2 ? cutPoint2 : cutPoint1); i++) {
-            Customer customer1 = allCustomersFromAllVehicles.get(i);
-            Customer customer2 = allCustomersFromAllVehicles.get(cutPoint2-i);
-            allCustomersFromAllVehicles.set(i, customer2);
-            allCustomersFromAllVehicles.set(cutPoint2-i, customer1);
+        for (int i = 0; i < upperBound-lowerBound; i++) {
+            Customer customer1 = allCustomersFromAllVehicles.get(lowerBound+i);
+            Customer customer2 = allCustomersFromAllVehicles.get(upperBound-i);
+            allCustomersFromAllVehicles.set(lowerBound+i, customer2);
+            allCustomersFromAllVehicles.set(upperBound-i, customer1);
         }
         // Iterate through all vehicles and add their corresponding new customers
         List<Vehicle> mutatedVehicleList = new ArrayList<>();
@@ -141,6 +158,8 @@ public class Depot{
         for (Integer index : vehicleIndices) {
             mutatedVehicleList.add(new Vehicle(vehicleIterator.next(), allCustomersFromAllVehicles.subList(prevIndex, index)));
         }
+        mutatedVehicleList.addAll(emptyVehicles);
+        vehicles = mutatedVehicleList;
     }
 
     /**
@@ -152,6 +171,9 @@ public class Depot{
     private void singleCustomerRerouting() {
         Random rand = new Random();
         Vehicle randVehicle = vehicles.get(rand.nextInt(vehicles.size()));
+        while (randVehicle.getCustomers().size() < 1) {
+            randVehicle = vehicles.get(rand.nextInt(vehicles.size()));
+        }
         Customer randCustomer = randVehicle.getCustomers().get(rand.nextInt(randVehicle.getCustomers().size()));
 
         randVehicle.removeCustomer(randCustomer);
@@ -165,27 +187,33 @@ public class Depot{
     private void swapping() {
         // Generate two random numbers to pick routes
         Random rand = new Random();
-        int randVehicle1 = rand.nextInt(vehicles.size());
-        int randVehicle2 = rand.nextInt(vehicles.size());
-        while(randVehicle1 == randVehicle2) {
-            randVehicle1 = rand.nextInt(vehicles.size());
+        Vehicle randVehicle1 = vehicles.get(rand.nextInt(vehicles.size()));
+        while (randVehicle1.getCustomers().size() < 1) {
+            randVehicle1 = vehicles.get(rand.nextInt(vehicles.size()));
+        }
+        Vehicle randVehicle2 = vehicles.get(rand.nextInt(vehicles.size()));
+        int tries = 0;
+        while(randVehicle1 == randVehicle2 || randVehicle2.getCustomers().size() < 1) {
+            if (tries >= Math.pow(vehicles.size(), 2)) {
+                return; // Assume no swap mutations possible
+            }
+            randVehicle2 = vehicles.get(rand.nextInt(vehicles.size()));
+            tries++;
         }
 
-        Vehicle vehicle1 = vehicles.get(randVehicle1);
-        Vehicle vehicle2 = vehicles.get(randVehicle2);
-
         // Generate two random numbers to pick customers to swap
-        int randCustomer1 = rand.nextInt(vehicle1.getCustomers().size());
-        int randCustomer2 = rand.nextInt(vehicle2.getCustomers().size());
+        int randCustomer1 = rand.nextInt(randVehicle1.getCustomers().size());
+        int randCustomer2 = rand.nextInt(randVehicle2.getCustomers().size());
         while(randCustomer1 == randCustomer2) {
-            randCustomer2 = rand.nextInt(vehicle2.getCustomers().size());
+            randCustomer2 = rand.nextInt(randVehicle2.getCustomers().size());
         }
 
         // Swap customers
-        Customer customer1 = vehicle1.getCustomers().get(randCustomer1);
-        Customer customer2 = vehicle2.getCustomers().get(randCustomer2);
-        vehicle1.getCustomers().set(randCustomer1, customer2);
-        vehicle2.getCustomers().set(randCustomer2, customer1);
+        Customer customer1 = randVehicle1.getCustomers().get(randCustomer1);
+        Customer customer2 = randVehicle2.getCustomers().get(randCustomer2);
+        randVehicle1.getCustomers().set(randCustomer1, customer2);
+        randVehicle2.getCustomers().set(randCustomer2, customer1);
+
     }
 
     public List<Customer> getAllCustomersInVehicles() {
