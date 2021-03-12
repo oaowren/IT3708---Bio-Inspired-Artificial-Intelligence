@@ -11,6 +11,7 @@ public class Population {
     
 	private List<Individual> individuals = new ArrayList<>();
     private int maxNumOfVehicles;
+    private List<Double> tournamentProbs = new ArrayList<>();
 
     public static List<Depot> depots;
     public static HashMap<Integer, Customer> customers;
@@ -23,7 +24,24 @@ public class Population {
     }
     
     public Population(int maxNumOfVehicles) {
+        this.tournamentProbs = getProbs();
         this.maxNumOfVehicles = maxNumOfVehicles;
+    }
+
+    private List<Double> getProbs(){
+            /* Calculate a cumulative probability such that you get: 
+            Best individual with probability p*(1-p)^0 = p
+            Second best individual with probability p*(1-p)
+            Third best individual with probability p*(1-p)^2
+            And so on, which means that one of the individuals selected for tournament will be chosen with prob = 1*/
+        double p = Parameters.tournamentProb;
+        double cumulativeP = 0.0;
+        List<Double> probs = new ArrayList<>();
+        for (int i=0; i< Parameters.tournamentSize; i++){
+            cumulativeP += p*Math.pow((1-p), i);
+            probs.add(cumulativeP);
+        }
+        return probs;
     }
 
     public List<Individual> getIndividuals(){
@@ -64,26 +82,15 @@ public class Population {
             // Sort by fitness
             selectedInds.sort(Comparator.comparingDouble(Individual::getFitness));
             double randselect = rand.nextDouble();
-            double p = Parameters.tournamentProb;
-            /* Calculate a cumulative probability such that you get: 
-            Best individual with probability p*(1-p)^0 = p
-            Second best individual with probability p*(1-p)
-            Third best individual with probability p*(1-p)^2
-            And so on, which means that one of the individuals selected for tournament will be chosen with prob = 1*/
-            double cumulativeP = 0.0;
-            for (int i=0; i< Parameters.tournamentSize; i++){
-                // If no selection has been done yet (improbable), default to the worst individual in tournament
-                if (i == Parameters.tournamentSize - 1){
+            for (int i=0;i<this.tournamentProbs.size();i++){
+                if (randselect < this.tournamentProbs.get(i)){
                     parents.add(selectedInds.get(i));
-                    break;
-                } else {
-                    cumulativeP += p*Math.pow((1-p), i);
-                    if (randselect < cumulativeP){
-                        parents.add(selectedInds.get(i));
-                        break;
-                    }
                 }
             }
+            if (randselect > this.tournamentProbs.get(this.tournamentProbs.size()-1)){
+                parents.add(selectedInds.get(selectedInds.size()-1));
+            }
+            
         }
         return parents; 
     }
