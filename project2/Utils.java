@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Utils {
 
@@ -18,5 +19,12 @@ public class Utils {
             index++;
         }
         return pick;
+    }
+
+    public static List<Customer> allSwappableCustomers(Depot depot) {
+        List<Customer> allCustomersInDepot1 = depot.getAllCustomersInVehicles();
+        return depot.getSwappableCustomers().stream()
+                                            .filter(c -> allCustomersInDepot1.contains(c))
+                                            .collect(Collectors.toList());
     }
 }
