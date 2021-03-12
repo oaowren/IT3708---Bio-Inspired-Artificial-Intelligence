@@ -155,7 +155,7 @@ public class Individual{
             mutationSuccessful = randomDepot2.insertAtMostFeasible(randomCustomer1);
             if (mutationSuccessful) {
                 randomDepot1.removeCustomer(randomCustomer1);
-                System.out.println("Moved " + randomCustomer1.id + " from " + randomDepot1.id + " to " + randomDepot2.id);
+                // System.out.println("Moved " + randomCustomer1.id + " from " + randomDepot1.id + " to " + randomDepot2.id);
                 break;
             }
             tries++;

@@ -209,13 +209,10 @@ public class Depot{
         // Generate two random numbers to pick customers to swap
         int randCustomer1 = rand.nextInt(randVehicle1.getCustomers().size());
         int randCustomer2 = rand.nextInt(randVehicle2.getCustomers().size());
-        while(randCustomer1 == randCustomer2) {
-            randCustomer2 = rand.nextInt(randVehicle2.getCustomers().size());
-        }
-
         // Swap customers
         Customer customer1 = randVehicle1.getCustomers().get(randCustomer1);
         Customer customer2 = randVehicle2.getCustomers().get(randCustomer2);
+
         randVehicle1.getCustomers().set(randCustomer1, customer2);
         randVehicle2.getCustomers().set(randCustomer2, customer1);
 
