@@ -29,11 +29,11 @@ public class Population {
     }
 
     private List<Double> getProbs(){
-            /* Calculate a cumulative probability such that you get: 
-            Best individual with probability p*(1-p)^0 = p
-            Second best individual with probability p*(1-p)
-            Third best individual with probability p*(1-p)^2
-            And so on, which means that one of the individuals selected for tournament will be chosen with prob = 1*/
+        /* Calculate a cumulative probability such that you get: 
+        Best individual with probability p*(1-p)^0 = p
+        Second best individual with probability p*(1-p)
+        Third best individual with probability p*(1-p)^2
+        And so on, which means that one of the individuals selected for tournament will be chosen with prob = 1*/
         double p = Parameters.tournamentProb;
         double cumulativeP = 0.0;
         List<Double> probs = new ArrayList<>();
@@ -126,7 +126,7 @@ public class Population {
 
         for (Individual individual : new_population) {
             if (rand.nextDouble() <= Parameters.mutationProbability) {
-                if (generationCount % 10 == 0 && generationCount != 0) {
+                if (generationCount % Parameters.interDepotMutationRate == 0 && generationCount != 0) {
                     individual.interDepotMutation();
                 } else {
                     Depot randomDepot = individual.getDepots().get(rand.nextInt(individual.getDepots().size()));

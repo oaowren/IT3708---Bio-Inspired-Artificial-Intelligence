@@ -1,8 +1,8 @@
 public class Parameters {
     
-    static final String problem = "p15";
+    static final String problem = "p23";
     static final int populationSize = 70;
-    static final int generationSpan = 150;
+    static final int generationSpan = 500;
     static final int eliteSize = 5;
     static final int tournamentSize = 5;
     static final int parentSelectionSize = 20;

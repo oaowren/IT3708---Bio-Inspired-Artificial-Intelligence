@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import DataClasses.Tuple;
+import jdk.jfr.Threshold;
 
 public class DataSetIo {
     
@@ -16,6 +17,33 @@ public class DataSetIo {
     private int numOfCustomers;
     private int numberOfDepots;
     private int depotIndexStartEnd;
+
+    private static final HashMap<String, Double> thresholds = new HashMap<>(){{
+        //If it is stupid but it works, it's not stupid
+        put("p01", 611.1);
+        put("p02", 519.75);
+        put("p03", 756.0);
+        put("p04", 1063.9);
+        put("p05", 834.75);
+        put("p06", 966.0);
+        put("p07", 1008.0);
+        put("p08", 4830.0);
+        put("p09", 4233.6);
+        put("p10", 4014.15);
+        put("p11", 4046.7);
+        put("p12", 1369.9);
+        put("p13", 1384.4);
+        put("p14", 1428.0);
+        put("p15", 2889.6);
+        put("p16", 2733.15);
+        put("p17", 2817.15);
+        put("p18", 4165.35);
+        put("p19", 4098.15);
+        put("p20", 4378.5);
+        put("p21", 6426.0);
+        put("p22", 6230.7);
+        put("p23", 6520.5);
+     }};
 
     public void readDataFile(String filename) {
         try {
@@ -93,6 +121,10 @@ public class DataSetIo {
 
     public int getNumberOfDepots() {
         return this.numberOfDepots;
+    }
+
+    public static double getThreshold(String filename){
+        return thresholds.get(filename);
     }
 
 }
