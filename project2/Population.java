@@ -7,7 +7,7 @@ import java.util.Random;
 
 import DataClasses.*;
 
-public class Population {
+public class Population{
     
 	private List<Individual> individuals = new ArrayList<>();
     private int maxNumOfVehicles;
@@ -49,17 +49,7 @@ public class Population {
     }
 
     public Individual getIndividualByRank(int index){
-        // route denotes whether to only calculate based on pure route or fitness-measure with number of routes as well
-        this.individuals.sort((a,b) -> {
-            if (Fitness.getIndividualRouteFitness(a) > Fitness.getIndividualRouteFitness(b)){
-                return 1;
-            } else if(Fitness.getIndividualRouteFitness(a) < Fitness.getIndividualRouteFitness(b)){
-                return -1;
-            }
-            return 0;
-        });
-        return this.individuals.get(index);
-        
+        return Utils.select(this.individuals, index, true);        
     }
 
     public void generatePopulation() {
@@ -72,33 +62,30 @@ public class Population {
     }
 
     public List<Individual> tournamentSelection(){
-        Random rand = new Random();
-        int popSize = Parameters.populationSize;
         List<Individual> parents = new ArrayList<>();
         // Create parents list of given parentSelectionSize in parameters
         while (parents.size() < Parameters.parentSelectionSize){
             List<Individual> selectedInds = new ArrayList<>();
             // Create individual-list of size defined by tournamentSize
             while (selectedInds.size() < Parameters.tournamentSize){
-                Individual i = this.individuals.get(rand.nextInt(popSize));
+                Individual i = this.individuals.get(Utils.randomInt(Parameters.populationSize));
                 // Make sure that an individual does not compete with itself, can still be selected in multiple different tournaments
                 if (!selectedInds.contains(i)){
                     selectedInds.add(i);
                 }
             }
-            // Sort by fitness
-            selectedInds.sort(Comparator.comparingDouble(Individual::getFitness));
-            double randselect = rand.nextDouble();
+            int index = 0;
+            double randselect = Utils.randomDouble();
             for (int i=0;i<this.tournamentProbs.size();i++){
                 if (randselect < this.tournamentProbs.get(i)){
-                    parents.add(selectedInds.get(i));
+                    index = i;
                     break;
                 }
             }
             if (randselect > this.tournamentProbs.get(this.tournamentProbs.size()-1)){
-                parents.add(selectedInds.get(selectedInds.size()-1));
+                index = Parameters.tournamentSize - 1;
             }
-            
+            parents.add(Utils.select(selectedInds, index, false));
         }
         return parents; 
     }
@@ -109,11 +96,10 @@ public class Population {
 
     public List<Individual> crossover(List<Individual> parents, int generationCount){
         List<Individual> new_population = new ArrayList<>();
-        Random rand = new Random();
         while (new_population.size() < Parameters.populationSize){
             for (Individual p1: parents){
                 for (Individual p2:parents){
-                    if (rand.nextDouble()<Parameters.crossoverProbability){
+                    if (Utils.randomDouble()<Parameters.crossoverProbability){
                         Tuple<Individual, Individual> offspring = p1.crossover(p2);
                         if (!Objects.isNull(offspring)){
                             new_population.add(offspring.x);
@@ -125,14 +111,11 @@ public class Population {
         }
 
         for (Individual individual : new_population) {
-            if (rand.nextDouble() <= Parameters.mutationProbability) {
+            if (Utils.randomDouble() <= Parameters.mutationProbability) {
                 if (generationCount % Parameters.interDepotMutationRate == 0 && generationCount != 0) {
                     individual.interDepotMutation();
                 } else {
-                    Depot randomDepot = individual.getDepots().get(rand.nextInt(individual.getDepots().size()));
-                    while (randomDepot.getAllCustomersInVehicles().size() < 1) {
-                        randomDepot = individual.getDepots().get(rand.nextInt(individual.getDepots().size()));
-                    }
+                    Depot randomDepot = Utils.randomPick(individual.getDepots(), (p->p.getAllCustomersInVehicles().size() > 1));
                     randomDepot.intraDepotMutation();
                 }
                 individual.calculateFitness();
