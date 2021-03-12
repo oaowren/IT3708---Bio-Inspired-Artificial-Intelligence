@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.Random;
+
 import DataClasses.Tuple;
+import DataClasses.Customer;
 
 public class Individual{
 

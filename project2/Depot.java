@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import DataClasses.Tuple;
+import DataClasses.Customer;
 
 public class Depot{
 

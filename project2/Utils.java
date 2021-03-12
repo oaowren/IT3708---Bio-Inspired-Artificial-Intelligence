@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import DataClasses.Customer;
+
 public class Utils {
 
+    // Pick a random item from a list that satisfies a condition
     public static <T> T randomPick(List<T> list, Predicate<T> predicate) {
         List<T> listCopy = new ArrayList<>(list);
         Collections.shuffle(listCopy);
@@ -22,9 +25,9 @@ public class Utils {
     }
 
     public static List<Customer> allSwappableCustomers(Depot depot) {
-        List<Customer> allCustomersInDepot1 = depot.getAllCustomersInVehicles();
+        List<Customer> allCustomersInDepot = depot.getAllCustomersInVehicles();
         return depot.getSwappableCustomers().stream()
-                                            .filter(c -> allCustomersInDepot1.contains(c))
+                                            .filter(c -> allCustomersInDepot.contains(c))
                                             .collect(Collectors.toList());
     }
 }
