@@ -153,10 +153,12 @@ public class Individual{
         while(!mutationSuccessful && tries < depots.size()) {
             randomDepot2 = depotMap.get(randomCandidateDepotId);
             mutationSuccessful = randomDepot2.insertAtMostFeasible(randomCustomer1);
+            if (mutationSuccessful) {
+                randomDepot1.removeCustomer(randomCustomer1);
+                System.out.println("Moved " + randomCustomer1.id + " from " + randomDepot1.id + " to " + randomDepot2.id);
+                break;
+            }
             tries++;
-        }
-        if (mutationSuccessful) {
-            randomDepot1.removeCustomer(randomCustomer1);
         }
     }
 
