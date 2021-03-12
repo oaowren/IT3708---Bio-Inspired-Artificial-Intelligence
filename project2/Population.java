@@ -141,7 +141,7 @@ public class Population {
         return new_population;
     }
 
-    public List<Individual> survivor_selection(List<Individual> parents, List<Individual> offspring){
+    public List<Individual> survivorSelection(List<Individual> parents, List<Individual> offspring){
         int elitism = Parameters.eliteSize;
         offspring.sort(Comparator.comparingDouble(Individual::getFitness));
         parents.sort(Comparator.comparingDouble(Individual::getFitness));

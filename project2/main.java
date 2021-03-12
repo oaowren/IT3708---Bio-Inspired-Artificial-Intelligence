@@ -25,7 +25,7 @@ class Main{
             System.out.println(i+1);
             List<Individual> parents = p.tournamentSelection();
             List<Individual> offspring = p.crossover(parents, i);
-            List<Individual> new_pop = p.survivor_selection(parents, offspring);
+            List<Individual> new_pop = p.survivorSelection(parents, offspring);
             p.setNewPopulation(new_pop);
             gFitness.add(new Tuple<>(i+1, Fitness.getIndividualRouteFitness(p.getIndividualByRank(0))));
             Fitness.removeOldRoutes();
