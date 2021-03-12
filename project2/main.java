@@ -29,7 +29,7 @@ class Main{
             System.out.println(generation);
             List<Individual> parents = p.tournamentSelection();
             List<Individual> offspring = p.crossover(parents, generation);
-            List<Individual> new_pop = p.survivor_selection(parents, offspring);
+            List<Individual> new_pop = p.survivorSelection(parents, offspring);
             p.setNewPopulation(new_pop);
             bestIndFitness = Fitness.getIndividualRouteFitness(p.getIndividualByRank(0));
             gFitness.add(new Tuple<>(generation, bestIndFitness));

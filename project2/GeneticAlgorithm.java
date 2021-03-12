@@ -2,6 +2,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import DataClasses.Customer;
+
 public class GeneticAlgorithm {
     
     public static void initialDepotClustering(List<Depot> depots, Collection<Customer> customers) {

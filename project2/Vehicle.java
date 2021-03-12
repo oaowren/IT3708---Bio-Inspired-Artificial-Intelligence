@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import DataClasses.Tuple;
+import DataClasses.Customer;
 
 
 public class Vehicle{

@@ -5,10 +5,10 @@ public class Parameters {
     static final int generationSpan = 500;
     static final int eliteSize = 5;
     static final int tournamentSize = 5;
-    static final int parentSelectionSize = 20;
+    static final int parentSelectionSize = 15;
     static final double tournamentProb = 0.9;
-    static final double crossoverProbability = 0.60;
-    static final double mutationProbability = 0.20;
+    static final double crossoverProbability = 0.40;
+    static final double mutationProbability = 0.30;
     static final double interDepotMutationRate = 5;
     static final double swappableCustomerDistance = 2.5;
 

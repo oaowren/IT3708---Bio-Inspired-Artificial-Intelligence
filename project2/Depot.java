@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import DataClasses.Tuple;
+import DataClasses.Customer;
 
 public class Depot{
 
@@ -140,8 +141,8 @@ public class Depot{
         }
         // Select two random (inequal) cutpoints in the list of all customers.
         int cutPoint1 = rand.nextInt(allCustomersFromAllVehicles.size());
-        int cutPoint2 = rand.nextInt(allCustomersFromAllVehicles.size());
-        while(cutPoint1 == cutPoint2) {
+        int cutPoint2 = rand.nextInt(allCustomersFromAllVehicles.size()); 
+        while (cutPoint1 == cutPoint2) {
             cutPoint2 = rand.nextInt(allCustomersFromAllVehicles.size());
         }
         int lowerBound = cutPoint1 < cutPoint2 ? cutPoint1 : cutPoint2;
@@ -173,10 +174,10 @@ public class Depot{
      */
     private void singleCustomerRerouting() {
         Random rand = new Random();
-        Vehicle randVehicle = vehicles.get(rand.nextInt(vehicles.size()));
-        while (randVehicle.getCustomers().size() < 1) {
-            randVehicle = vehicles.get(rand.nextInt(vehicles.size()));
-        }
+
+        Vehicle randVehicle = Utils.randomPick(vehicles, (vehicle -> vehicle.getCustomers().size() >= 1));
+        if (randVehicle == null) return;
+
         Customer randCustomer = randVehicle.getCustomers().get(rand.nextInt(randVehicle.getCustomers().size()));
 
         randVehicle.removeCustomer(randCustomer);
@@ -191,19 +192,12 @@ public class Depot{
     private void swapping() {
         // Generate two random numbers to pick routes
         Random rand = new Random();
-        Vehicle randVehicle1 = vehicles.get(rand.nextInt(vehicles.size()));
-        while (randVehicle1.getCustomers().size() < 1) {
-            randVehicle1 = vehicles.get(rand.nextInt(vehicles.size()));
-        }
-        Vehicle randVehicle2 = vehicles.get(rand.nextInt(vehicles.size()));
-        int tries = 0;
-        while(randVehicle1 == randVehicle2 || randVehicle2.getCustomers().size() < 1) {
-            if (tries >= Math.pow(vehicles.size(), 2)) {
-                return; // Assume no swap mutations possible
-            }
-            randVehicle2 = vehicles.get(rand.nextInt(vehicles.size()));
-            tries++;
-        }
+
+        Vehicle randVehicle1 = Utils.randomPick(vehicles, (vehicle -> vehicle.getCustomers().size() >= 1));
+        if (randVehicle1 == null) return;
+
+        Vehicle randVehicle2 = Utils.randomPick(vehicles, (vehicle -> vehicle.getCustomers().size() >= 1 && vehicle != randVehicle1));
+        if (randVehicle2 == null) return; // Assume no swap mutations possible
 
         // Generate two random numbers to pick customers to swap
         int randCustomer1 = rand.nextInt(randVehicle1.getCustomers().size());
