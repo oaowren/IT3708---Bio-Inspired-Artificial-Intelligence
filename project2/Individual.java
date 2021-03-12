@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.Random;
 import DataClasses.Tuple;
@@ -140,9 +142,22 @@ public class Individual{
     public void interDepotMutation() {
         Random rand = new Random();
         Depot randomDepot1 = getDepots().get(rand.nextInt(getDepots().size()));
-        Depot randomDepot2 = getDepots().get(rand.nextInt(getDepots().size()));
-        while(randomDepot1 == randomDepot2) {
-            randomDepot2 = getDepots().get(rand.nextInt(getDepots().size()));
+        List<Customer> allCustomersDepot1 = randomDepot1.getAllCustomersFromAllVehicles();
+        Customer randomCustomer1 = allCustomersDepot1.get(rand.nextInt(allCustomersDepot1.size()));
+        Integer randomCandidateDepotId = randomCustomer1.candidateList.get(rand.nextInt(randomCustomer1.candidateList.size()));
+        Map<Integer, Depot> depotMap = depots.stream()
+                                             .collect(Collectors.toMap(depot -> depot.id, depot -> depot));
+        Depot randomDepot2 = depotMap.get(randomCandidateDepotId);
+
+        int tries = 0;
+        boolean mutationSuccessful = false;
+        while(!mutationSuccessful && tries < depots.size()) {
+            randomDepot2 = depotMap.get(randomCandidateDepotId);
+            mutationSuccessful = randomDepot2.insertAtMostFeasible(randomCustomer1);
+            tries++;
+        }
+        if (mutationSuccessful) {
+            randomDepot1.removeCustomer(randomCustomer1);
         }
     }
 
