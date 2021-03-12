@@ -79,6 +79,12 @@ public class Depot{
         return this.vehicles;
     }
 
+    public List<Customer> getAllCustomersFromAllVehicles() {
+        return this.vehicles.stream()
+                            .flatMap(vehicle -> vehicle.getCustomers().stream())
+                            .collect(Collectors.toList());
+    }
+
     public void addVehicle(Vehicle v) {
         if (this.vehicles.size() >= this.maxVehicles) {
             throw new IllegalStateException("Too many vehicles");

@@ -111,11 +111,11 @@ public class Population {
 
         for (Individual individual : new_population) {
             if (rand.nextDouble() >= Parameters.mutationProbability) {
-                /*if (generationCount % 10 == 0) {
+                if (generationCount % 10 == 0) {
                     individual.interDepotMutation();
-                } else {*/
+                } else {
                     individual.getDepots().get(rand.nextInt(individual.getDepots().size())).intraDepotMutation();
-                //}
+                }
                 individual.calculateFitness();
             }
         }

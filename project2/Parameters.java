@@ -7,8 +7,8 @@ public class Parameters {
     static final int tournamentSize = 5;
     static final int parentSelectionSize = 30;
     static final double tournamentProb = 0.85;
-    static final double crossoverProbability = 0.70;
-    static final double mutationProbability = 0.20;
+    static final double crossoverProbability = 0.60;
+    static final double mutationProbability = 0.5;
     static final double interDepotMutationRate = 10;
     static final double swappableCustomerDistance = 2.5;
 
