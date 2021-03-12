@@ -141,6 +141,9 @@ public class Individual{
     public void interDepotMutation() {
         Random rand = new Random();
         Depot randomDepot1 = getDepots().get(rand.nextInt(getDepots().size()));
+        while (randomDepot1.getAllCustomersFromAllVehicles().size() < 1) {
+            randomDepot1 = getDepots().get(rand.nextInt(getDepots().size()));
+        }
         List<Customer> allCustomersDepot1 = randomDepot1.getAllCustomersFromAllVehicles();
         Customer randomCustomer1 = allCustomersDepot1.get(rand.nextInt(allCustomersDepot1.size()));
         Integer randomCandidateDepotId = randomCustomer1.candidateList.get(rand.nextInt(randomCustomer1.candidateList.size()));
