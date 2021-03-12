@@ -5,8 +5,7 @@ import DataClasses.*;
 public class Fitness{
 
     // Memoize distance of route from/to a given depot
-    private static final HashMap<Tuple<String, Depot>, Double> routeMemo = new HashMap<>();
-    private static final HashMap<Tuple<String, Depot>, Integer> routeAge = new HashMap<>();
+    private static final HashMap<Tuple<String, Depot>, Tuple<Double, Integer>> routeMemo = new HashMap<>();
     // Memoize euclidian distance between two points
     private static final HashMap<Tuple<Integer, Integer>, Double> pairMemo = new HashMap<>();
     private static final HashMap<Integer, Customer> customers = new HashMap<>();
@@ -17,17 +16,19 @@ public class Fitness{
     }
 
     public static void removeOldRoutes(){
-        routeMemo.entrySet().removeIf(v-> routeAge.get(v.getKey()) > Parameters.memoCacheMaxAge);
-        routeAge.entrySet().removeIf(v->v.getValue() > Parameters.memoCacheMaxAge);
-        routeAge.replaceAll((k,v) -> v + 1);
+        // Remove entries with age > memoCacheMaxAge
+        routeMemo.entrySet().removeIf(v-> v.getValue().y > Parameters.memoCacheMaxAge);
+        // Increase age by 1
+        routeMemo.replaceAll((k,v) -> new Tuple<>(v.x, v.y + 1));
     }
 
     // Memoized in routeMemo
     public static double getVehicleFitness(Vehicle vehicle, Depot depot) {
         Tuple<String, Depot> pair = new Tuple<>(vehicle.getCustomerSequence(), depot);
         if (routeMemo.containsKey(pair)) {
-            routeAge.put(pair, 0);
-            return routeMemo.get(pair);
+            // Set age to 0
+            routeMemo.put(pair, new Tuple<>(routeMemo.get(pair).x, 0));
+            return routeMemo.get(pair).x;
         }
         if (!vehicle.isActive()) {
             return 0.0;
@@ -40,8 +41,7 @@ public class Fitness{
             distance += getDistance(customers.get(vehicleCustomers.get(i)), customers.get(vehicleCustomers.get(i+1)));
         }
         distance += getDistance(customers.get(vehicleCustomers.get(final_ind)), depot);
-        routeMemo.put(pair, distance);
-        routeAge.put(pair, 0);
+        routeMemo.put(pair, new Tuple<>(distance,0));
         return distance;
     }
 
