@@ -30,7 +30,10 @@ public class Individual{
     }
 
     public Depot getDepotById(int id){
-        return this.depots.stream().filter(d-> d.id == id).findFirst().orElseThrow(() -> new IllegalArgumentException("Depot not found"));
+        return this.depots.stream()
+                          .filter(d-> d.id == id)
+                          .findFirst()
+                          .orElseThrow(() -> new IllegalArgumentException("Depot not found"));
     }
 
     public double getFitness(){
@@ -158,12 +161,14 @@ public class Individual{
         int randomDepotId = randomDepot1.id;
         Integer randomCandidateDepotId = Utils.randomPick(randomCustomer1.candidateList, (depotId -> depotId.intValue() != randomDepotId));
         if (randomCandidateDepotId == null) return;
+
         Collection<Integer> testedDepotIds = new ArrayList<>();
         testedDepotIds.add(randomCandidateDepotId);
         testedDepotIds.add(randomDepotId);
 
         Map<Integer, Depot> depotMap = depots.stream()
                                              .collect(Collectors.toMap(depot -> depot.id, depot -> depot));
+                                             
         Depot randomDepot2 = depotMap.get(randomCandidateDepotId);
 
         int tries = 0;
