@@ -98,11 +98,16 @@ public class Depot{
         Random rand = new Random();
         int randInt = rand.nextInt(3);
         if (randInt == 0) {
-            /*boolean mutationSuccessful = false;
-            while (!mutationSuccessful) {
+            boolean mutationSuccessful = false;
+            int tries = 0;
+            while (!mutationSuccessful && tries < 10) {
+                try {
                     reversalMutation();
                     mutationSuccessful = true;
-            }*/
+                } catch (IllegalStateException e) {
+                    tries++;
+                }
+            }
             // FIXME: MAGNUS 
         } else if (randInt == 1) {
             singleCustomerRerouting();
@@ -119,11 +124,16 @@ public class Depot{
         Random rand = new Random();
         List<Integer> vehicleIndices = new ArrayList<>();
         List<Customer> allCustomersFromAllVehicles = new ArrayList<>();
+        List<Vehicle> emptyVehicles = new ArrayList<>();
         /* 
         *  Iterate through all vehicles and flatten to 1D list of all customers, while tracking which
         *  vehicles should contain which customers after mutation 
         */
         for (Vehicle vehicle : vehicles) {
+            if (vehicle.getCustomers().size() < 1) {
+                emptyVehicles.add(vehicle);
+                continue;
+            }
             allCustomersFromAllVehicles.addAll(vehicle.getCustomers());
             vehicleIndices.add(allCustomersFromAllVehicles.size()-1); // Keep indices for vehicles for permutation
         }
@@ -149,6 +159,7 @@ public class Depot{
         for (Integer index : vehicleIndices) {
             mutatedVehicleList.add(new Vehicle(vehicleIterator.next(), allCustomersFromAllVehicles.subList(prevIndex, index)));
         }
+        mutatedVehicleList.addAll(emptyVehicles);
         vehicles = mutatedVehicleList;
     }
 
