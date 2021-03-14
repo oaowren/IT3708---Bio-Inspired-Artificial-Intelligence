@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import DataClasses.Customer;
+import DataClasses.Tuple;
 
 public class Utils {
 
@@ -35,40 +36,19 @@ public class Utils {
         return rand.nextInt(bound);
     }
 
+    public static Tuple<Integer, Integer> randomCutpoints(int bound){
+        int cutPoint1 = Utils.randomInt(bound);
+        int cutPoint2 = Utils.randomInt(bound); 
+        while (cutPoint1 == cutPoint2) {
+            cutPoint2 = Utils.randomInt(bound);
+        }
+        return new Tuple<>(cutPoint1, cutPoint2);
+    }
+
     public static List<Customer> allSwappableCustomers(Depot depot) {
         List<Customer> allCustomersInDepot = depot.getAllCustomersInVehicles();
         return depot.getSwappableCustomers().stream()
                                             .filter(c -> allCustomersInDepot.contains(c))
                                             .collect(Collectors.toList());
-    }
-
-    public static Individual select(List<Individual> arr, int index, boolean route){
-        if (arr.size()==0){
-            return null;
-        }
-        List<Individual> left = new ArrayList<>();
-        List<Individual> right = new ArrayList<>();
-        Individual pivot = arr.get(0);
-        for (int i=1; i<arr.size();i++){
-            Individual val = arr.get(i);
-            double comp;
-            if (!route){
-                comp = pivot.getFitness() - val.getFitness();
-            }else {
-                comp = Fitness.getIndividualRouteFitness(pivot) - Fitness.getIndividualFitness(val);
-            }
-            if (comp > 0){
-                left.add(val);
-            } else {
-                right.add(val);
-            }
-        }
-        if (left.size() == index){
-            return pivot;
-        } 
-        if (left.size() > index){
-            return select(left, index, route);
-        }
-        return select(right, index - (left.size()+1), route);
     }
 }

@@ -91,9 +91,9 @@ def plot_route(v, depots, customers, color):
         first_customer = next_customer
     plt.plot(
         (depot_pos["x"],
-         next_customer["x"]),
+         first_customer["x"]),
         (depot_pos["y"],
-         next_customer["y"]),
+         first_customer["y"]),
         linewidth=line_thickness, c=color)
 
 

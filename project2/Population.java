@@ -3,7 +3,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
+import java.util.stream.Collectors;
 
 import DataClasses.*;
 
@@ -49,7 +49,16 @@ public class Population{
     }
 
     public Individual getIndividualByRank(int index){
-        return Utils.select(this.individuals, index, true);        
+        this.individuals.sort((a,b) -> {
+            if (Fitness.getIndividualRouteFitness(a) > Fitness.getIndividualRouteFitness(b)){
+                return 1;
+            } else if(Fitness.getIndividualRouteFitness(a) < Fitness.getIndividualRouteFitness(b)){
+                return -1;
+            }
+            return 0;
+        });
+        return this.individuals.get(index);
+        
     }
 
     public void generatePopulation() {
@@ -74,18 +83,18 @@ public class Population{
                     selectedInds.add(i);
                 }
             }
-            int index = 0;
+            // Sort by fitness
+            selectedInds.sort(Comparator.comparingDouble(Individual::getFitness));
             double randselect = Utils.randomDouble();
             for (int i=0;i<this.tournamentProbs.size();i++){
                 if (randselect < this.tournamentProbs.get(i)){
-                    index = i;
+                    parents.add(selectedInds.get(i));
                     break;
                 }
             }
             if (randselect > this.tournamentProbs.get(this.tournamentProbs.size()-1)){
-                index = Parameters.tournamentSize - 1;
+                parents.add(selectedInds.get(selectedInds.size()-1));
             }
-            parents.add(Utils.select(selectedInds, index, false));
         }
         return parents; 
     }
@@ -109,16 +118,16 @@ public class Population{
                 }
             }
         }
-
         for (Individual individual : new_population) {
             if (Utils.randomDouble() <= Parameters.mutationProbability) {
                 if (generationCount % Parameters.interDepotMutationRate == 0 && generationCount != 0) {
                     individual.interDepotMutation();
                 } else {
-                    Depot randomDepot = Utils.randomPick(individual.getDepots(), (p->p.getAllCustomersInVehicles().size() > 1));
+                    Depot randomDepot = Utils.randomPick(individual.getDepots(), (p->p.getAllCustomersInVehicles().size() >= 1));
                     randomDepot.intraDepotMutation();
                 }
                 individual.calculateFitness();
+
             }
         }
         return new_population;

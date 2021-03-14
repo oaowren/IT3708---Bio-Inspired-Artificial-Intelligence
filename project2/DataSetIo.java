@@ -110,7 +110,6 @@ public class DataSetIo {
                         customerRow -> new Customer(customerRow.get(0), customerRow.get(1), customerRow.get(2), customerRow.get(4))));
     }
 
-
     public int getMaxNumOfVehicles() {
         return this.maxNumOfVehicles;
     }

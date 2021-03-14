@@ -2,7 +2,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
-import java.util.Comparator;
 
 import DataClasses.*;
 
@@ -24,19 +23,14 @@ class Main{
         System.out.println(p.getIndividuals().stream()
                                              .map(Fitness::getIndividualRouteFitness)
                                              .collect(Collectors.toList()));
-        // int index = 7;
-        // Individual a = Utils.select(p.getIndividuals(), index, false);
-        // List<Individual> b = p.getIndividuals();
-        // b.sort(Comparator.comparingDouble(Individual::getFitness));
-        // System.out.println(a == b.get(index));
         double bestIndFitness = Fitness.getIndividualRouteFitness(p.getIndividualByRank(0));
         gFitness.add(new Tuple<>(0, bestIndFitness));
         while (bestIndFitness > threshold && generation < Parameters.generationSpan){
             generation++;
             System.out.println(generation);
             List<Individual> parents = p.tournamentSelection();
-            List<Individual> offspring = p.crossover(parents, generation);
-            List<Individual> new_pop = p.survivorSelection(parents, offspring);
+            List<Individual> new_pop = p.crossover(parents, generation);
+            new_pop = p.survivorSelection(parents, new_pop);
             p.setNewPopulation(new_pop);
             bestIndFitness = Fitness.getIndividualRouteFitness(p.getIndividualByRank(0));
             gFitness.add(new Tuple<>(generation, bestIndFitness));

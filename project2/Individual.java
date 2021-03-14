@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.Random;
 
 import DataClasses.Tuple;
 import DataClasses.Customer;
@@ -105,13 +104,12 @@ public class Individual{
     public Tuple<Individual, Individual> crossover(Individual i){
         Individual offspring1 = this.clone();
         Individual offspring2 = i.clone();
-        Random rand = new Random();
         // Select a random depot for each offspring
-        Depot depot1 = offspring1.getDepots().get(rand.nextInt(offspring1.getDepots().size()));
-        Depot depot2 = offspring2.getDepots().get(rand.nextInt(offspring2.getDepots().size()));
+        Depot depot1 = offspring1.getDepots().get(Utils.randomInt(offspring1.getDepots().size()));
+        Depot depot2 = offspring2.getDepots().get(Utils.randomInt(offspring2.getDepots().size()));
         // Select a random route for each depot, empty routes can not be selected
-        Vehicle vehicle1 = depot1.getAllVehicles().get(rand.nextInt(depot1.getAllVehicles().size()));
-        Vehicle vehicle2 = depot2.getAllVehicles().get(rand.nextInt(depot2.getAllVehicles().size()));
+        Vehicle vehicle1 = depot1.getAllVehicles().get(Utils.randomInt(depot1.getAllVehicles().size()));
+        Vehicle vehicle2 = depot2.getAllVehicles().get(Utils.randomInt(depot2.getAllVehicles().size()));
         // Remove customers from opposite route, insert new at most feasible location
         List<Customer> c1 = new ArrayList<>(vehicle1.getCustomers());
         List<Customer> c2 = new ArrayList<>(vehicle2.getCustomers());
@@ -145,13 +143,11 @@ public class Individual{
     }
 
     public void interDepotMutation() {
-        Random rand = new Random();
-
-        Depot randomDepot1 = getDepots().get(rand.nextInt(getDepots().size()));
+        Depot randomDepot1 = getDepots().get(Utils.randomInt(getDepots().size()));
         List<Customer> allSwappableCustomersDepot1 = Utils.allSwappableCustomers(randomDepot1);
 
         while (allSwappableCustomersDepot1.size() < 1) {
-            randomDepot1 = getDepots().get(rand.nextInt(getDepots().size()));
+            randomDepot1 = getDepots().get(Utils.randomInt(getDepots().size()));
             allSwappableCustomersDepot1 = Utils.allSwappableCustomers(randomDepot1);
         }
         

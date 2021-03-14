@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import DataClasses.Tuple;
@@ -95,8 +94,7 @@ public class Depot{
     }
     
     public void intraDepotMutation() {
-        Random rand = new Random();
-        int randInt = rand.nextInt(3);
+        int randInt = Utils.randomInt(3);
         if (randInt == 0) {
             boolean mutationSuccessful = false;
             int tries = 0;
@@ -120,7 +118,6 @@ public class Depot{
      * and the genetic material between these two cutpoints is reversed.
      */
     private void reversalMutation() {
-        Random rand = new Random();
         List<Integer> vehicleIndices = new ArrayList<>();
         List<Customer> allCustomersFromAllVehicles = new ArrayList<>();
         List<Vehicle> emptyVehicles = new ArrayList<>();
@@ -134,21 +131,17 @@ public class Depot{
                 continue;
             }
             allCustomersFromAllVehicles.addAll(vehicle.getCustomers());
-            vehicleIndices.add(allCustomersFromAllVehicles.size()-1); // Keep indices for vehicles for permutation
+            vehicleIndices.add(allCustomersFromAllVehicles.size()); // Keep indices for vehicles for permutation
         }
         if (allCustomersFromAllVehicles.size() <= 1){
             throw new IllegalStateException("If depot only has 1 vehicle then cutpoint will be equal");
         }
         // Select two random (inequal) cutpoints in the list of all customers.
-        int cutPoint1 = rand.nextInt(allCustomersFromAllVehicles.size());
-        int cutPoint2 = rand.nextInt(allCustomersFromAllVehicles.size()); 
-        while (cutPoint1 == cutPoint2) {
-            cutPoint2 = rand.nextInt(allCustomersFromAllVehicles.size());
-        }
-        int lowerBound = cutPoint1 < cutPoint2 ? cutPoint1 : cutPoint2;
-        int upperBound = lowerBound == cutPoint1 ? cutPoint2 : cutPoint1;
+        final Tuple<Integer, Integer> cutpoints = Utils.randomCutpoints(allCustomersFromAllVehicles.size());
+        int lowerBound = cutpoints.x < cutpoints.y ? cutpoints.x : cutpoints.y;
+        int upperBound = lowerBound == cutpoints.x ? cutpoints.y : cutpoints.x;
         // Swap each i-th customer from each cutpoint
-        for (int i = 0; i < upperBound-lowerBound; i++) {
+        for (int i = 0; i < (int) Math.floor((upperBound-lowerBound)/2); i++) {
             Customer customer1 = allCustomersFromAllVehicles.get(lowerBound+i);
             Customer customer2 = allCustomersFromAllVehicles.get(upperBound-i);
             allCustomersFromAllVehicles.set(lowerBound+i, customer2);
@@ -160,9 +153,10 @@ public class Depot{
         int prevIndex = 0;
         for (Integer index : vehicleIndices) {
             mutatedVehicleList.add(new Vehicle(vehicleIterator.next(), allCustomersFromAllVehicles.subList(prevIndex, index)));
+            prevIndex = index;
         }
         mutatedVehicleList.addAll(emptyVehicles);
-        vehicles = mutatedVehicleList;
+        this.vehicles = mutatedVehicleList;
         //System.out.println("Reversed " + this.id + " sliced " + cutPoint1 + " to " + cutPoint2);
     }
 
@@ -173,12 +167,10 @@ public class Depot{
      * which finally re-inserts the customer in the most feasible location.
      */
     private void singleCustomerRerouting() {
-        Random rand = new Random();
-
         Vehicle randVehicle = Utils.randomPick(vehicles, (vehicle -> vehicle.getCustomers().size() >= 1));
         if (randVehicle == null) return;
 
-        Customer randCustomer = randVehicle.getCustomers().get(rand.nextInt(randVehicle.getCustomers().size()));
+        Customer randCustomer = randVehicle.getCustomers().get(Utils.randomInt(randVehicle.getCustomers().size()));
 
         randVehicle.removeCustomer(randCustomer);
         insertAtMostFeasible(randCustomer);
@@ -190,9 +182,6 @@ public class Depot{
      * swaps one randomly chosen customer from one route to another.
     */
     private void swapping() {
-        // Generate two random numbers to pick routes
-        Random rand = new Random();
-
         Vehicle randVehicle1 = Utils.randomPick(vehicles, (vehicle -> vehicle.getCustomers().size() >= 1));
         if (randVehicle1 == null) return;
 
@@ -200,8 +189,8 @@ public class Depot{
         if (randVehicle2 == null) return; // Assume no swap mutations possible
 
         // Generate two random numbers to pick customers to swap
-        int randCustomer1 = rand.nextInt(randVehicle1.getCustomers().size());
-        int randCustomer2 = rand.nextInt(randVehicle2.getCustomers().size());
+        int randCustomer1 = Utils.randomInt(randVehicle1.getCustomers().size());
+        int randCustomer2 = Utils.randomInt(randVehicle2.getCustomers().size());
         // Swap customers
         Customer customer1 = randVehicle1.getCustomers().get(randCustomer1);
         Customer customer2 = randVehicle2.getCustomers().get(randCustomer2);
