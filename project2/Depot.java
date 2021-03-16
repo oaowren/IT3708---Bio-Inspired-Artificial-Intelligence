@@ -75,8 +75,27 @@ public class Depot{
         return true;
     }
 
+    public double getDistanceDeviation(){
+        if (this.maxDuration == 0){
+            return 0.0;
+        }
+        return this.vehicles.stream().map(v-> Fitness.getVehicleFitness(v, this)).reduce(0.0, (tot, element) -> tot + (element > this.maxDuration ? element - this.maxDuration : 0.0));
+    }
+
     public List<Vehicle> getAllVehicles() {
         return this.vehicles;
+    }
+
+    public int countActiveVehicles(){
+        return this.vehicles.stream().map(v-> v.isActive() ? 1 : 0).reduce(0, (acc, el) -> acc + el);
+    }
+
+    public void createNewRoute(Customer c){
+        if (countActiveVehicles() == this.maxVehicles){
+            throw new IllegalStateException("No empty vehicles available");
+        }
+        Vehicle inactive = this.vehicles.stream().filter(v-> !v.isActive()).collect(Collectors.toList()).get(0);
+        inactive.visitCustomer(c);
     }
     
     public void addVehicle(Vehicle v) {

@@ -23,16 +23,20 @@ class Main{
         System.out.println(p.getIndividuals().stream()
                                              .map(Fitness::getIndividualRouteFitness)
                                              .collect(Collectors.toList()));
-        double bestIndFitness = Fitness.getIndividualRouteFitness(p.getIndividualByRank(0));
+        Individual bestInd = p.getIndividualByRank(0);
+        double bestIndFitness = Fitness.getIndividualRouteFitness(bestInd);
         gFitness.add(new Tuple<>(0, bestIndFitness));
-        while (bestIndFitness > threshold && generation < Parameters.generationSpan){
+        while ((bestIndFitness > threshold || bestInd.getDistanceDeviation() != 0.0) && generation < Parameters.generationSpan){
             generation++;
             System.out.println(generation);
             List<Individual> parents = p.tournamentSelection();
             List<Individual> new_pop = p.crossover(parents, generation);
-            new_pop = p.survivorSelection(parents, new_pop);
+            new_pop = p.survivorSelection(p.getIndividuals(), new_pop);
             p.setNewPopulation(new_pop);
-            bestIndFitness = Fitness.getIndividualRouteFitness(p.getIndividualByRank(0));
+            bestInd = p.getIndividualByRankAndDeviation(0, p.getIndividualsWithCorrectDuration());
+            bestIndFitness = Fitness.getIndividualRouteFitness(bestInd);
+            System.out.println("Route Fitness: "+bestIndFitness);
+            System.out.println("Deviation from max duration: "+bestInd.getDistanceDeviation());
             gFitness.add(new Tuple<>(generation, bestIndFitness));
             Fitness.removeOldRoutes();
         }

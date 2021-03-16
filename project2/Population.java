@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +12,6 @@ public class Population{
     
 	private List<Individual> individuals = new ArrayList<>();
     private int maxNumOfVehicles;
-    private List<Double> tournamentProbs = new ArrayList<>();
 
     public static List<Depot> depots;
     public static HashMap<Integer, Customer> customers;
@@ -24,24 +24,7 @@ public class Population{
     }
     
     public Population(int maxNumOfVehicles) {
-        this.tournamentProbs = getProbs();
         this.maxNumOfVehicles = maxNumOfVehicles;
-    }
-
-    private List<Double> getProbs(){
-        /* Calculate a cumulative probability such that you get: 
-        Best individual with probability p*(1-p)^0 = p
-        Second best individual with probability p*(1-p)
-        Third best individual with probability p*(1-p)^2
-        And so on, which means that one of the individuals selected for tournament will be chosen with prob = 1*/
-        double p = Parameters.tournamentProb;
-        double cumulativeP = 0.0;
-        List<Double> probs = new ArrayList<>();
-        for (int i=0; i< Parameters.tournamentSize; i++){
-            cumulativeP += p*Math.pow((1-p), i);
-            probs.add(cumulativeP);
-        }
-        return probs;
     }
 
     public List<Individual> getIndividuals(){
@@ -58,45 +41,63 @@ public class Population{
             return 0;
         });
         return this.individuals.get(index);
-        
+    }
+
+    public Individual getIndividualByRankAndDeviation(int index, List<Individual> inds){
+        if (inds.size()==0){
+            return getIndividualByRank(index);
+        }
+        List<Individual> copy = new ArrayList<>(inds);
+        copy.sort((a,b) -> {
+            if (Fitness.getIndividualRouteFitness(a) > Fitness.getIndividualRouteFitness(b)){
+                return 1;
+            } else if(Fitness.getIndividualRouteFitness(a) < Fitness.getIndividualRouteFitness(b)){
+                return -1;
+            }
+            return 0;
+        });
+        return copy.get(index);
     }
 
     public void generatePopulation() {
         Individual newIndividual = null;
         for (int i = 0; i < Parameters.populationSize; i++) {
             newIndividual = new Individual(depots, this.maxNumOfVehicles);
-            newIndividual.createRandomIndividual(customers);
+            boolean created = newIndividual.createRandomIndividual(customers);
+            while (!created){
+                newIndividual.createDepots(depots);
+                created = newIndividual.createRandomIndividual(customers);
+            }
+            System.out.println("Create individual: "+i);
             this.individuals.add(newIndividual);
         }
     }
 
     public List<Individual> tournamentSelection(){
-        List<Individual> parents = new ArrayList<>();
+        int count = 0;
+        List<Individual> parents = Collections.synchronizedList(new ArrayList<>());
         // Create parents list of given parentSelectionSize in parameters
-        while (parents.size() < Parameters.parentSelectionSize){
-            List<Individual> selectedInds = new ArrayList<>();
-            // Create individual-list of size defined by tournamentSize
-            while (selectedInds.size() < Parameters.tournamentSize){
-                Individual i = this.individuals.get(Utils.randomInt(Parameters.populationSize));
-                // Make sure that an individual does not compete with itself, can still be selected in multiple different tournaments
-                if (!selectedInds.contains(i)){
-                    selectedInds.add(i);
+        while (true){
+            count++;
+            synchronized(parents){
+                ThreadedTournament tt = new ThreadedTournament(""+count*-1, this.individuals);
+                tt.start();
+                try{
+                    tt.join();
+                } catch (InterruptedException e){
+                    tt.interrupt();
                 }
-            }
-            // Sort by fitness
-            selectedInds.sort(Comparator.comparingDouble(Individual::getFitness));
-            double randselect = Utils.randomDouble();
-            for (int i=0;i<this.tournamentProbs.size();i++){
-                if (randselect < this.tournamentProbs.get(i)){
-                    parents.add(selectedInds.get(i));
-                    break;
+                parents.add(tt.selected);
+                tt.interrupt();
+                if (parents.size() >= Parameters.parentSelectionSize){
+                    return parents; 
                 }
-            }
-            if (randselect > this.tournamentProbs.get(this.tournamentProbs.size()-1)){
-                parents.add(selectedInds.get(selectedInds.size()-1));
             }
         }
-        return parents; 
+    }
+
+    public List<Individual> getIndividualsWithCorrectDuration(){
+        return this.individuals.stream().filter(i->i.getDistanceDeviation() == 0.0).collect(Collectors.toList());
     }
 
     public void setNewPopulation(List<Individual> population){
@@ -104,33 +105,32 @@ public class Population{
     }
 
     public List<Individual> crossover(List<Individual> parents, int generationCount){
-        List<Individual> new_population = new ArrayList<>();
-        while (new_population.size() < Parameters.populationSize){
+        List<Individual> new_population = Collections.synchronizedList(new ArrayList<>());
+        while (true){
+            synchronized(new_population){
             for (Individual p1: parents){
                 for (Individual p2:parents){
                     if (Utils.randomDouble()<Parameters.crossoverProbability){
-                        Tuple<Individual, Individual> offspring = p1.crossover(p2);
-                        if (!Objects.isNull(offspring)){
-                            new_population.add(offspring.x);
-                            new_population.add(offspring.y);
+                        ThreadedCrossover offspring = new ThreadedCrossover(Integer.toString((new_population.size())+1*(generationCount)+1), p1, p2, generationCount);
+                        offspring.start();
+                        try{
+                            offspring.join();
+                            if (!Objects.isNull(offspring.offspring)){
+                                new_population.add(offspring.offspring.x);
+                                new_population.add(offspring.offspring.y);
+                            }
+                        } catch (InterruptedException e){
+                            offspring.interrupt();
                         }
+                        offspring.interrupt();
+                    }
+                    if (new_population.size() >= Parameters.populationSize){
+                        return new_population;
                     }
                 }
             }
         }
-        for (Individual individual : new_population) {
-            if (Utils.randomDouble() <= Parameters.mutationProbability) {
-                if (generationCount % Parameters.interDepotMutationRate == 0 && generationCount != 0) {
-                    individual.interDepotMutation();
-                } else {
-                    Depot randomDepot = Utils.randomPick(individual.getDepots(), (p->p.getAllCustomersInVehicles().size() >= 1));
-                    randomDepot.intraDepotMutation();
-                }
-                individual.calculateFitness();
-
-            }
-        }
-        return new_population;
+    }
     }
 
     public List<Individual> survivorSelection(List<Individual> parents, List<Individual> offspring){

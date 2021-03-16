@@ -17,7 +17,7 @@ public class Individual{
 
     public Individual(List<Depot> depots, int maxVehicles) {
         this.maxVehicles = maxVehicles;
-        this.depots = this.createDepots(depots);
+        this.createDepots(depots);
     }
 
     public void calculateFitness(){
@@ -39,12 +39,12 @@ public class Individual{
         return this.fitness;
     }
 
-    public List<Depot> createDepots(List<Depot> depots){
+    public void createDepots(List<Depot> depots){
         List<Depot> depotResults = new ArrayList<>();
         for (Depot d: depots){
             Depot depotCopy = d.clone();
             for (int i = 0;i < this.maxVehicles ;i++){
-                Vehicle v = new Vehicle(i+1, d.maxLoad);
+                Vehicle v = new Vehicle(i+1, d.maxLoad, d.maxDuration);
                 try{
                     depotCopy.addVehicle(v);
                 } catch (IllegalStateException e){
@@ -53,7 +53,7 @@ public class Individual{
             }
             depotResults.add(depotCopy);
         }
-        return depotResults;
+        this.depots = depotResults;
     }
 
     public int numberOfCustomers(){
@@ -66,7 +66,11 @@ public class Individual{
         return cust;
     }
 
-    public void createRandomIndividual(HashMap<Integer, Customer> customers){
+    public double getDistanceDeviation(){
+        return this.depots.stream().map(Depot::getDistanceDeviation).reduce(0.0, (total, element) -> total + element);
+    }
+
+    public boolean createRandomIndividual(HashMap<Integer, Customer> customers){
         List<Customer> customerValues = new ArrayList<>(customers.values());
         Collections.shuffle(customerValues);
         for (Customer c: customerValues){
@@ -88,7 +92,11 @@ public class Individual{
                 }
             }
         }
+        if(this.numberOfCustomers() != customers.values().size()){
+            return false;
+        }
         this.calculateFitness();
+        return true;
     }
 
     public boolean removeCustomer(Customer c){
@@ -101,15 +109,20 @@ public class Individual{
         return false;
     }
 
+    public Vehicle randomRoute(){
+        Depot d = this.getDepots().get(Utils.randomInt(this.getDepots().size()));
+        return d.getAllVehicles().get(Utils.randomInt(d.getAllVehicles().size()));
+    }
+
     public Tuple<Individual, Individual> crossover(Individual i){
         Individual offspring1 = this.clone();
         Individual offspring2 = i.clone();
         // Select a random depot for each offspring
         Depot depot1 = offspring1.getDepots().get(Utils.randomInt(offspring1.getDepots().size()));
         Depot depot2 = offspring2.getDepots().get(Utils.randomInt(offspring2.getDepots().size()));
-        // Select a random route for each depot, empty routes can not be selected
-        Vehicle vehicle1 = depot1.getAllVehicles().get(Utils.randomInt(depot1.getAllVehicles().size()));
-        Vehicle vehicle2 = depot2.getAllVehicles().get(Utils.randomInt(depot2.getAllVehicles().size()));
+        // Select a random route for each offspring
+        Vehicle vehicle1 = offspring1.randomRoute();
+        Vehicle vehicle2 = offspring2.randomRoute();
         // Remove customers from opposite route, insert new at most feasible location
         List<Customer> c1 = new ArrayList<>(vehicle1.getCustomers());
         List<Customer> c2 = new ArrayList<>(vehicle2.getCustomers());
@@ -127,13 +140,17 @@ public class Individual{
         }
         for (Customer c: c1){
             boolean inserted = depot2.insertAtMostFeasible(c);
-            if (!inserted){
+            if (!inserted && depot2.countActiveVehicles() < depot2.maxVehicles){
+                depot2.createNewRoute(c);
+            } else if (!inserted){
                 return null;
             }
         }
         for (Customer c: c2){
             boolean inserted = depot1.insertAtMostFeasible(c);
-            if (!inserted){
+            if (!inserted && depot1.countActiveVehicles() < depot1.maxVehicles){
+                depot1.createNewRoute(c);
+            } else if (!inserted){
                 return null;
             }
         }

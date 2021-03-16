@@ -10,19 +10,21 @@ import DataClasses.Customer;
 
 public class Vehicle{
     
-    public final int id, maxLoad;
+    public final int id, maxLoad, maxDuration;
     private int load = 0;
     private List<Customer> customers = new ArrayList<>();
     private Depot depot;
 
-    public Vehicle(int id, int maxLoad) {
+    public Vehicle(int id, int maxLoad, int maxDuration) {
         this.id = id;
         this.maxLoad = maxLoad;
+        this.maxDuration = maxDuration;
     }
 
     public Vehicle(Vehicle vehicle){
         this.id = vehicle.id;
         this.maxLoad = vehicle.maxLoad;
+        this.maxDuration = vehicle.maxDuration;
         this.load = vehicle.getLoad();
         this.customers = new ArrayList<>(vehicle.getCustomers());
         this.depot = vehicle.getDepot();
@@ -31,6 +33,7 @@ public class Vehicle{
     public Vehicle(Vehicle vehicle, List<Customer> customers){
         this.id = vehicle.id;
         this.maxLoad = vehicle.maxLoad;
+        this.maxDuration = vehicle.maxDuration;
         this.depot = vehicle.getDepot();
         addCustomersToRoute(customers, 0);
     }
@@ -79,6 +82,9 @@ public class Vehicle{
     }
 
     public Tuple<Integer, Double> mostFeasibleInsertion(Customer customer){
+        if (this.load + customer.demand > this.maxLoad){
+            return null;
+        }
         int lengthOfRoute = this.customers.size();
         List<Tuple<Integer, Double>> indexAndFitness = new ArrayList<>();
         for (int i=0; i< lengthOfRoute + 1;i++){
@@ -130,6 +136,7 @@ public class Vehicle{
     public int getLoad(){
         return this.load;
     }
+
 
     @Override
     public boolean equals(Object o) {

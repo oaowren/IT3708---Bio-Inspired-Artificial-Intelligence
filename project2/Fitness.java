@@ -51,20 +51,30 @@ public class Fitness{
                                            .flatMap(depot -> depot.getAllVehicles().stream())
                                            .map(vehicle -> vehicle.isActive() ? 1 : 0)
                                            .reduce(0, (subtotal, element) -> subtotal + element);
-        double fitness = getIndividualRouteFitness(individual);
-        return Parameters.alpha * numberOfActiveVehicles + Parameters.beta * fitness;
+        double fitness = getIndividualRouteDeviationFitness(individual);
+        return Parameters.alpha * numberOfActiveVehicles + fitness;
     }
 
     public static double getIndividualRouteFitness(Individual individual) {
+        return individual.getDepots().stream()
+                                     .map(Fitness::getDepotRouteFitness)
+                                     .reduce(0.0, (subtotal, element) -> subtotal + element);
+    }
+
+    public static double getIndividualRouteDeviationFitness(Individual individual){
         return individual.getDepots().stream()
                                      .map(Fitness::getDepotFitness)
                                      .reduce(0.0, (subtotal, element) -> subtotal + element);
     }
 
-    public static double getDepotFitness(Depot depot) {
+    public static double getDepotRouteFitness(Depot depot){
         return depot.getAllVehicles().stream()
                                      .map(vehicle -> getVehicleFitness(vehicle, depot))
                                      .reduce(0.0, (subtotal, element) -> subtotal + element);
+    }
+
+    public static double getDepotFitness(Depot depot) {
+        return Parameters.durationPenalty * depot.getDistanceDeviation() + Parameters.beta * getDepotRouteFitness(depot);
     }
 
     // Memoized in pairMemo
