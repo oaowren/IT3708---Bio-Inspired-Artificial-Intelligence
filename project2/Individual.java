@@ -141,7 +141,11 @@ public class Individual{
         for (Customer c: c1){
             boolean inserted = depot2.insertAtMostFeasible(c);
             if (!inserted && depot2.countActiveVehicles() < depot2.maxVehicles){
-                depot2.createNewRoute(c);
+                try {
+                    depot2.createNewRoute(c);
+                } catch (IllegalStateException e){
+                    return null;
+                }
             } else if (!inserted){
                 return null;
             }
@@ -149,7 +153,11 @@ public class Individual{
         for (Customer c: c2){
             boolean inserted = depot1.insertAtMostFeasible(c);
             if (!inserted && depot1.countActiveVehicles() < depot1.maxVehicles){
-                depot1.createNewRoute(c);
+                try {
+                    depot1.createNewRoute(c);
+                } catch (IllegalStateException e){
+                    return null;
+                }
             } else if (!inserted){
                 return null;
             }

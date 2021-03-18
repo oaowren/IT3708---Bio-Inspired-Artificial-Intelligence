@@ -94,8 +94,9 @@ public class Depot{
         if (countActiveVehicles() == this.maxVehicles){
             throw new IllegalStateException("No empty vehicles available");
         }
-        Vehicle inactive = this.vehicles.stream().filter(v-> !v.isActive()).collect(Collectors.toList()).get(0);
-        inactive.visitCustomer(c);
+        List<Vehicle> inactive = this.vehicles.stream().filter(v-> !v.isActive()).collect(Collectors.toList());
+        Vehicle v = inactive.get(Utils.randomInt(inactive.size()));
+        v.visitCustomer(c);
     }
     
     public void addVehicle(Vehicle v) {

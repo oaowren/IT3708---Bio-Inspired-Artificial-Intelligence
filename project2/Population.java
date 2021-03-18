@@ -79,21 +79,21 @@ public class Population{
         // Create parents list of given parentSelectionSize in parameters
         while (true){
             count++;
-            synchronized(parents){
-                ThreadedTournament tt = new ThreadedTournament(""+count*-1, this.individuals);
+                ThreadedTournament tt = new ThreadedTournament("Tournament"+count, this.individuals);
                 tt.start();
                 try{
                     tt.join();
                 } catch (InterruptedException e){
                     tt.interrupt();
                 }
-                parents.add(tt.selected);
-                tt.interrupt();
-                if (parents.size() >= Parameters.parentSelectionSize){
-                    return parents; 
+                synchronized(parents){
+                    parents.add(tt.selected);
+                    tt.interrupt();
+                    if (parents.size() >= Parameters.parentSelectionSize){
+                        return parents; 
+                    }
                 }
             }
-        }
     }
 
     public List<Individual> getIndividualsWithCorrectDuration(){
@@ -107,30 +107,28 @@ public class Population{
     public List<Individual> crossover(List<Individual> parents, int generationCount){
         List<Individual> new_population = Collections.synchronizedList(new ArrayList<>());
         while (true){
-            synchronized(new_population){
-            for (Individual p1: parents){
-                for (Individual p2:parents){
-                    if (Utils.randomDouble()<Parameters.crossoverProbability){
-                        ThreadedCrossover offspring = new ThreadedCrossover(Integer.toString((new_population.size())+1*(generationCount)+1), p1, p2, generationCount);
-                        offspring.start();
-                        try{
-                            offspring.join();
-                            if (!Objects.isNull(offspring.offspring)){
-                                new_population.add(offspring.offspring.x);
-                                new_population.add(offspring.offspring.y);
+            Individual p1 = parents.get(Utils.randomInt(Parameters.parentSelectionSize-1));
+            Individual p2 = Utils.randomPick(parents, p-> p != p1);
+            if (Utils.randomDouble()<Parameters.crossoverProbability){
+                ThreadedCrossover offspring = new ThreadedCrossover("Crossover" + p1.hashCode() + p2.hashCode(), p1, p2, generationCount);                    
+                offspring.start();
+                try{
+                    offspring.join();
+                    if (!Objects.isNull(offspring.offspring)){
+                        synchronized(new_population){
+                            new_population.add(offspring.offspring.x);
+                            new_population.add(offspring.offspring.y);
+                            if (new_population.size() >= Parameters.populationSize){
+                                return new_population;
                             }
-                        } catch (InterruptedException e){
-                            offspring.interrupt();
                         }
-                        offspring.interrupt();
                     }
-                    if (new_population.size() >= Parameters.populationSize){
-                        return new_population;
-                    }
+                } catch (InterruptedException e){
+                    offspring.interrupt();
                 }
+                offspring.interrupt();
             }
         }
-    }
     }
 
     public List<Individual> survivorSelection(List<Individual> parents, List<Individual> offspring){

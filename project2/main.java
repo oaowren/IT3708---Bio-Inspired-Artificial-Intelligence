@@ -1,6 +1,5 @@
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
 
 import DataClasses.*;
@@ -20,27 +19,30 @@ class Main{
         p.setDepots(depots);
         GeneticAlgorithm.initialDepotClustering(depots, customers.values());
         p.generatePopulation();
-        System.out.println(p.getIndividuals().stream()
-                                             .map(Fitness::getIndividualRouteFitness)
-                                             .collect(Collectors.toList()));
         Individual bestInd = p.getIndividualByRank(0);
         double bestIndFitness = Fitness.getIndividualRouteFitness(bestInd);
         gFitness.add(new Tuple<>(0, bestIndFitness));
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                DataSetIo.writeResults(p.getIndividualByRank(0), "project2/Results/"+Parameters.problem);
+                DataSetIo.writeGenerations(gFitness, "project2/Generations/"+Parameters.problem);
+            }
+        });
         while ((bestIndFitness > threshold || bestInd.getDistanceDeviation() != 0.0) && generation < Parameters.generationSpan){
             generation++;
-            System.out.println(generation);
             List<Individual> parents = p.tournamentSelection();
             List<Individual> new_pop = p.crossover(parents, generation);
-            new_pop = p.survivorSelection(p.getIndividuals(), new_pop);
+            if (!Parameters.useCrowding){
+                new_pop = p.survivorSelection(p.getIndividuals(), new_pop);
+            }
             p.setNewPopulation(new_pop);
             bestInd = p.getIndividualByRankAndDeviation(0, p.getIndividualsWithCorrectDuration());
             bestIndFitness = Fitness.getIndividualRouteFitness(bestInd);
-            System.out.println("Route Fitness: "+bestIndFitness);
-            System.out.println("Deviation from max duration: "+bestInd.getDistanceDeviation());
+            System.out.println(String.format("Generation %d\tRoute Fitness: %.3f\tDeviation from max duration: %.2f", generation, bestIndFitness, bestInd.getDistanceDeviation()));
             gFitness.add(new Tuple<>(generation, bestIndFitness));
             Fitness.removeOldRoutes();
         }
-        DataSetIo.writeResults(p.getIndividualByRank(0), "project2/Results/"+Parameters.problem);
+        DataSetIo.writeResults(bestInd, "project2/Results/"+Parameters.problem);
         DataSetIo.writeGenerations(gFitness, "project2/Generations/"+Parameters.problem);
     }
 }
