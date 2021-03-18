@@ -56,30 +56,55 @@ public class Depot{
                            .collect(Collectors.toList());
     }
 
-    public boolean insertAtMostFeasible(Customer customer, ExecutorService executor) {
-        List<Tuple<Integer, Tuple<Integer, Double>>> inds = Collections.synchronizedList(new ArrayList<>());
+    // public boolean insertAtMostFeasible(Customer customer) {
+    //     List<Tuple<Integer, Tuple<Integer, Double>>> inds = Collections.synchronizedList(new ArrayList<>());
+    //     for (int i=0; i<this.vehicles.size(); i++) {
+    //         Depot depotClone = this.clone();
+    //         Vehicle v = depotClone.getAllVehicles().get(i);
+    //         ThreadedInsertion ti = new ThreadedInsertion(v, customer, inds, i);
+    //         executor.execute(ti);
+    //     }
+    //     double minFitness = Integer.MAX_VALUE;
+    //     Tuple<Integer, Tuple<Integer, Double>> best = new Tuple<>(-1, new Tuple<>(-1, minFitness));
+    //     Vehicle v = null;
+    //     synchronized (inds){
+    //         for (Tuple<Integer, Tuple<Integer, Double>> i: inds){
+    //             if (i.y.y < minFitness){
+    //                 minFitness = i.y.y;
+    //                 v = this.vehicles.get(i.x);
+    //                 best = i;
+    //             }
+    //         }
+    //     }
+    //     if (best.y.x == -1) {
+    //         return false;
+    //     }
+    //     v.insertCustomer(customer, best.y.x);
+    //     return true;
+    // }
+
+    public boolean insertAtMostFeasible(Customer customer) {
+        Vehicle vehicle = null;
+        int maxFeasible = -1;
+        double minFitness = Integer.MAX_VALUE;
         for (int i=0; i<this.vehicles.size(); i++) {
             Depot depotClone = this.clone();
             Vehicle v = depotClone.getAllVehicles().get(i);
-            ThreadedInsertion ti = new ThreadedInsertion(v, customer, inds, i);
-            executor.execute(ti);
-        }
-        double minFitness = Integer.MAX_VALUE;
-        Tuple<Integer, Tuple<Integer, Double>> best = new Tuple<>(-1, new Tuple<>(-1, minFitness));
-        Vehicle v = null;
-        synchronized (inds){
-            for (Tuple<Integer, Tuple<Integer, Double>> i: inds){
-                if (i.y.y < minFitness){
-                    minFitness = i.y.y;
-                    v = this.vehicles.get(i.x);
-                    best = i;
+            Tuple<Integer, Double> best = v.mostFeasibleInsertion(customer);
+            if (best != null) {
+                v.insertCustomer(customer, best.x);
+                Double newFitness = Fitness.getDepotFitness(depotClone);
+                if (newFitness < minFitness) {
+                    vehicle = this.vehicles.get(i);
+                    minFitness = newFitness;
+                    maxFeasible = best.x;            
                 }
             }
         }
-        if (best.y.x == -1) {
+        if (maxFeasible == -1) {
             return false;
         }
-        v.insertCustomer(customer, best.y.x);
+        vehicle.insertCustomer(customer, maxFeasible);
         return true;
     }
 
@@ -127,7 +152,7 @@ public class Depot{
                                     .collect(Collectors.toList());
     }
     
-    public void intraDepotMutation(ExecutorService executor) {
+    public void intraDepotMutation() {
         int randInt = Utils.randomInt(3);
         if (randInt == 0) {
             boolean mutationSuccessful = false;
@@ -141,7 +166,7 @@ public class Depot{
                 }
             }
         } else if (randInt == 1) {
-            singleCustomerRerouting(executor);
+            singleCustomerRerouting();
         } else {
             swapping();
         }
@@ -199,14 +224,14 @@ public class Depot{
      * This involves computing the total cost of insertion at every insertion locale, 
      * which finally re-inserts the customer in the most feasible location.
      */
-    private void singleCustomerRerouting(ExecutorService executor) {
+    private void singleCustomerRerouting() {
         Vehicle randVehicle = Utils.randomPick(vehicles, (vehicle -> vehicle.getCustomers().size() >= 1));
         if (randVehicle == null) return;
 
         Customer randCustomer = randVehicle.getCustomers().get(Utils.randomInt(randVehicle.getCustomers().size()));
 
         randVehicle.removeCustomer(randCustomer);
-        insertAtMostFeasible(randCustomer, executor);
+        insertAtMostFeasible(randCustomer);
     }
 
     /** 

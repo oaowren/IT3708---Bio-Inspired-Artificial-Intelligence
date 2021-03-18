@@ -1,6 +1,6 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 import DataClasses.*;
 
@@ -21,7 +21,7 @@ public class Fitness{
             return 0.0;
         }
         double distance = 0.0;
-        List<Integer> vehicleCustomers = vehicle.getCustomersId();
+        List<Integer> vehicleCustomers = new ArrayList<>(vehicle.getCustomersId());
         int final_ind = vehicleCustomers.size()-1;
         distance += getDistance(customers.get(vehicleCustomers.get(0)), depot);
         for (int i = 0; i < final_ind; i++) {

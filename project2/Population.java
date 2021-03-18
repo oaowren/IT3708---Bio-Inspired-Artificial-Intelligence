@@ -97,7 +97,7 @@ public class Population{
             Individual p1 = parents.get(Utils.randomInt(Parameters.parentSelectionSize-1));
             Individual p2 = Utils.randomPick(parents, p -> p != p1);
             if (Utils.randomDouble()<Parameters.crossoverProbability){
-                ThreadedCrossover offspring = new ThreadedCrossover(p1, p2, generationCount, new_population, executor);     
+                ThreadedCrossover offspring = new ThreadedCrossover(p1, p2, generationCount, new_population);     
                 executor.execute(offspring);
                 if (new_population.size() >= Parameters.populationSize){
                     return List.of(new_population.toArray(new Individual[]{}));
@@ -108,11 +108,13 @@ public class Population{
 
     public List<Individual> survivorSelection(List<Individual> parents, List<Individual> offspring){
         int elitism = Parameters.eliteSize;
-        offspring.sort(Comparator.comparingDouble(Individual::getFitness));
-        parents.sort(Comparator.comparingDouble(Individual::getFitness));
-        offspring.subList(offspring.size() - elitism, offspring.size()).clear();
-        offspring.addAll(parents.subList(0, elitism));
-        return offspring;
+        List<Individual> copyOffspring = new ArrayList<>(offspring);
+        List<Individual> copyParents = new ArrayList<>(parents);
+        copyOffspring.sort(Comparator.comparingDouble(Individual::getFitness));
+        copyParents.sort(Comparator.comparingDouble(Individual::getFitness));
+        copyOffspring.subList(copyOffspring.size() - elitism, copyOffspring.size()).clear();
+        copyOffspring.addAll(copyParents.subList(0, elitism));
+        return copyOffspring;
     }
 
 }

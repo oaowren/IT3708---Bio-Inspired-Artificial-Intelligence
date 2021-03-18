@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import DataClasses.Customer;
 import DataClasses.Tuple;
@@ -80,7 +81,6 @@ public class GeneticAlgorithm {
             bestIndFitness = Fitness.getIndividualRouteFitness(bestInd);
             System.out.println(String.format("Generation %d\tRoute Fitness: %.3f\tDeviation from max duration: %.2f", generation, bestIndFitness, bestInd.getDistanceDeviation()));
             generationalFitness.add(new Tuple<>(generation, bestIndFitness));
-            // Fitness.removeOldRoutes();
         }
     }
 }

@@ -34,10 +34,7 @@ public class ThreadedTournament implements Runnable{
             // Create individual-list of size defined by tournamentSize
             while (selectedInds.size() < Parameters.tournamentSize){
                 Individual i = this.population.get(Utils.randomInt(Parameters.populationSize));
-                // Make sure that an individual does not compete with itself, can still be selected in multiple different tournaments
-                if (!selectedInds.contains(i)){
-                    selectedInds.add(i);
-                }
+                selectedInds.add(i);
             }
             // Sort by fitness
             selectedInds.sort(Comparator.comparingDouble(Individual::getFitness));
