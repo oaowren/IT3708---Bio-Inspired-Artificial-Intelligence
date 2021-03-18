@@ -71,11 +71,13 @@ public class Depot{
         double minFitness = Integer.MAX_VALUE;
         Tuple<Vehicle, Tuple<Integer, Double>> best = new Tuple<>(this.vehicles.get(0), new Tuple<>(-1, minFitness));
         Vehicle v = null;
-        for (Tuple<Vehicle, Tuple<Integer, Double>> i: inds){
-            if (i.y.y < minFitness){
-                minFitness = i.y.y;
-                v = this.getVehicleById(i.x.id);
-                best = i;
+        synchronized (inds){
+            for (Tuple<Vehicle, Tuple<Integer, Double>> i: inds){
+                if (i.y.y < minFitness){
+                    minFitness = i.y.y;
+                    v = this.getVehicleById(i.x.id);
+                    best = i;
+                }
             }
         }
         if (best.y.x == -1) {
