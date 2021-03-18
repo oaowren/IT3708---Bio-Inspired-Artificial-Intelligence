@@ -64,7 +64,6 @@ public class Depot{
             ThreadedInsertion ti = new ThreadedInsertion(v, customer, inds, i);
             executor.execute(ti);
         }
-        executor.shutdown();
         double minFitness = Integer.MAX_VALUE;
         Tuple<Integer, Tuple<Integer, Double>> best = new Tuple<>(-1, new Tuple<>(-1, minFitness));
         Vehicle v = null;

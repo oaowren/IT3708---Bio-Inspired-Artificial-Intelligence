@@ -1,11 +1,11 @@
 public class Parameters {
     
-    static final String problem = "p08";
-    static final int populationSize = 100;
+    static final String problem = "p23";
+    static final int populationSize = 50;
     static final int generationSpan = 5000;
     static final int eliteSize = 2;
     static final int tournamentSize = 2;
-    static final int parentSelectionSize = 70;
+    static final int parentSelectionSize = 35;
     static final double tournamentProb = 0.8;
     static final double crossoverProbability = 0.60;
     static final double mutationProbability = 0.2;
@@ -17,5 +17,6 @@ public class Parameters {
     static final double durationPenalty = 100;
     static final int memoCacheMaxAge = 5;
     static final boolean useCrowding = true;
+    static final int threadPoolSize = 10;
 
 }

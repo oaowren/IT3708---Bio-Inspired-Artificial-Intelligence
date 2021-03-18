@@ -13,9 +13,11 @@ import DataClasses.*;
 
 public class Population{
 
-    private ExecutorService executor = new ThreadPoolExecutor(20, 20, 30, TimeUnit.SECONDS, 
-                                                          new ArrayBlockingQueue<>(20),
-                                                          new ThreadPoolExecutor.CallerRunsPolicy());
+    private ExecutorService executor = new ThreadPoolExecutor(Parameters.threadPoolSize, 
+                                                              Parameters.threadPoolSize, 
+                                                              30, TimeUnit.SECONDS, 
+                                                              new ArrayBlockingQueue<>(Parameters.threadPoolSize),
+                                                              new ThreadPoolExecutor.CallerRunsPolicy());
     
 	private List<Individual> individuals = new ArrayList<>();
     private int maxNumOfVehicles;
@@ -74,7 +76,6 @@ public class Population{
             ThreadedTournament tt = new ThreadedTournament(this.individuals, parents);
             executor.execute(tt);
             if (parents.size() >= Parameters.parentSelectionSize){
-                executor.shutdown();
                 return parents;
             }
         }
@@ -99,7 +100,6 @@ public class Population{
                 ThreadedCrossover offspring = new ThreadedCrossover(p1, p2, generationCount, new_population, executor);     
                 executor.execute(offspring);
                 if (new_population.size() >= Parameters.populationSize){
-                    executor.shutdown();
                     return List.of(new_population.toArray(new Individual[]{}));
                 }
             }
