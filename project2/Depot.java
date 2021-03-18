@@ -60,22 +60,22 @@ public class Depot{
         ExecutorService executor = new ThreadPoolExecutor(1, 2, 30, TimeUnit.SECONDS, 
                                                           new ArrayBlockingQueue<>(2), 
                                                           new ThreadPoolExecutor.CallerRunsPolicy());
-        List<Tuple<Vehicle, Tuple<Integer, Double>>> inds = Collections.synchronizedList(new ArrayList<>());
+        List<Tuple<Integer, Tuple<Integer, Double>>> inds = Collections.synchronizedList(new ArrayList<>());
         for (int i=0; i<this.vehicles.size(); i++) {
             Depot depotClone = this.clone();
             Vehicle v = depotClone.getAllVehicles().get(i);
-            ThreadedInsertion ti = new ThreadedInsertion(v, customer, inds);
+            ThreadedInsertion ti = new ThreadedInsertion(v, customer, inds, v.id);
             executor.execute(ti);
         }
         executor.shutdown();
         double minFitness = Integer.MAX_VALUE;
-        Tuple<Vehicle, Tuple<Integer, Double>> best = new Tuple<>(this.vehicles.get(0), new Tuple<>(-1, minFitness));
+        Tuple<Integer, Tuple<Integer, Double>> best = new Tuple<>(-1, new Tuple<>(-1, minFitness));
         Vehicle v = null;
         synchronized (inds){
-            for (Tuple<Vehicle, Tuple<Integer, Double>> i: inds){
+            for (Tuple<Integer, Tuple<Integer, Double>> i: inds){
                 if (i.y.y < minFitness){
                     minFitness = i.y.y;
-                    v = this.getVehicleById(i.x.id);
+                    v = this.getVehicleById(i.x);
                     best = i;
                 }
             }

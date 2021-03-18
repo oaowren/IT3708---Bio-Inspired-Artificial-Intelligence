@@ -13,7 +13,7 @@ public class Vehicle{
     
     public final int id, maxLoad, maxDuration;
     private int load = 0;
-    private List<Customer> customers = Collections.synchronizedList(new ArrayList<>());
+    private List<Customer> customers = new ArrayList<>();
     private Depot depot;
 
     public Vehicle(int id, int maxLoad, int maxDuration) {
@@ -36,6 +36,7 @@ public class Vehicle{
         this.maxLoad = vehicle.maxLoad;
         this.maxDuration = vehicle.maxDuration;
         this.depot = vehicle.getDepot();
+        this.load = vehicle.getLoad();
         addCustomersToRoute(customers, 0);
     }
 
