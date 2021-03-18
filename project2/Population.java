@@ -3,7 +3,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import DataClasses.*;
@@ -51,7 +50,7 @@ public class Population{
         copy.sort((a,b) -> {
             if (Fitness.getIndividualRouteFitness(a) > Fitness.getIndividualRouteFitness(b)){
                 return 1;
-            } else if(Fitness.getIndividualRouteFitness(a) < Fitness.getIndividualRouteFitness(b)){
+            } else if (Fitness.getIndividualRouteFitness(a) < Fitness.getIndividualRouteFitness(b)){
                 return -1;
             }
             return 0;
@@ -97,7 +96,9 @@ public class Population{
     }
 
     public List<Individual> getIndividualsWithCorrectDuration(){
-        return this.individuals.stream().filter(i->i.getDistanceDeviation() == 0.0).collect(Collectors.toList());
+        return this.individuals.stream()
+                               .filter(i->i.getDistanceDeviation() == 0.0)
+                               .collect(Collectors.toList());
     }
 
     public void setNewPopulation(List<Individual> population){
@@ -110,23 +111,12 @@ public class Population{
             Individual p1 = parents.get(Utils.randomInt(Parameters.parentSelectionSize-1));
             Individual p2 = Utils.randomPick(parents, p-> p != p1);
             if (Utils.randomDouble()<Parameters.crossoverProbability){
-                ThreadedCrossover offspring = new ThreadedCrossover("Crossover" + p1.hashCode() + p2.hashCode(), p1, p2, generationCount);                    
+                ThreadedCrossover offspring = new ThreadedCrossover("Crossover" + p1.hashCode() + p2.hashCode(), p1, p2, generationCount, new_population);                    
                 offspring.start();
-                try{
-                    offspring.join();
-                    if (!Objects.isNull(offspring.offspring)){
-                        synchronized(new_population){
-                            new_population.add(offspring.offspring.x);
-                            new_population.add(offspring.offspring.y);
-                            if (new_population.size() >= Parameters.populationSize){
-                                return new_population;
-                            }
-                        }
-                    }
-                } catch (InterruptedException e){
-                    offspring.interrupt();
+                try{offspring.join();}catch (InterruptedException e){;}
+                if (new_population.size() >= Parameters.populationSize){
+                    return new_population;
                 }
-                offspring.interrupt();
             }
         }
     }
