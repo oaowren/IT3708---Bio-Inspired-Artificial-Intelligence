@@ -79,7 +79,9 @@ public class Depot{
         if (this.maxDuration == 0){
             return 0.0;
         }
-        return this.vehicles.stream().map(v-> Fitness.getVehicleFitness(v, this)).reduce(0.0, (tot, element) -> tot + (element > this.maxDuration ? element - this.maxDuration : 0.0));
+        return vehicles.stream()
+                       .map(v-> Fitness.getVehicleFitness(v, this))
+                       .reduce(0.0, (tot, element) -> tot + (element > this.maxDuration ? element - this.maxDuration : 0.0));
     }
 
     public List<Vehicle> getAllVehicles() {
@@ -87,14 +89,18 @@ public class Depot{
     }
 
     public int countActiveVehicles(){
-        return this.vehicles.stream().map(v-> v.isActive() ? 1 : 0).reduce(0, (acc, el) -> acc + el);
+        return this.vehicles.stream()
+                            .map(v-> v.isActive() ? 1 : 0)
+                            .reduce(0, (acc, el) -> acc + el);
     }
 
     public void createNewRoute(Customer c){
         if (countActiveVehicles() == this.maxVehicles){
             throw new IllegalStateException("No empty vehicles available");
         }
-        List<Vehicle> inactive = this.vehicles.stream().filter(v-> !v.isActive()).collect(Collectors.toList());
+        List<Vehicle> inactive = vehicles.stream()
+                                         .filter(vehicle -> !vehicle.isActive())
+                                         .collect(Collectors.toList());
         Vehicle v = inactive.get(Utils.randomInt(inactive.size()));
         v.visitCustomer(c);
     }
@@ -177,7 +183,6 @@ public class Depot{
         }
         mutatedVehicleList.addAll(emptyVehicles);
         this.vehicles = mutatedVehicleList;
-        //System.out.println("Reversed " + this.id + " sliced " + cutPoint1 + " to " + cutPoint2);
     }
 
     /**
@@ -194,7 +199,6 @@ public class Depot{
 
         randVehicle.removeCustomer(randCustomer);
         insertAtMostFeasible(randCustomer);
-        //System.out.println("Rerouted in depot " + this.id + " rerouted " + randCustomer.id + " from " + randVehicle.id);
     }
 
     /** 
@@ -217,13 +221,11 @@ public class Depot{
 
         randVehicle1.getCustomers().set(randCustomer1, customer2);
         randVehicle2.getCustomers().set(randCustomer2, customer1);
-
-        //System.out.println("Swapped in depot " + this.id + " swapped " + customer1.id + " and " + customer2.id);
     }
 
     public List<Customer> getAllCustomersInVehicles() {
         return vehicles.stream()
-                       .flatMap(v -> v.getCustomers().stream())
+                       .flatMap(vehicle -> vehicle.getCustomers().stream())
                        .collect(Collectors.toList());
     }
 
