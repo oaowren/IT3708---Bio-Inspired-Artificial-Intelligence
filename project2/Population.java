@@ -66,7 +66,7 @@ public class Population{
     public List<Individual> tournamentSelection(){
         List<Individual> parents = Collections.synchronizedList(new ArrayList<>());
         // Create parents list of given parentSelectionSize in parameters
-        ExecutorService executor = new ThreadPoolExecutor(1, Parameters.parentSelectionSize, 10, TimeUnit.SECONDS, 
+        ExecutorService executor = new ThreadPoolExecutor(10, Parameters.parentSelectionSize, 30, TimeUnit.SECONDS, 
                                                           new ArrayBlockingQueue<>(Parameters.parentSelectionSize), 
                                                           new ThreadPoolExecutor.CallerRunsPolicy());
         while (true){
@@ -98,11 +98,9 @@ public class Population{
             if (Utils.randomDouble()<Parameters.crossoverProbability){
                 ThreadedCrossover offspring = new ThreadedCrossover(p1, p2, generationCount, new_population);     
                 executor.execute(offspring);
-                synchronized (new_population){
-                    if (new_population.size() >= Parameters.populationSize){
-                        executor.shutdown();
-                        return List.of(new_population.toArray(new Individual[]{}));
-                    }
+                if (new_population.size() >= Parameters.populationSize){
+                    executor.shutdown();
+                    return List.of(new_population.toArray(new Individual[]{}));
                 }
             }
         }

@@ -52,6 +52,9 @@ public class ThreadedTournament implements Runnable{
                 this.selected = selectedInds.get(selectedInds.size()-1);
             }
             synchronized(parents){
+                if (parents.size() >= Parameters.parentSelectionSize){
+                    return;
+                }
                 parents.add(this.selected);
             }
     }

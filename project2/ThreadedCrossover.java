@@ -50,8 +50,11 @@ public class ThreadedCrossover implements Runnable{
                 }
             }
             synchronized(this.population){
-                    this.population.add(this.offspring.x);
-                    this.population.add(this.offspring.y);
+                if (this.population.size() >= Parameters.populationSize){
+                    return;
+                }
+                this.population.add(this.offspring.x);
+                this.population.add(this.offspring.y);
             }
         }
     }
