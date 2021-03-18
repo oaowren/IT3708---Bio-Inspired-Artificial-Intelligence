@@ -2,14 +2,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class ThreadedTournament extends Thread{
+public class ThreadedTournament implements Runnable{
     
-    public List<Individual> population;
+    public List<Individual> population, parents;
     public Individual selected;
 
-    public ThreadedTournament(String name, List<Individual> population){
-        super(name);
+    public ThreadedTournament(List<Individual> population, List<Individual> parents){
         this.population = population;
+        this.parents = parents;
     }
 
     private List<Double> getProbs(){
@@ -50,6 +50,9 @@ public class ThreadedTournament extends Thread{
             }
             if (randselect > tournamentProbs.get(tournamentProbs.size()-1)){
                 this.selected = selectedInds.get(selectedInds.size()-1);
+            }
+            synchronized(parents){
+                parents.add(this.selected);
             }
     }
 }

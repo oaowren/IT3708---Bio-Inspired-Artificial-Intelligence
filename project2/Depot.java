@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
 import DataClasses.Tuple;
@@ -52,30 +55,25 @@ public class Depot{
 
     public boolean insertAtMostFeasible(Customer customer) {
         Vehicle vehicle = null;
-        List<Thread> activeThreads = new ArrayList<>();
         int maxFeasible = -1;
         double minFitness = Integer.MAX_VALUE;
+        ExecutorService executor = Executors.newFixedThreadPool(5);
         for (int i=0; i<this.vehicles.size(); i++) {
             Depot depotClone = this.clone();
             Vehicle v = depotClone.getAllVehicles().get(i);
             ThreadedInsertion ti = new ThreadedInsertion(v, customer);
-            Thread insertion = new Thread(ti);
-            if (activeThreads.size() < this.vehicles.size()){
-                activeThreads.add(insertion);
-                insertion.start();
-                if (ti.best != null) {
-                    v.insertCustomer(customer, ti.best.x);
-                    Double newFitness = Fitness.getDepotFitness(depotClone);
-                    if (newFitness < minFitness) {                        
-                        vehicle = this.vehicles.get(i);
-                        minFitness = newFitness;
-                        maxFeasible = ti.best.x;            
-                    }
+            executor.execute(ti);
+            if (ti.best != null) {
+                v.insertCustomer(customer, ti.best.x);
+                Double newFitness = Fitness.getDepotFitness(depotClone);
+                if (newFitness < minFitness) {                                                
+                    vehicle = this.vehicles.get(i);
+                    minFitness = newFitness;
+                    maxFeasible = ti.best.x;            
                 }
-                activeThreads.remove(insertion);
-                insertion.interrupt();
-            }
+            }   
         }
+        executor.shutdown();
         if (maxFeasible == -1) {
             return false;
         }

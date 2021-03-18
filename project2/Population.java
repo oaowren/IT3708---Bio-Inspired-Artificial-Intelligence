@@ -3,6 +3,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
 import DataClasses.*;
@@ -47,14 +50,7 @@ public class Population{
             return getIndividualByRank(index);
         }
         List<Individual> copy = new ArrayList<>(inds);
-        copy.sort((a,b) -> {
-            if (Fitness.getIndividualRouteFitness(a) > Fitness.getIndividualRouteFitness(b)){
-                return 1;
-            } else if (Fitness.getIndividualRouteFitness(a) < Fitness.getIndividualRouteFitness(b)){
-                return -1;
-            }
-            return 0;
-        });
+        copy.sort((a,b) -> Double.compare(Fitness.getIndividualRouteFitness(a), Fitness.getIndividualRouteFitness(b)));
         return copy.get(index);
     }
 
@@ -73,26 +69,19 @@ public class Population{
     }
 
     public List<Individual> tournamentSelection(){
-        int count = 0;
         List<Individual> parents = Collections.synchronizedList(new ArrayList<>());
         // Create parents list of given parentSelectionSize in parameters
+        ExecutorService executor = Executors.newFixedThreadPool(5);
         while (true){
-            count++;
-                ThreadedTournament tt = new ThreadedTournament("Tournament"+count, this.individuals);
-                tt.start();
-                try{
-                    tt.join();
-                } catch (InterruptedException e){
-                    tt.interrupt();
-                }
-                synchronized(parents){
-                    parents.add(tt.selected);
-                    tt.interrupt();
-                    if (parents.size() >= Parameters.parentSelectionSize){
-                        return parents; 
-                    }
+            ThreadedTournament tt = new ThreadedTournament(this.individuals, parents);
+            executor.execute(tt);
+            synchronized (parents){
+                if (parents.size() >= Parameters.parentSelectionSize){
+                    executor.shutdown();
+                    return parents;
                 }
             }
+        }
     }
 
     public List<Individual> getIndividualsWithCorrectDuration(){
@@ -107,15 +96,18 @@ public class Population{
 
     public List<Individual> crossover(List<Individual> parents, int generationCount){
         List<Individual> new_population = Collections.synchronizedList(new ArrayList<>());
+        ExecutorService executor = Executors.newFixedThreadPool(1);
         while (true){
             Individual p1 = parents.get(Utils.randomInt(Parameters.parentSelectionSize-1));
-            Individual p2 = Utils.randomPick(parents, p-> p != p1);
+            Individual p2 = Utils.randomPick(parents, p -> p != p1);
             if (Utils.randomDouble()<Parameters.crossoverProbability){
-                ThreadedCrossover offspring = new ThreadedCrossover("Crossover" + p1.hashCode() + p2.hashCode(), p1, p2, generationCount, new_population);                    
-                offspring.start();
-                try{offspring.join();}catch (InterruptedException e){;}
-                if (new_population.size() >= Parameters.populationSize){
-                    return new_population;
+                ThreadedCrossover offspring = new ThreadedCrossover(p1, p2, generationCount, new_population);     
+                executor.execute(offspring);
+                synchronized (new_population){
+                    if (new_population.size() >= Parameters.populationSize){
+                        executor.shutdown();
+                        return new_population;
+                    }
                 }
             }
         }

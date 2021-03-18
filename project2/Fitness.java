@@ -78,10 +78,7 @@ public class Fitness{
     }
 
     public static Individual crowding(Individual i1, Individual i2){
-        if (i1.getFitness() < i2.getFitness()){
-            return i1;
-        }
-        return i2;
+        return i1.getFitness() < i2.getFitness() ? i1 : i2;
     }
 
     public static int distanceCrowding(Individual i1, Individual i2){

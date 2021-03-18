@@ -3,14 +3,13 @@ import java.util.Objects;
 
 import DataClasses.Tuple;
 
-public class ThreadedCrossover extends Thread{
+public class ThreadedCrossover implements Runnable{
     
     public Tuple<Individual, Individual> parents, offspring;
     public int generation;
     public List<Individual> population;
 
-    public ThreadedCrossover(String name, Individual i1, Individual i2, int generation, List<Individual> population){
-        super(name);
+    public ThreadedCrossover(Individual i1, Individual i2, int generation, List<Individual> population){
         this.parents = new Tuple<>(i1, i2);
         this.generation = generation;
         this.population = population;
