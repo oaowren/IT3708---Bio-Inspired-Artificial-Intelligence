@@ -76,7 +76,9 @@ public class Vehicle{
         List<Customer> removedCustomers = new ArrayList<>();
         removedCustomers.addAll(this.customers.subList(startIndex, endIndex));
         this.customers.removeAll(removedCustomers);
-        int totalDemand = removedCustomers.stream().map(c->c.demand).reduce(0, (total, demand) -> total+demand);
+        int totalDemand = removedCustomers.stream()
+                                          .map(c->c.demand)
+                                          .reduce(0, (total, demand) -> total+demand);
         this.load -= totalDemand;
         return removedCustomers;
     }
@@ -115,13 +117,13 @@ public class Vehicle{
 
     public String getCustomerSequence(){
         return customers.stream()
-                        .map(c -> Integer.toString(c.id))
+                        .map(customer -> Integer.toString(customer.id))
                         .reduce("", (output, c) -> output + (output.matches("")? "":" ") + c);
     }
 
     public List<Integer> getCustomersId(){
         return customers.stream()
-                        .map(c->c.id)
+                        .map(customer -> customer.id)
                         .collect(Collectors.toList());
     }
 
@@ -146,7 +148,10 @@ public class Vehicle{
             return false;
         }
         Vehicle vehicle = (Vehicle) o;
-        return id == vehicle.id && maxLoad == vehicle.maxLoad && load == vehicle.load && Objects.equals(customers, vehicle.customers);
+        return id == vehicle.id 
+            && maxLoad == vehicle.maxLoad 
+            && load == vehicle.load 
+            && Objects.equals(customers, vehicle.customers);
     }
 
     @Override
