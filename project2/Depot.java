@@ -56,15 +56,12 @@ public class Depot{
                            .collect(Collectors.toList());
     }
 
-    public boolean insertAtMostFeasible(Customer customer) {
-        ExecutorService executor = new ThreadPoolExecutor(1, 2, 30, TimeUnit.SECONDS, 
-                                                          new ArrayBlockingQueue<>(2), 
-                                                          new ThreadPoolExecutor.CallerRunsPolicy());
+    public boolean insertAtMostFeasible(Customer customer, ExecutorService executor) {
         List<Tuple<Integer, Tuple<Integer, Double>>> inds = Collections.synchronizedList(new ArrayList<>());
         for (int i=0; i<this.vehicles.size(); i++) {
             Depot depotClone = this.clone();
             Vehicle v = depotClone.getAllVehicles().get(i);
-            ThreadedInsertion ti = new ThreadedInsertion(v, customer, inds, v.id);
+            ThreadedInsertion ti = new ThreadedInsertion(v, customer, inds, i);
             executor.execute(ti);
         }
         executor.shutdown();
@@ -75,7 +72,7 @@ public class Depot{
             for (Tuple<Integer, Tuple<Integer, Double>> i: inds){
                 if (i.y.y < minFitness){
                     minFitness = i.y.y;
-                    v = this.getVehicleById(i.x);
+                    v = this.vehicles.get(i.x);
                     best = i;
                 }
             }
@@ -131,7 +128,7 @@ public class Depot{
                                     .collect(Collectors.toList());
     }
     
-    public void intraDepotMutation() {
+    public void intraDepotMutation(ExecutorService executor) {
         int randInt = Utils.randomInt(3);
         if (randInt == 0) {
             boolean mutationSuccessful = false;
@@ -145,7 +142,7 @@ public class Depot{
                 }
             }
         } else if (randInt == 1) {
-            singleCustomerRerouting();
+            singleCustomerRerouting(executor);
         } else {
             swapping();
         }
@@ -203,14 +200,14 @@ public class Depot{
      * This involves computing the total cost of insertion at every insertion locale, 
      * which finally re-inserts the customer in the most feasible location.
      */
-    private void singleCustomerRerouting() {
+    private void singleCustomerRerouting(ExecutorService executor) {
         Vehicle randVehicle = Utils.randomPick(vehicles, (vehicle -> vehicle.getCustomers().size() >= 1));
         if (randVehicle == null) return;
 
         Customer randCustomer = randVehicle.getCustomers().get(Utils.randomInt(randVehicle.getCustomers().size()));
 
         randVehicle.removeCustomer(randCustomer);
-        insertAtMostFeasible(randCustomer);
+        insertAtMostFeasible(randCustomer, executor);
     }
 
     /** 

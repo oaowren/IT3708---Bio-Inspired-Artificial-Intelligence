@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 import DataClasses.Tuple;
@@ -114,7 +115,7 @@ public class Individual{
         return d.getAllVehicles().get(Utils.randomInt(d.getAllVehicles().size()));
     }
 
-    public Tuple<Individual, Individual> crossover(Individual i){
+    public Tuple<Individual, Individual> crossover(Individual i, ExecutorService executor){
         Individual offspring1 = this.clone();
         Individual offspring2 = i.clone();
         // Select a random depot for each offspring
@@ -139,7 +140,7 @@ public class Individual{
             }
         }
         for (Customer c: c1){
-            boolean inserted = depot2.insertAtMostFeasible(c);
+            boolean inserted = depot2.insertAtMostFeasible(c, executor);
             if (!inserted && depot2.countActiveVehicles() < depot2.maxVehicles){
                 try {
                     depot2.createNewRoute(c);
@@ -151,7 +152,7 @@ public class Individual{
             }
         }
         for (Customer c: c2){
-            boolean inserted = depot1.insertAtMostFeasible(c);
+            boolean inserted = depot1.insertAtMostFeasible(c, executor);
             if (!inserted && depot1.countActiveVehicles() < depot1.maxVehicles){
                 try {
                     depot1.createNewRoute(c);
@@ -167,7 +168,7 @@ public class Individual{
         return new Tuple<>(offspring1, offspring2);
     }
 
-    public void interDepotMutation() {
+    public void interDepotMutation(ExecutorService executor) {
         Depot randomDepot1 = getDepots().get(Utils.randomInt(getDepots().size()));
         List<Customer> allSwappableCustomersDepot1 = Utils.allSwappableCustomers(randomDepot1);
 
@@ -196,7 +197,7 @@ public class Individual{
         boolean mutationSuccessful = false;
         while(!mutationSuccessful && tries < depots.size()) {
             randomDepot2 = depotMap.get(randomCandidateDepotId);
-            mutationSuccessful = randomDepot2.insertAtMostFeasible(randomCustomer1);
+            mutationSuccessful = randomDepot2.insertAtMostFeasible(randomCustomer1, executor);
             if (mutationSuccessful) {
                 randomDepot1.removeCustomer(randomCustomer1);
                 // System.out.println("Moved " + randomCustomer1.id + " from " + randomDepot1.id + " to " + randomDepot2.id);

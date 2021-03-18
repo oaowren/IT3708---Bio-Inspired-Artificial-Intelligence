@@ -12,6 +12,10 @@ import java.util.stream.Collectors;
 import DataClasses.*;
 
 public class Population{
+
+    private ExecutorService executor = new ThreadPoolExecutor(20, 20, 30, TimeUnit.SECONDS, 
+                                                          new ArrayBlockingQueue<>(20),
+                                                          new ThreadPoolExecutor.CallerRunsPolicy());
     
 	private List<Individual> individuals = new ArrayList<>();
     private int maxNumOfVehicles;
@@ -66,9 +70,6 @@ public class Population{
     public List<Individual> tournamentSelection(){
         List<Individual> parents = Collections.synchronizedList(new ArrayList<>());
         // Create parents list of given parentSelectionSize in parameters
-        ExecutorService executor = new ThreadPoolExecutor(10, 15, 30, TimeUnit.SECONDS, 
-                                                          new ArrayBlockingQueue<>(15), 
-                                                          new ThreadPoolExecutor.CallerRunsPolicy());
         while (true){
             ThreadedTournament tt = new ThreadedTournament(this.individuals, parents);
             executor.execute(tt);
@@ -91,14 +92,11 @@ public class Population{
 
     public List<Individual> crossover(List<Individual> parents, int generationCount){
         List<Individual> new_population = Collections.synchronizedList(new ArrayList<>());
-        ExecutorService executor = new ThreadPoolExecutor(5, 15, 30, TimeUnit.SECONDS, 
-                                                          new ArrayBlockingQueue<>(15), 
-                                                          new ThreadPoolExecutor.CallerRunsPolicy());
         while (true){
             Individual p1 = parents.get(Utils.randomInt(Parameters.parentSelectionSize-1));
             Individual p2 = Utils.randomPick(parents, p -> p != p1);
             if (Utils.randomDouble()<Parameters.crossoverProbability){
-                ThreadedCrossover offspring = new ThreadedCrossover(p1, p2, generationCount, new_population);     
+                ThreadedCrossover offspring = new ThreadedCrossover(p1, p2, generationCount, new_population, executor);     
                 executor.execute(offspring);
                 if (new_population.size() >= Parameters.populationSize){
                     executor.shutdown();
