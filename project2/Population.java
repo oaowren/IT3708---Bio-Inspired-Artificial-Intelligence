@@ -31,15 +31,8 @@ public class Population{
     }
 
     public Individual getIndividualByRank(int index){
-        this.individuals.sort((a,b) -> {
-            if (Fitness.getIndividualRouteFitness(a) > Fitness.getIndividualRouteFitness(b)){
-                return 1;
-            } else if(Fitness.getIndividualRouteFitness(a) < Fitness.getIndividualRouteFitness(b)){
-                return -1;
-            }
-            return 0;
-        });
-        return this.individuals.get(index);
+        individuals.sort((a,b) -> Double.compare(Fitness.getIndividualRouteFitness(a), Fitness.getIndividualRouteFitness(b)));
+        return individuals.get(index);
     }
 
     public Individual getIndividualByRankAndDeviation(int index, List<Individual> inds){
@@ -47,14 +40,7 @@ public class Population{
             return getIndividualByRank(index);
         }
         List<Individual> copy = new ArrayList<>(inds);
-        copy.sort((a,b) -> {
-            if (Fitness.getIndividualRouteFitness(a) > Fitness.getIndividualRouteFitness(b)){
-                return 1;
-            } else if (Fitness.getIndividualRouteFitness(a) < Fitness.getIndividualRouteFitness(b)){
-                return -1;
-            }
-            return 0;
-        });
+        copy.sort((a,b) -> Double.compare(Fitness.getIndividualRouteFitness(a), Fitness.getIndividualRouteFitness(b)));
         return copy.get(index);
     }
 
@@ -109,7 +95,7 @@ public class Population{
         List<Individual> new_population = Collections.synchronizedList(new ArrayList<>());
         while (true){
             Individual p1 = parents.get(Utils.randomInt(Parameters.parentSelectionSize-1));
-            Individual p2 = Utils.randomPick(parents, p-> p != p1);
+            Individual p2 = Utils.randomPick(parents, p -> p != p1);
             if (Utils.randomDouble()<Parameters.crossoverProbability){
                 ThreadedCrossover offspring = new ThreadedCrossover("Crossover" + p1.hashCode() + p2.hashCode(), p1, p2, generationCount, new_population);                    
                 offspring.start();
