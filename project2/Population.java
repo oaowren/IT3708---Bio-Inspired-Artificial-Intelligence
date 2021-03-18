@@ -97,7 +97,9 @@ public class Population{
     }
 
     public List<Individual> getIndividualsWithCorrectDuration(){
-        return this.individuals.stream().filter(i->i.getDistanceDeviation() == 0.0).collect(Collectors.toList());
+        return this.individuals.stream()
+                               .filter(individual -> individual.getDistanceDeviation() == 0.0)
+                               .collect(Collectors.toList());
     }
 
     public void setNewPopulation(List<Individual> population){
