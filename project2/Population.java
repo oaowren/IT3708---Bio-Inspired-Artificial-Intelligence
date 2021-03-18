@@ -34,15 +34,8 @@ public class Population{
     }
 
     public Individual getIndividualByRank(int index){
-        this.individuals.sort((a,b) -> {
-            if (Fitness.getIndividualRouteFitness(a) > Fitness.getIndividualRouteFitness(b)){
-                return 1;
-            } else if(Fitness.getIndividualRouteFitness(a) < Fitness.getIndividualRouteFitness(b)){
-                return -1;
-            }
-            return 0;
-        });
-        return this.individuals.get(index);
+        individuals.sort((a,b) -> Double.compare(Fitness.getIndividualRouteFitness(a), Fitness.getIndividualRouteFitness(b)));
+        return individuals.get(index);
     }
 
     public Individual getIndividualByRankAndDeviation(int index, List<Individual> inds){
