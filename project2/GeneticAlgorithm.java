@@ -61,7 +61,7 @@ public class GeneticAlgorithm {
                     depotMap.put(depots.get(i).id, depots.get(i));
                 }
             }
-            c.candidateList.sort((d1, d2) -> (int) (Fitness.getDistance(c, depotMap.get(d1)) - Fitness.getDistance(c, depotMap.get(d2))));
+            c.candidateList.sort((d1, d2) -> Double.compare(Fitness.getDistance(c, depotMap.get(d1)), Fitness.getDistance(c, depotMap.get(d2))));
         }
     }
 
