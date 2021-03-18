@@ -75,14 +75,12 @@ public class GeneticAlgorithm {
             if (!Parameters.useCrowding){
                 new_pop = p.survivorSelection(p.getIndividuals(), new_pop);
             }
-            synchronized (new_pop){
-                p.setNewPopulation(new_pop);
-            }
+            p.setNewPopulation(new_pop);
             bestInd = p.getIndividualByRankAndDeviation(0, p.getIndividualsWithCorrectDuration());
             bestIndFitness = Fitness.getIndividualRouteFitness(bestInd);
             System.out.println(String.format("Generation %d\tRoute Fitness: %.3f\tDeviation from max duration: %.2f", generation, bestIndFitness, bestInd.getDistanceDeviation()));
             generationalFitness.add(new Tuple<>(generation, bestIndFitness));
-            Fitness.removeOldRoutes();
+            // Fitness.removeOldRoutes();
         }
     }
 }

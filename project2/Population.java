@@ -35,8 +35,9 @@ public class Population{
     }
 
     public Individual getIndividualByRank(int index){
-        individuals.sort((a,b) -> Double.compare(Fitness.getIndividualRouteFitness(a), Fitness.getIndividualRouteFitness(b)));
-        return individuals.get(index);
+        List<Individual> copy = new ArrayList<>(individuals);
+        copy.sort((a,b) -> Double.compare(Fitness.getIndividualRouteFitness(a), Fitness.getIndividualRouteFitness(b)));
+        return copy.get(index);
     }
 
     public Individual getIndividualByRankAndDeviation(int index, List<Individual> inds){
@@ -100,7 +101,7 @@ public class Population{
                 synchronized (new_population){
                     if (new_population.size() >= Parameters.populationSize){
                         executor.shutdown();
-                        return new_population;
+                        return List.of(new_population.toArray(new Individual[]{}));
                     }
                 }
             }
