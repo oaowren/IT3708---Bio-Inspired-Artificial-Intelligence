@@ -2,6 +2,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 
 import DataClasses.Tuple;
@@ -12,7 +13,7 @@ public class Vehicle{
     
     public final int id, maxLoad, maxDuration;
     private int load = 0;
-    private List<Customer> customers = new ArrayList<>();
+    private List<Customer> customers = Collections.synchronizedList(new ArrayList<>());
     private Depot depot;
 
     public Vehicle(int id, int maxLoad, int maxDuration) {

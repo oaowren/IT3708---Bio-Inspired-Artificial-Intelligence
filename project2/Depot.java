@@ -1,9 +1,12 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import DataClasses.Tuple;
@@ -54,28 +57,31 @@ public class Depot{
     }
 
     public boolean insertAtMostFeasible(Customer customer) {
-        Vehicle vehicle = null;
-        int maxFeasible = -1;
-        Tuple<Integer, Double> best;
-        double minFitness = Integer.MAX_VALUE;
+        ExecutorService executor = new ThreadPoolExecutor(1, 2, 30, TimeUnit.SECONDS, 
+                                                          new ArrayBlockingQueue<>(2), 
+                                                          new ThreadPoolExecutor.CallerRunsPolicy());
+        List<Tuple<Vehicle, Tuple<Integer, Double>>> inds = Collections.synchronizedList(new ArrayList<>());
         for (int i=0; i<this.vehicles.size(); i++) {
             Depot depotClone = this.clone();
             Vehicle v = depotClone.getAllVehicles().get(i);
-            best = v.mostFeasibleInsertion(customer);
-            if (best != null) {
-                v.insertCustomer(customer, best.x);
-                Double newFitness = Fitness.getDepotFitness(depotClone);
-                if (newFitness < minFitness) {                                                
-                    vehicle = this.vehicles.get(i);
-                    minFitness = newFitness;
-                    maxFeasible = best.x;            
-                }
-            }   
+            ThreadedInsertion ti = new ThreadedInsertion(v, customer, inds);
+            executor.execute(ti);
         }
-        if (maxFeasible == -1) {
+        executor.shutdown();
+        double minFitness = Integer.MAX_VALUE;
+        Tuple<Vehicle, Tuple<Integer, Double>> best = new Tuple<>(this.vehicles.get(0), new Tuple<>(-1, minFitness));
+        Vehicle v = null;
+        for (Tuple<Vehicle, Tuple<Integer, Double>> i: inds){
+            if (i.y.y < minFitness){
+                minFitness = i.y.y;
+                v = this.getVehicleById(i.x.id);
+                best = i;
+            }
+        }
+        if (best.y.x == -1) {
             return false;
         }
-        vehicle.insertCustomer(customer, maxFeasible);
+        v.insertCustomer(customer, best.y.x);
         return true;
     }
 

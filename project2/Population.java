@@ -91,7 +91,9 @@ public class Population{
 
     public List<Individual> crossover(List<Individual> parents, int generationCount){
         List<Individual> new_population = Collections.synchronizedList(new ArrayList<>());
-        ExecutorService executor = new ThreadPoolExecutor(10, 15, 30, TimeUnit.SECONDS, new ArrayBlockingQueue<>(15), new ThreadPoolExecutor.CallerRunsPolicy());
+        ExecutorService executor = new ThreadPoolExecutor(10, 15, 30, TimeUnit.SECONDS, 
+                                                          new ArrayBlockingQueue<>(15), 
+                                                          new ThreadPoolExecutor.CallerRunsPolicy());
         while (true){
             Individual p1 = parents.get(Utils.randomInt(Parameters.parentSelectionSize-1));
             Individual p2 = Utils.randomPick(parents, p -> p != p1);
