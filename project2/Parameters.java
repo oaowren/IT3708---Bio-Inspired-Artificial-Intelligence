@@ -5,7 +5,7 @@ public class Parameters {
     static final int generationSpan = 5000;
     static final int eliteSize = 2;
     static final int tournamentSize = 2;
-    static final int parentSelectionSize = 1;
+    static final int parentSelectionSize = 35;
     static final double tournamentProb = 0.8;
     static final double crossoverProbability = 0.60;
     static final double mutationProbability = 0.2;

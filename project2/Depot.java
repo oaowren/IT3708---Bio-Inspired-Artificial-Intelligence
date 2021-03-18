@@ -56,24 +56,22 @@ public class Depot{
     public boolean insertAtMostFeasible(Customer customer) {
         Vehicle vehicle = null;
         int maxFeasible = -1;
+        Tuple<Integer, Double> best;
         double minFitness = Integer.MAX_VALUE;
-        ExecutorService executor = Executors.newFixedThreadPool(5);
         for (int i=0; i<this.vehicles.size(); i++) {
             Depot depotClone = this.clone();
             Vehicle v = depotClone.getAllVehicles().get(i);
-            ThreadedInsertion ti = new ThreadedInsertion(v, customer);
-            executor.execute(ti);
-            if (ti.best != null) {
-                v.insertCustomer(customer, ti.best.x);
+            best = v.mostFeasibleInsertion(customer);
+            if (best != null) {
+                v.insertCustomer(customer, best.x);
                 Double newFitness = Fitness.getDepotFitness(depotClone);
                 if (newFitness < minFitness) {                                                
                     vehicle = this.vehicles.get(i);
                     minFitness = newFitness;
-                    maxFeasible = ti.best.x;            
+                    maxFeasible = best.x;            
                 }
             }   
         }
-        executor.shutdown();
         if (maxFeasible == -1) {
             return false;
         }
