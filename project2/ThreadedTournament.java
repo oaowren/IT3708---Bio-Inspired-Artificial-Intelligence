@@ -33,8 +33,15 @@ public class ThreadedTournament implements Runnable{
         List<Individual> selectedInds = new ArrayList<>();
             // Create individual-list of size defined by tournamentSize
             while (selectedInds.size() < Parameters.tournamentSize){
-                Individual i = this.population.get(Utils.randomInt(Parameters.populationSize));
-                selectedInds.add(i);
+                synchronized(population){
+                    if (population.size() == 0){
+                        return;
+                    }
+                    Individual i = this.population.get(Utils.randomInt(population.size()));
+                    selectedInds.add(i);
+                    population.remove(i);
+                }
+                
             }
             // Sort by fitness
             selectedInds.sort(Comparator.comparingDouble(Individual::getFitness));

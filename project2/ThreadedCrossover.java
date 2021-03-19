@@ -17,7 +17,11 @@ public class ThreadedCrossover implements Runnable{
     }
 
     public void run(){
-        this.offspring = parents.x.crossover(parents.y);
+        if (Utils.randomDouble()<Parameters.crossoverProbability){
+            this.offspring = parents.x.crossover(parents.y);
+        } else {
+            this.offspring = new Tuple<>(this.parents.x.clone(), this.parents.y.clone());
+        }
         boolean isNull = Objects.isNull(this.offspring);
         if (!isNull){
             double rand = Utils.randomDouble();

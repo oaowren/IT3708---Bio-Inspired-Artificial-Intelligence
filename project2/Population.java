@@ -71,12 +71,20 @@ public class Population{
 
     public List<Individual> tournamentSelection(){
         List<Individual> parents = Collections.synchronizedList(new ArrayList<>());
+        List<Individual> popCopy = Collections.synchronizedList(new ArrayList<>(this.individuals));
         // Create parents list of given parentSelectionSize in parameters
         while (true){
-            ThreadedTournament tt = new ThreadedTournament(this.individuals, parents);
+            ThreadedTournament tt = new ThreadedTournament(popCopy, parents);
             executor.execute(tt);
-            if (parents.size() >= Parameters.parentSelectionSize){
-                return parents;
+            synchronized (parents){
+                if (parents.size() >= Parameters.parentSelectionSize){
+                    return parents;
+                }
+            }
+            synchronized (popCopy){
+                if (popCopy.size() == 0){
+                    popCopy = Collections.synchronizedList(new ArrayList<>(this.individuals));
+                }
             }
         }
     }
@@ -96,12 +104,10 @@ public class Population{
         while (true){
             Individual p1 = parents.get(Utils.randomInt(Parameters.parentSelectionSize-1));
             Individual p2 = Utils.randomPick(parents, p -> p != p1);
-            if (Utils.randomDouble()<Parameters.crossoverProbability){
-                ThreadedCrossover offspring = new ThreadedCrossover(p1, p2, generationCount, new_population);     
-                executor.execute(offspring);
-                if (new_population.size() >= Parameters.populationSize){
-                    return List.of(new_population.toArray(new Individual[]{}));
-                }
+            ThreadedCrossover offspring = new ThreadedCrossover(p1, p2, generationCount, new_population);     
+            executor.execute(offspring);
+            if (new_population.size() >= Parameters.populationSize){
+                return List.of(new_population.toArray(new Individual[]{}));
             }
         }
     }

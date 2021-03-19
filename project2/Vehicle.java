@@ -85,28 +85,38 @@ public class Vehicle{
         return removedCustomers;
     }
 
-    public Tuple<Integer, Double> mostFeasibleInsertion(Customer customer){
+    public Integer mostFeasibleInsertion(Customer customer){
         if (this.load + customer.demand > this.maxLoad){
             return null;
         }
         int lengthOfRoute = this.customers.size();
-        List<Tuple<Integer, Double>> indexAndFitness = new ArrayList<>();
+        if (lengthOfRoute == 0){
+            return 0;
+        }
+        double lowestDiff = Integer.MAX_VALUE;
+        int index = -1;
         for (int i=0; i< lengthOfRoute + 1;i++){
-            Vehicle copy = this.clone();
-            try{
-                copy.insertCustomer(customer, i);
-                indexAndFitness.add(new Tuple<>(i, Fitness.getVehicleFitness(copy, copy.depot)));
-            } catch (Exception e){
-                ;
+            double currentDist;
+            double diff;
+            if (i==0){
+                currentDist = Fitness.getDistance(this.customers.get(0), this.depot);
+                diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, this.customers.get(0));
+            } else if(i == lengthOfRoute) {
+                currentDist = Fitness.getDistance(this.customers.get(lengthOfRoute-1), this.depot);
+                diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, this.customers.get(lengthOfRoute-1));
+            } else {
+                currentDist = Fitness.getDistance(this.customers.get(i-1), this.customers.get(i));
+                diff = Fitness.getDistance(customer, this.customers.get(i-1)) + Fitness.getDistance(customer, this.customers.get(i)) - currentDist;
+            }
+            if (diff < lowestDiff){
+                lowestDiff = diff;
+                index = i;
             }
         }
-        indexAndFitness.sort(Comparator.comparingDouble(Tuple<Integer, Double>::getY));
-        try{
-            return indexAndFitness.get(0);
-        } catch (IndexOutOfBoundsException e){
+        if (index == -1){
             return null;
         }
-        
+        return index;
     }
 
     public void setDepot(Depot depot){
