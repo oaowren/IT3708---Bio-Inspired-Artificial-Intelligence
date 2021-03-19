@@ -63,7 +63,7 @@ public class Depot{
         List<Tuple<Vehicle, Integer>> inFeasible = new ArrayList<>();
         for (int i=0; i<this.vehicles.size(); i++) {
             Vehicle v = this.vehicles.get(i);
-            Tuple<Integer, Boolean> inserts = v.feasibleInsertions(customer);
+            Tuple<Integer, Boolean> inserts = v.feasibleInsertion(customer);
             if (inserts == null){
                 continue;
             }
@@ -77,31 +77,13 @@ public class Depot{
             return false;
         }
         if (feasible.size() != 0){
-            Vehicle v = null;
-            int index = -1;
-            double bestFit = Integer.MAX_VALUE;
-            for (Tuple<Vehicle, Integer> t: feasible){
-                double fit = fitnessIfInsertCustomer(t.x, customer, t.y);
-                if (fit < bestFit){
-                    bestFit = fit;
-                    v = t.x;
-                    index = t.y;
-                }
-            }
-            v.insertCustomer(customer, index);
+            Tuple<Vehicle, Integer> insertion = feasible.get(Utils.randomInt(feasible.size()));
+            insertion.x.insertCustomer(customer, insertion.y);
             return true;
         }
         Tuple<Vehicle, Integer> insertion = inFeasible.get(Utils.randomInt(inFeasible.size()));
         insertion.x.insertCustomer(customer, insertion.y);
         return true;
-    }
-
-    private double fitnessIfInsertCustomer(Vehicle v, Customer c, int index){
-        int vehicleIndex = this.vehicles.indexOf(v);
-        Depot depotClone = this.clone();
-        Vehicle vCopy = depotClone.getAllVehicles().get(vehicleIndex);
-        vCopy.insertCustomer(c, index);
-        return Fitness.getDepotFitness(depotClone);
     }
 
     public double getDistanceDeviation(){

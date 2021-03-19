@@ -1,6 +1,6 @@
 public class Parameters {
     
-    static final String problem = "p08";
+    static final String problem = "p04";
     static final int populationSize = 100;
     static final int generationSpan = 5000;
     static final int eliteSize = 2;
@@ -10,12 +10,12 @@ public class Parameters {
     static final double crossoverProbability = 0.65;
     static final double mutationProbability = 0.25;
     static final double interDepotMutationRate = 10;
-    static final double swappableCustomerDistance = 1;
+    static final double swappableCustomerDistance = 0.4;
 
     static final double alpha = 10; // Discount factor for number of active vehicles
     static final double beta = 0.01; // Discount factor for total route length
     static final double durationPenalty = 100;
-    static final boolean useCrowding = true;
+    static final boolean useCrowding = false;
     static final int threadPoolSize = 10;
     static final double feasibleInsertionLimit = 40;
 

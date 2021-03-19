@@ -85,11 +85,12 @@ public class Vehicle{
         return removedCustomers;
     }
 
-    public Tuple<Integer, Boolean> feasibleInsertions(Customer customer){
+    public Tuple<Integer, Boolean> feasibleInsertion(Customer customer){
         if (this.load + customer.demand > this.maxLoad){
             return null;
         }
-        int lengthOfRoute = this.customers.size();
+        List<Customer> cCopy = new ArrayList<>(this.customers);
+        int lengthOfRoute = cCopy.size();
         if (lengthOfRoute == 0){
             return new Tuple<>(0, false);
         }
@@ -99,14 +100,14 @@ public class Vehicle{
             double currentDist;
             double diff;
             if (i==0){
-                currentDist = Fitness.getDistance(this.customers.get(0), this.depot);
-                diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, this.customers.get(0));
+                currentDist = Fitness.getDistance(cCopy.get(0), this.depot);
+                diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, cCopy.get(0)) - currentDist;
             } else if(i == lengthOfRoute) {
                 currentDist = Fitness.getDistance(this.customers.get(lengthOfRoute-1), this.depot);
-                diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, this.customers.get(lengthOfRoute-1));
+                diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, cCopy.get(lengthOfRoute-1)) - currentDist;
             } else {
-                currentDist = Fitness.getDistance(this.customers.get(i-1), this.customers.get(i));
-                diff = Fitness.getDistance(customer, this.customers.get(i-1)) + Fitness.getDistance(customer, this.customers.get(i)) - currentDist;
+                currentDist = Fitness.getDistance(cCopy.get(i-1), cCopy.get(i));
+                diff = Fitness.getDistance(customer, cCopy.get(i-1)) + Fitness.getDistance(customer, cCopy.get(i)) - currentDist;
             }
             if (diff < lowestDiff){
                 lowestDiff = diff;
