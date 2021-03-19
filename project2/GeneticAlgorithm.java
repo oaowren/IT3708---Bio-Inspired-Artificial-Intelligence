@@ -23,6 +23,12 @@ public class GeneticAlgorithm {
         p.setCustomers(customers);
         p.setDepots(depots);
         initialDepotClustering(depots, customers.values());
+        /*System.out.println("Number of swappable customers: " + depots.get(0).getSwappableCustomers().size() + " "+ depots.get(0).getSwappableCustomers().size());
+        depots.get(0).getSwappableCustomers().forEach((customer)-> System.out.println(customer.id));
+        System.out.println("HHEY");
+        depots.get(1).getSwappableCustomers().forEach((customer)-> System.out.println(customer.id));*/
+
+
         p.generatePopulation();
         generationalFitness.add(new Tuple<>(0, Fitness.getIndividualRouteFitness(p.getIndividualByRank(0))));
     }
@@ -49,7 +55,7 @@ public class GeneticAlgorithm {
             HashMap<Integer, Depot> depotMap = new HashMap<>();
             customer.candidateList.add(closestDepot.id);
             depotMap.put(closestDepot.id, closestDepot);
-            closestDepot.addSwappableCustomer(customer);
+            //closestDepot.addSwappableCustomer(customer);
             for (int i = 0; i < depots.size(); i++) {
                 if (depots.get(i) == closestDepot) {
                     continue;
@@ -57,6 +63,7 @@ public class GeneticAlgorithm {
                 double distance_c_d = Fitness.getDistance(customer, depots.get(i));
                 // "Using Genetic Algorithms for Multi-depot Vehicle Routing" p. 90:
                 if (((distance_c_d - closestDistance) / closestDistance) <= Parameters.swappableCustomerDistance) {
+                    System.out.println("TRUE" + ((distance_c_d - closestDistance) / closestDistance));
                     customer.candidateList.add(depots.get(i).id);
                     depots.get(i).addSwappableCustomer(customer);
                     depotMap.put(depots.get(i).id, depots.get(i));
