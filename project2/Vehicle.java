@@ -85,13 +85,13 @@ public class Vehicle{
         return removedCustomers;
     }
 
-    public Integer mostFeasibleInsertion(Customer customer){
+    public Tuple<Integer, Boolean> feasibleInsertions(Customer customer){
         if (this.load + customer.demand > this.maxLoad){
             return null;
         }
         int lengthOfRoute = this.customers.size();
         if (lengthOfRoute == 0){
-            return 0;
+            return new Tuple<>(0, false);
         }
         double lowestDiff = Integer.MAX_VALUE;
         int index = -1;
@@ -116,7 +116,7 @@ public class Vehicle{
         if (index == -1){
             return null;
         }
-        return index;
+        return new Tuple<>(index, lowestDiff <= Parameters.feasibleInsertionLimit);
     }
 
     public void setDepot(Depot depot){

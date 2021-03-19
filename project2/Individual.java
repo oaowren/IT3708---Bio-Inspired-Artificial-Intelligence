@@ -30,7 +30,7 @@ public class Individual{
     }
 
     public Depot getDepotById(int id){
-        return this.depots.parallelStream()
+        return this.depots.stream()
                           .filter(d-> d.id == id)
                           .findAny()
                           .orElseThrow(() -> new IllegalArgumentException("Depot not found"));
@@ -68,7 +68,7 @@ public class Individual{
     }
 
     public double getDistanceDeviation(){
-        return this.depots.parallelStream()
+        return this.depots.stream()
                           .map(Depot::getDistanceDeviation)
                           .reduce(0.0, (total, element) -> total + element);
     }

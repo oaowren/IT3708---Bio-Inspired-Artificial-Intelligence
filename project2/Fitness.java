@@ -33,7 +33,7 @@ public class Fitness{
 
     public static double getIndividualFitness(Individual individual) {
         List<Depot> depots = individual.getDepots();
-        int numberOfActiveVehicles = depots.parallelStream()
+        int numberOfActiveVehicles = depots.stream()
                                            .flatMap(depot -> depot.getAllVehicles().stream())
                                            .map(vehicle -> vehicle.isActive() ? 1 : 0)
                                            .reduce(0, (subtotal, element) -> subtotal + element);
@@ -42,19 +42,19 @@ public class Fitness{
     }
 
     public static double getIndividualRouteFitness(Individual individual) {
-        return individual.getDepots().parallelStream()
+        return individual.getDepots().stream()
                                      .map(Fitness::getDepotRouteFitness)
                                      .reduce(0.0, (subtotal, element) -> subtotal + element);
     }
 
     public static double getIndividualRouteDeviationFitness(Individual individual){
-        return individual.getDepots().parallelStream()
+        return individual.getDepots().stream()
                                      .map(Fitness::getDepotFitness)
                                      .reduce(0.0, (subtotal, element) -> subtotal + element);
     }
 
     public static double getDepotRouteFitness(Depot depot){
-        return depot.getAllVehicles().parallelStream()
+        return depot.getAllVehicles().stream()
                                      .map(vehicle -> getVehicleFitness(vehicle, depot))
                                      .reduce(0.0, (subtotal, element) -> subtotal + element);
     }

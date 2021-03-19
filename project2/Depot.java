@@ -41,14 +41,14 @@ public class Depot{
     }
 
     public Vehicle getVehicleById(int id) {
-        return vehicles.parallelStream()
+        return vehicles.stream()
                        .filter(v -> v.id == id)
                        .findAny()
                        .orElse(null);
     }
 
     public boolean removeCustomer(Customer c) {
-        return vehicles.parallelStream()
+        return vehicles.stream()
                        .anyMatch(vehicle -> vehicle.removeCustomer(c));
     }
 
@@ -59,35 +59,56 @@ public class Depot{
     }
 
     public boolean insertAtMostFeasible(Customer customer) {
-        Vehicle vehicle = null;
-        int maxFeasible = -1;
-        double minFitness = Integer.MAX_VALUE;
+        List<Tuple<Vehicle, Integer>> feasible = new ArrayList<>();
+        List<Tuple<Vehicle, Integer>> inFeasible = new ArrayList<>();
         for (int i=0; i<this.vehicles.size(); i++) {
-            Depot depotClone = this.clone();
-            Vehicle v = depotClone.getAllVehicles().get(i);
-            Integer best = v.mostFeasibleInsertion(customer);
-            if (best != null) {
-                v.insertCustomer(customer, best);
-                Double newFitness = Fitness.getDepotFitness(depotClone);
-                if (newFitness < minFitness) {
-                    vehicle = this.vehicles.get(i);
-                    minFitness = newFitness;
-                    maxFeasible = best;   
-                }
+            Vehicle v = this.vehicles.get(i);
+            Tuple<Integer, Boolean> inserts = v.feasibleInsertions(customer);
+            if (inserts == null){
+                continue;
+            }
+            if (inserts.y){
+                feasible.add(new Tuple<>(v, inserts.x));
+            } else {
+                inFeasible.add(new Tuple<>(v, inserts.x));
             }
         }
-        if (maxFeasible == -1) {
+        if (feasible.size() == 0 && inFeasible.size() == 0) {
             return false;
         }
-        vehicle.insertCustomer(customer, maxFeasible);
+        if (feasible.size() != 0){
+            Vehicle v = null;
+            int index = -1;
+            double bestFit = Integer.MAX_VALUE;
+            for (Tuple<Vehicle, Integer> t: feasible){
+                double fit = fitnessIfInsertCustomer(t.x, customer, t.y);
+                if (fit < bestFit){
+                    bestFit = fit;
+                    v = t.x;
+                    index = t.y;
+                }
+            }
+            v.insertCustomer(customer, index);
+            return true;
+        }
+        Tuple<Vehicle, Integer> insertion = inFeasible.get(Utils.randomInt(inFeasible.size()));
+        insertion.x.insertCustomer(customer, insertion.y);
         return true;
+    }
+
+    private double fitnessIfInsertCustomer(Vehicle v, Customer c, int index){
+        int vehicleIndex = this.vehicles.indexOf(v);
+        Depot depotClone = this.clone();
+        Vehicle vCopy = depotClone.getAllVehicles().get(vehicleIndex);
+        vCopy.insertCustomer(c, index);
+        return Fitness.getDepotFitness(depotClone);
     }
 
     public double getDistanceDeviation(){
         if (this.maxDuration == 0){
             return 0.0;
         }
-        return vehicles.parallelStream()
+        return vehicles.stream()
                        .map(v-> Fitness.getVehicleFitness(v, this))
                        .reduce(0.0, (tot, element) -> tot + (element > this.maxDuration ? element - this.maxDuration : 0.0));
     }
