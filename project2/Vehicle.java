@@ -95,18 +95,19 @@ public class Vehicle{
         }
         double lowestDiff = Integer.MAX_VALUE;
         int index = -1;
+        List<Customer> customersCopy = new ArrayList<>(this.customers);
         for (int i=0; i< lengthOfRoute + 1;i++){
             double currentDist;
             double diff;
             if (i==0){
-                currentDist = Fitness.getDistance(this.customers.get(0), this.depot);
-                diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, this.customers.get(0));
+                currentDist = Fitness.getDistance(customersCopy.get(0), this.depot);
+                diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, customersCopy.get(0));
             } else if(i == lengthOfRoute) {
-                currentDist = Fitness.getDistance(this.customers.get(lengthOfRoute-1), this.depot);
-                diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, this.customers.get(lengthOfRoute-1));
+                currentDist = Fitness.getDistance(customersCopy.get(lengthOfRoute-1), this.depot);
+                diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, customersCopy.get(lengthOfRoute-1));
             } else {
-                currentDist = Fitness.getDistance(this.customers.get(i-1), this.customers.get(i));
-                diff = Fitness.getDistance(customer, this.customers.get(i-1)) + Fitness.getDistance(customer, this.customers.get(i)) - currentDist;
+                currentDist = Fitness.getDistance(customersCopy.get(i-1), customersCopy.get(i));
+                diff = Fitness.getDistance(customer, customersCopy.get(i-1)) + Fitness.getDistance(customer, customersCopy.get(i)) - currentDist;
             }
             if (diff < lowestDiff){
                 lowestDiff = diff;
