@@ -1,8 +1,10 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -39,14 +41,14 @@ public class Depot{
     }
 
     public Vehicle getVehicleById(int id) {
-        return vehicles.stream()
+        return vehicles.parallelStream()
                        .filter(v -> v.id == id)
                        .findAny()
                        .orElse(null);
     }
 
     public boolean removeCustomer(Customer c) {
-        return vehicles.stream()
+        return vehicles.parallelStream()
                        .anyMatch(vehicle -> vehicle.removeCustomer(c));
     }
 
@@ -87,7 +89,7 @@ public class Depot{
         if (this.maxDuration == 0){
             return 0.0;
         }
-        return vehicles.stream()
+        return vehicles.parallelStream()
                        .map(v-> Fitness.getVehicleFitness(v, this))
                        .reduce(0.0, (tot, element) -> tot + (element > this.maxDuration ? element - this.maxDuration : 0.0));
     }
@@ -238,7 +240,8 @@ public class Depot{
     }
 
     public boolean hasActiveVehicles() {
-        return vehicles.stream().anyMatch(Vehicle::isActive);
+        return vehicles.stream()
+                       .anyMatch(Vehicle::isActive);
     }
 
 

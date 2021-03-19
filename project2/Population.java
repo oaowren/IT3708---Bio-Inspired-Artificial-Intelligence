@@ -13,11 +13,14 @@ import DataClasses.*;
 
 public class Population{
 
-    private ExecutorService executor = new ThreadPoolExecutor(Parameters.threadPoolSize, 
-                                                              Parameters.threadPoolSize, 
-                                                              30, TimeUnit.SECONDS, 
-                                                              new ArrayBlockingQueue<>(Parameters.threadPoolSize),
-                                                              new ThreadPoolExecutor.CallerRunsPolicy());
+    private ExecutorService executor = 
+        new ThreadPoolExecutor(
+            Parameters.threadPoolSize, 
+            Parameters.threadPoolSize, 
+            30, TimeUnit.SECONDS, 
+            new ArrayBlockingQueue<>(Parameters.threadPoolSize),
+            new ThreadPoolExecutor.CallerRunsPolicy()
+        );
     
 	private List<Individual> individuals = new ArrayList<>();
     private int maxNumOfVehicles;

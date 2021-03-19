@@ -30,9 +30,9 @@ public class Individual{
     }
 
     public Depot getDepotById(int id){
-        return this.depots.stream()
+        return this.depots.parallelStream()
                           .filter(d-> d.id == id)
-                          .findFirst()
+                          .findAny()
                           .orElseThrow(() -> new IllegalArgumentException("Depot not found"));
     }
 
@@ -68,7 +68,9 @@ public class Individual{
     }
 
     public double getDistanceDeviation(){
-        return this.depots.stream().map(Depot::getDistanceDeviation).reduce(0.0, (total, element) -> total + element);
+        return this.depots.parallelStream()
+                          .map(Depot::getDistanceDeviation)
+                          .reduce(0.0, (total, element) -> total + element);
     }
 
     public boolean createRandomIndividual(HashMap<Integer, Customer> customers){

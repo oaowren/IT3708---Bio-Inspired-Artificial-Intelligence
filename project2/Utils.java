@@ -1,7 +1,9 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -46,9 +48,8 @@ public class Utils {
     }
 
     public static List<Customer> allSwappableCustomers(Depot depot) {
-        List<Customer> allCustomersInDepot = depot.getAllCustomersInVehicles();
-        return depot.getSwappableCustomers().stream()
-                                            .filter(c -> allCustomersInDepot.contains(c))
-                                            .collect(Collectors.toList());
+        List<Customer> copy = new ArrayList<>(depot.getSwappableCustomers());
+        copy.retainAll(depot.getAllCustomersInVehicles());
+        return copy;
     }
 }
