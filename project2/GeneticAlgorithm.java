@@ -36,33 +36,33 @@ public class GeneticAlgorithm {
     }
 
     public static void initialDepotClustering(List<Depot> depots, Collection<Customer> customers) {
-        HashMap<Integer, Depot> depotMap = new HashMap<>();
-        for (Customer c : customers) {
+        for (Customer customer : customers) {
             Depot closestDepot = depots.get(0);
-            double closestDistance = Fitness.getDistance(c.x, closestDepot.x, c.y, closestDepot.y);
+            double closestDistance = Fitness.getDistance(customer, closestDepot);
             for (int i = 1; i < depots.size(); i++) {
-                Double fitness = Fitness.getDistance(c.x, depots.get(i).x, c.y, depots.get(i).y);
-                if (fitness < closestDistance) {
+                Double distance = Fitness.getDistance(customer, depots.get(i));
+                if (distance < closestDistance) {
                     closestDepot = depots.get(i);
-                    closestDistance = Fitness.getDistance(c.x,closestDepot.x, c.y, closestDepot.y);
+                    closestDistance = Fitness.getDistance(customer, closestDepot);
                 }
             }
-            c.candidateList.add(closestDepot.id);
+            HashMap<Integer, Depot> depotMap = new HashMap<>();
+            customer.candidateList.add(closestDepot.id);
             depotMap.put(closestDepot.id, closestDepot);
-            closestDepot.addSwappableCustomer(c);
+            closestDepot.addSwappableCustomer(customer);
             for (int i = 0; i < depots.size(); i++) {
                 if (depots.get(i) == closestDepot) {
                     continue;
                 }
-                double distance_c_d = Fitness.getDistance(c.x, c.y, depots.get(i).x, depots.get(i).y);
+                double distance_c_d = Fitness.getDistance(customer, depots.get(i));
                 // "Using Genetic Algorithms for Multi-depot Vehicle Routing" p. 90:
-                if (((distance_c_d - closestDistance)/closestDistance) <= Parameters.swappableCustomerDistance) {
-                    c.candidateList.add(depots.get(i).id);
-                    depots.get(i).addSwappableCustomer(c);
+                if (((distance_c_d - closestDistance) / closestDistance) <= Parameters.swappableCustomerDistance) {
+                    customer.candidateList.add(depots.get(i).id);
+                    depots.get(i).addSwappableCustomer(customer);
                     depotMap.put(depots.get(i).id, depots.get(i));
                 }
             }
-            c.candidateList.sort((d1, d2) -> Double.compare(Fitness.getDistance(c, depotMap.get(d1)), Fitness.getDistance(c, depotMap.get(d2))));
+            customer.candidateList.sort((d1, d2) -> Double.compare(Fitness.getDistance(customer, depotMap.get(d1)), Fitness.getDistance(customer, depotMap.get(d2))));
         }
     }
 
