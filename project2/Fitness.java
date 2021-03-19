@@ -23,11 +23,15 @@ public class Fitness{
         double distance = 0.0;
         List<Integer> vehicleCustomers = new ArrayList<>(vehicle.getCustomersId());
         int final_ind = vehicleCustomers.size()-1;
-        distance += getDistance(customers.get(vehicleCustomers.get(0)), depot);
-        for (int i = 0; i < final_ind; i++) {
-            distance += getDistance(customers.get(vehicleCustomers.get(i)), customers.get(vehicleCustomers.get(i+1)));
+        try {
+            distance += getDistance(customers.get(vehicleCustomers.get(0)), depot);
+            for (int i = 0; i < final_ind; i++) {
+                distance += getDistance(customers.get(vehicleCustomers.get(i)), customers.get(vehicleCustomers.get(i+1)));
+            }
+            distance += getDistance(customers.get(vehicleCustomers.get(final_ind)), depot);
+        } catch (NullPointerException e){
+            ;
         }
-        distance += getDistance(customers.get(vehicleCustomers.get(final_ind)), depot);
         return distance;
     }
 
