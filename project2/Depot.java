@@ -48,8 +48,12 @@ public class Depot{
     }
 
     public boolean removeCustomer(Customer c) {
-        return vehicles.stream()
-                       .anyMatch(vehicle -> vehicle.removeCustomer(c));
+        boolean removed = vehicles.stream()
+                                  .anyMatch(vehicle -> vehicle.removeCustomer(c));
+        if (removed){
+            this.swappableCustomers.add(c);
+        }
+        return removed;
     }
 
     public void removeVehicleById(int id) {
@@ -76,14 +80,49 @@ public class Depot{
         if (feasible.size() == 0 && inFeasible.size() == 0) {
             return false;
         }
-        if (feasible.size() != 0){
-            Tuple<Vehicle, Integer> insertion = feasible.get(Utils.randomInt(feasible.size()));
+        double rand = Utils.randomDouble();
+        if (rand < Parameters.feasibleProb && feasible.size() != 0){
+            Vehicle v = null;
+            int index = -1;
+            double minFit = Integer.MAX_VALUE;
+            for (Tuple<Vehicle, Integer> t : feasible){
+                double fit = getFitnessIfInserted(t.x, customer, t.y);
+                if (fit < minFit){
+                    v = t.x;
+                    index = t.y;
+                    minFit = fit;
+                }
+            }
+            v.insertCustomer(customer, index);
+        } else if (rand > 1-(1-Parameters.feasibleProb)/2 && inFeasible.size() != 0){
+            Tuple<Vehicle, Integer> insertion = inFeasible.get(Utils.randomInt(inFeasible.size()));
             insertion.x.insertCustomer(customer, insertion.y);
-            return true;
+        } else if (feasible.size() != 0){
+            Vehicle v = null;
+            int index = -1;
+            double minFit = Integer.MAX_VALUE;
+            for (Tuple<Vehicle, Integer> t : feasible){
+                double fit = getFitnessIfInserted(t.x, customer, t.y);
+                if (fit < minFit){
+                    v = t.x;
+                    index = t.y;
+                    minFit = fit;
+                }
+            }
+            v.insertCustomer(customer, index);
+        } else {
+            Tuple<Vehicle, Integer> insertion = inFeasible.get(Utils.randomInt(inFeasible.size()));
+            insertion.x.insertCustomer(customer, insertion.y);
         }
-        Tuple<Vehicle, Integer> insertion = inFeasible.get(Utils.randomInt(inFeasible.size()));
-        insertion.x.insertCustomer(customer, insertion.y);
+        this.swappableCustomers.remove(customer);
         return true;
+    }
+
+    private double getFitnessIfInserted(Vehicle v, Customer c, int index){
+        Depot dClone = this.clone();
+        Vehicle vClone = dClone.getAllVehicles().get(this.vehicles.indexOf(v));
+        vClone.insertCustomer(c, index);
+        return Fitness.getDepotFitness(dClone);
     }
 
     public double getDistanceDeviation(){

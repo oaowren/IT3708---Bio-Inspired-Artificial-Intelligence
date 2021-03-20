@@ -109,8 +109,10 @@ public class Population{
             Individual p2 = Utils.randomPick(parents, p -> p != p1);
             ThreadedCrossover offspring = new ThreadedCrossover(p1, p2, generationCount, new_population);     
             executor.execute(offspring);
-            if (new_population.size() >= Parameters.populationSize){
-                return List.of(new_population.toArray(new Individual[]{}));
+            synchronized (new_population){
+                if (new_population.size() >= Parameters.populationSize){
+                    return List.of(new_population.toArray(new Individual[]{}));
+                }
             }
         }
     }

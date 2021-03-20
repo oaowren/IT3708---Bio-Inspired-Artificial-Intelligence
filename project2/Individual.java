@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 import DataClasses.Tuple;
@@ -195,21 +194,21 @@ public class Individual{
                                              
         Depot randomDepot2 = depotMap.get(randomCandidateDepotId);
 
-        int tries = 0;
         boolean mutationSuccessful = false;
-        while(!mutationSuccessful && tries < depots.size()) {
+        while(!mutationSuccessful) {
             randomDepot2 = depotMap.get(randomCandidateDepotId);
             mutationSuccessful = randomDepot2.insertAtMostFeasible(randomCustomer1);
             if (mutationSuccessful) {
                 randomDepot1.removeCustomer(randomCustomer1);
-                // System.out.println("Moved " + randomCustomer1.id + " from " + randomDepot1.id + " to " + randomDepot2.id);
                 break;
             } else {
                 testedDepotIds.add(randomCandidateDepotId);
+                if (testedDepotIds.size() == randomCustomer1.candidateList.size()){
+                    return;
+                }
                 randomCandidateDepotId = Utils.randomPick(randomCustomer1.candidateList, (depotId -> !testedDepotIds.contains(depotId.intValue())));
                 if (randomCandidateDepotId == null) return;
             }
-            tries++;
         }
     }
 
