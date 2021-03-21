@@ -29,7 +29,7 @@ public class ThreadedCrossover implements Runnable{
             }
         }
         double rand = Utils.randomDouble();
-        /*if (generation % Parameters.interDepotMutationRate == 0 && generation != 0) {
+        if (generation % Parameters.interDepotMutationRate == 0 && generation != 0) {
             if (rand < Parameters.mutationProbability) {
                 this.offspring.x.interDepotMutation();
             } else if (rand > 1-(Parameters.mutationProbability)){
@@ -43,7 +43,7 @@ public class ThreadedCrossover implements Runnable{
                 Depot randomDepot = Utils.randomPick(this.offspring.y.getDepots(), (p->p.getAllCustomersInVehicles().size() >= 1));
                 randomDepot.intraDepotMutation();
             }
-        }*/
+        }
         this.offspring.x.calculateFitness();
         this.offspring.y.calculateFitness();
         synchronized(this.population){
