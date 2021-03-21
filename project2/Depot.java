@@ -45,6 +45,11 @@ public class Depot{
         return removed;
     }
 
+    public Vehicle randomRoute(){
+        return getAllVehicles().get(Utils.randomInt(getAllVehicles().size()));
+    }
+
+
     public boolean insertAtMostFeasible(Customer customer) {
         List<Tuple<Tuple<Vehicle, Integer>, Double>> feasible = Collections.synchronizedList(new ArrayList<>());
         for (int i=0; i<this.vehicles.size(); i++) {

@@ -126,11 +126,12 @@ public class Individual{
         Individual offspring1 = this.clone();
         Individual offspring2 = i.clone();
         // Select a random depot for each offspring
-        Depot depot1 = offspring1.getDepots().get(Utils.randomInt(offspring1.getDepots().size()));
-        Depot depot2 = offspring2.getDepots().get(Utils.randomInt(offspring2.getDepots().size()));
+        int randDepotIndex = Utils.randomInt(offspring1.getDepots().size());
+        Depot depot1 = offspring1.getDepots().get(randDepotIndex);
+        Depot depot2 = offspring2.getDepotById(depot1.id);
         // Select a random route for each offspring
-        Vehicle vehicle1 = offspring1.randomRoute();
-        Vehicle vehicle2 = offspring2.randomRoute();
+        Vehicle vehicle1 = depot1.randomRoute();
+        Vehicle vehicle2 = depot2.randomRoute();
         // Remove customers from opposite route, insert new at most feasible location
         List<Customer> c1 = new ArrayList<>(vehicle1.getCustomers());
         List<Customer> c2 = new ArrayList<>(vehicle2.getCustomers());
