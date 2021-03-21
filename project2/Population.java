@@ -13,7 +13,7 @@ import DataClasses.*;
 
 public class Population{
 
-    private ExecutorService executor = 
+    public static ExecutorService executor = 
         new ThreadPoolExecutor(
             Parameters.threadPoolSize, 
             Parameters.threadPoolSize, 
@@ -49,12 +49,19 @@ public class Population{
         return copy.get(index);
     }
 
-    public Individual getIndividualByRankAndDeviation(int index, List<Individual> inds){
-        if (inds.size()==0){
-            return getIndividualByRank(index);
+    public Individual getIndividualByRankAndDeviation(int index, boolean correctMax){
+        List<Individual> copy;
+        if (!correctMax){
+            copy = new ArrayList<>(individuals);
+            copy.sort((a,b) -> Double.compare(Fitness.getIndividualFitness(a), Fitness.getIndividualFitness(b)));
+        } else {
+            copy = new ArrayList<>(this.getIndividualsWithCorrectDuration());
+            copy.sort((a,b) -> Double.compare(Fitness.getIndividualRouteFitness(a), Fitness.getIndividualRouteFitness(b)));
         }
-        List<Individual> copy = new ArrayList<>(inds);
-        copy.sort((a,b) -> Double.compare(Fitness.getIndividualRouteFitness(a), Fitness.getIndividualRouteFitness(b)));
+        if (copy.size() == 0){
+            copy = new ArrayList<>(individuals);
+            copy.sort((a,b) -> Double.compare(Fitness.getIndividualFitness(a), Fitness.getIndividualFitness(b)));
+        }
         return copy.get(index);
     }
 
@@ -67,29 +74,22 @@ public class Population{
                 newIndividual.createDepots(depots);
                 created = newIndividual.createRandomIndividual(customers);
             }
-            System.out.println("Create individual: "+i);
+            System.out.println("Create individual: "+ (i+1));
             this.individuals.add(newIndividual);
         }
     }
 
     public List<Individual> tournamentSelection(){
         List<Individual> parents = Collections.synchronizedList(new ArrayList<>());
-        List<Individual> popCopy = Collections.synchronizedList(new ArrayList<>(this.individuals));
         // Create parents list of given parentSelectionSize in parameters
-        while (true){
-            ThreadedTournament tt = new ThreadedTournament(popCopy, parents);
+        for (int i = 0; i< Parameters.parentSelectionSize; i++){
+            ThreadedTournament tt = new ThreadedTournament(this.individuals, parents);
             executor.execute(tt);
-            synchronized (parents){
-                if (parents.size() >= Parameters.parentSelectionSize){
-                    return parents;
-                }
-            }
-            synchronized (popCopy){
-                if (popCopy.size() == 0){
-                    popCopy = Collections.synchronizedList(new ArrayList<>(this.individuals));
-                }
-            }
         }
+        while (parents.size() != Parameters.parentSelectionSize){
+            ;
+        }
+        return parents;
     }
 
     public List<Individual> getIndividualsWithCorrectDuration(){
@@ -104,17 +104,13 @@ public class Population{
 
     public List<Individual> crossover(List<Individual> parents, int generationCount){
         List<Individual> new_population = Collections.synchronizedList(new ArrayList<>());
-        while (true){
-            Individual p1 = parents.get(Utils.randomInt(Parameters.parentSelectionSize-1));
+        for (int i=0; i<Parameters.populationSize;i++){
+            Individual p1 = parents.get(Utils.randomInt(Parameters.parentSelectionSize));
             Individual p2 = Utils.randomPick(parents, p -> p != p1);
             ThreadedCrossover offspring = new ThreadedCrossover(p1, p2, generationCount, new_population);     
             executor.execute(offspring);
-            synchronized (new_population){
-                if (new_population.size() >= Parameters.populationSize){
-                    return List.of(new_population.toArray(new Individual[]{}));
-                }
-            }
         }
+        return List.of(new_population.toArray(new Individual[]{}));
     }
 
     public List<Individual> survivorSelection(List<Individual> parents, List<Individual> offspring){

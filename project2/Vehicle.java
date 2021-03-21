@@ -1,12 +1,8 @@
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
-import DataClasses.Tuple;
-import DataClasses.Customer;
+import DataClasses.*;
 
 
 public class Vehicle{
@@ -74,17 +70,6 @@ public class Vehicle{
         return false;
     }
 
-    public List<Customer> removeCustomersFromRoute(int startIndex, int endIndex){
-        List<Customer> removedCustomers = new ArrayList<>();
-        removedCustomers.addAll(this.customers.subList(startIndex, endIndex));
-        this.customers.removeAll(removedCustomers);
-        int totalDemand = removedCustomers.stream()
-                                          .map(c->c.demand)
-                                          .reduce(0, (total, demand) -> total+demand);
-        this.load -= totalDemand;
-        return removedCustomers;
-    }
-
     public Tuple<Integer, Boolean> feasibleInsertion(Customer customer){
         if (this.load + customer.demand > this.maxLoad){
             return null;
@@ -103,7 +88,7 @@ public class Vehicle{
                 currentDist = Fitness.getDistance(cCopy.get(0), this.depot);
                 diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, cCopy.get(0)) - currentDist;
             } else if(i == lengthOfRoute) {
-                currentDist = Fitness.getDistance(this.customers.get(lengthOfRoute-1), this.depot);
+                currentDist = Fitness.getDistance(cCopy.get(lengthOfRoute-1), this.depot);
                 diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, cCopy.get(lengthOfRoute-1)) - currentDist;
             } else {
                 currentDist = Fitness.getDistance(cCopy.get(i-1), cCopy.get(i));
@@ -117,7 +102,7 @@ public class Vehicle{
         if (index == -1){
             return null;
         }
-        return new Tuple<>(index, lowestDiff <= Parameters.feasibleInsertionLimit);
+        return new Tuple<>(index, (Fitness.getVehicleFitness(this, this.depot) + lowestDiff > this.maxDuration || lowestDiff <= Parameters.feasibleInsertionLimit));
     }
 
     public void setDepot(Depot depot){
@@ -132,12 +117,6 @@ public class Vehicle{
         return customers.stream()
                         .map(customer -> Integer.toString(customer.id))
                         .reduce("", (output, c) -> output + (output.matches("")? "":" ") + c);
-    }
-
-    public List<Integer> getCustomersId(){
-        return customers.stream()
-                        .map(customer -> customer.id)
-                        .collect(Collectors.toList());
     }
 
     public List<Customer> getCustomers(){

@@ -31,35 +31,25 @@ public class ThreadedTournament implements Runnable{
     public void run(){
         List<Double> tournamentProbs = getProbs();
         List<Individual> selectedInds = new ArrayList<>();
-            // Create individual-list of size defined by tournamentSize
-            while (selectedInds.size() < Parameters.tournamentSize){
-                synchronized(population){
-                    if (population.size() == 0){
-                        return;
-                    }
-                    Individual i = this.population.get(Utils.randomInt(population.size()));
-                    selectedInds.add(i);
-                    population.remove(i);
-                }
-                
+        // Create individual-list of size defined by tournamentSize
+        while (selectedInds.size() < Parameters.tournamentSize){
+            Individual i = this.population.get(Utils.randomInt(population.size()));
+            selectedInds.add(i);
+        }
+        // Sort by fitness
+        selectedInds.sort(Comparator.comparingDouble(Individual::getFitness));
+        double randselect = Utils.randomDouble();
+        for (int i=0;i<tournamentProbs.size();i++){
+            if (randselect < tournamentProbs.get(i)){
+                this.selected = selectedInds.get(i);
+                break;
             }
-            // Sort by fitness
-            selectedInds.sort(Comparator.comparingDouble(Individual::getFitness));
-            double randselect = Utils.randomDouble();
-            for (int i=0;i<tournamentProbs.size();i++){
-                if (randselect < tournamentProbs.get(i)){
-                    this.selected = selectedInds.get(i);
-                    break;
-                }
-            }
-            if (randselect > tournamentProbs.get(tournamentProbs.size()-1)){
-                this.selected = selectedInds.get(selectedInds.size()-1);
-            }
-            synchronized(parents){
-                if (parents.size() >= Parameters.parentSelectionSize){
-                    return;
-                }
-                parents.add(this.selected);
-            }
+        }
+        if (randselect > tournamentProbs.get(tournamentProbs.size()-1)){
+            this.selected = selectedInds.get(selectedInds.size()-1);
+        }
+        synchronized(parents){
+            parents.add(this.selected);
+        }
     }
 }

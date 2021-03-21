@@ -23,8 +23,6 @@ public class GeneticAlgorithm {
         p.setCustomers(customers);
         p.setDepots(depots);
         initialDepotClustering(depots, customers.values());
-
-
         p.generatePopulation();
         generationalFitness.add(new Tuple<>(0, Fitness.getIndividualRouteFitness(p.getIndividualByRank(0))));
     }
@@ -79,7 +77,7 @@ public class GeneticAlgorithm {
                 new_pop = p.survivorSelection(p.getIndividuals(), new_pop);
             }
             p.setNewPopulation(new_pop);
-            bestInd = p.getIndividualByRankAndDeviation(0, p.getIndividualsWithCorrectDuration());
+            bestInd = p.getIndividualByRankAndDeviation(0, false);
             bestIndFitness = Fitness.getIndividualRouteFitness(bestInd);
             System.out.println(String.format("Generation %d\tRoute Fitness: %.3f\tDeviation from max duration: %.2f", generation, bestIndFitness, bestInd.getDistanceDeviation()));
             generationalFitness.add(new Tuple<>(generation, bestIndFitness));

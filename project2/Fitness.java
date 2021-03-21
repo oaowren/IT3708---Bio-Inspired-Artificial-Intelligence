@@ -21,14 +21,14 @@ public class Fitness{
             return 0.0;
         }
         double distance = 0.0;
-        List<Integer> vehicleCustomers = new ArrayList<>(vehicle.getCustomersId());
+        List<Customer> vehicleCustomers = new ArrayList<>(vehicle.getCustomers());
         int final_ind = vehicleCustomers.size()-1;
         try {
-            distance += getDistance(customers.get(vehicleCustomers.get(0)), depot);
+            distance += getDistance(vehicleCustomers.get(0), depot);
             for (int i = 0; i < final_ind; i++) {
-                distance += getDistance(customers.get(vehicleCustomers.get(i)), customers.get(vehicleCustomers.get(i+1)));
+                distance += getDistance(vehicleCustomers.get(i), vehicleCustomers.get(i+1));
             }
-            distance += getDistance(customers.get(vehicleCustomers.get(final_ind)), depot);
+            distance += getDistance(vehicleCustomers.get(final_ind), depot);
         } catch (NullPointerException e){
             ;
         }

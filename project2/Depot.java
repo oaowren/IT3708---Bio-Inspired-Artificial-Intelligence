@@ -1,18 +1,12 @@
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import DataClasses.Tuple;
-import DataClasses.Customer;
+import javax.xml.namespace.QName;
+
+import DataClasses.*;
 
 public class Depot{
 
@@ -56,26 +50,13 @@ public class Depot{
         return removed;
     }
 
-    public void removeVehicleById(int id) {
-        vehicles = vehicles.stream()
-                           .filter(v -> v.id != id)
-                           .collect(Collectors.toList());
-    }
-
     public boolean insertAtMostFeasible(Customer customer) {
-        List<Tuple<Vehicle, Integer>> feasible = new ArrayList<>();
-        List<Tuple<Vehicle, Integer>> inFeasible = new ArrayList<>();
+        List<Tuple<Vehicle, Integer>> feasible = Collections.synchronizedList(new ArrayList<>());
+        List<Tuple<Vehicle, Integer>> inFeasible = Collections.synchronizedList(new ArrayList<>());
         for (int i=0; i<this.vehicles.size(); i++) {
             Vehicle v = this.vehicles.get(i);
-            Tuple<Integer, Boolean> inserts = v.feasibleInsertion(customer);
-            if (inserts == null){
-                continue;
-            }
-            if (inserts.y){
-                feasible.add(new Tuple<>(v, inserts.x));
-            } else {
-                inFeasible.add(new Tuple<>(v, inserts.x));
-            }
+            ThreadedInsertion ti = new ThreadedInsertion(v, customer, feasible, inFeasible);
+            Population.executor.execute(ti);
         }
         if (feasible.size() == 0 && inFeasible.size() == 0) {
             return false;
@@ -85,33 +66,43 @@ public class Depot{
             Vehicle v = null;
             int index = -1;
             double minFit = Integer.MAX_VALUE;
-            for (Tuple<Vehicle, Integer> t : feasible){
-                double fit = getFitnessIfInserted(t.x, customer, t.y);
-                if (fit < minFit){
-                    v = t.x;
-                    index = t.y;
-                    minFit = fit;
+            synchronized (feasible){
+                for (Tuple<Vehicle, Integer> t : feasible){
+                    double fit = getFitnessIfInserted(t.x, customer, t.y);
+                    if (fit < minFit){
+                        v = t.x;
+                        index = t.y;
+                        minFit = fit;
+                    }
                 }
             }
             v.insertCustomer(customer, index);
         } else if (rand > 1-(1-Parameters.feasibleProb)/2 && inFeasible.size() != 0){
-            Tuple<Vehicle, Integer> insertion = inFeasible.get(Utils.randomInt(inFeasible.size()));
+            Tuple<Vehicle, Integer> insertion;
+            synchronized (inFeasible){
+                insertion = inFeasible.get(Utils.randomInt(inFeasible.size()));
+            }
             insertion.x.insertCustomer(customer, insertion.y);
         } else if (feasible.size() != 0){
             Vehicle v = null;
             int index = -1;
             double minFit = Integer.MAX_VALUE;
-            for (Tuple<Vehicle, Integer> t : feasible){
-                double fit = getFitnessIfInserted(t.x, customer, t.y);
-                if (fit < minFit){
-                    v = t.x;
-                    index = t.y;
-                    minFit = fit;
+            synchronized (feasible){
+                for (Tuple<Vehicle, Integer> t : feasible){
+                    double fit = getFitnessIfInserted(t.x, customer, t.y);
+                    if (fit < minFit){
+                        v = t.x;
+                        index = t.y;
+                        minFit = fit;
+                    }
                 }
             }
             v.insertCustomer(customer, index);
         } else {
-            Tuple<Vehicle, Integer> insertion = inFeasible.get(Utils.randomInt(inFeasible.size()));
+            Tuple<Vehicle, Integer> insertion;
+            synchronized (inFeasible) {
+                insertion = inFeasible.get(Utils.randomInt(inFeasible.size()));
+            }
             insertion.x.insertCustomer(customer, insertion.y);
         }
         this.swappableCustomers.remove(customer);
@@ -137,23 +128,6 @@ public class Depot{
     public List<Vehicle> getAllVehicles() {
         return this.vehicles;
     }
-
-    public int countActiveVehicles(){
-        return this.vehicles.stream()
-                            .map(v-> v.isActive() ? 1 : 0)
-                            .reduce(0, (acc, el) -> acc + el);
-    }
-
-    public void createNewRoute(Customer c){
-        if (countActiveVehicles() == this.maxVehicles){
-            throw new IllegalStateException("No empty vehicles available");
-        }
-        List<Vehicle> inactive = vehicles.stream()
-                                         .filter(vehicle -> !vehicle.isActive())
-                                         .collect(Collectors.toList());
-        Vehicle v = inactive.get(Utils.randomInt(inactive.size()));
-        v.visitCustomer(c);
-    }
     
     public void addVehicle(Vehicle v) {
         if (this.vehicles.size() >= this.maxVehicles) {
@@ -161,12 +135,6 @@ public class Depot{
         }
         v.setDepot(this);
         this.vehicles.add(v);
-    }
-
-    public List<String> getVehicleRoutes() {
-        return this.getAllVehicles().stream()
-                                    .map(Vehicle::getCustomerSequence)
-                                    .collect(Collectors.toList());
     }
     
     public void intraDepotMutation() {
@@ -246,9 +214,13 @@ public class Depot{
         if (randVehicle == null) return;
 
         Customer randCustomer = randVehicle.getCustomers().get(Utils.randomInt(randVehicle.getCustomers().size()));
-
+        int customerIndex = randVehicle.getCustomers().indexOf(randCustomer);
         randVehicle.removeCustomer(randCustomer);
-        insertAtMostFeasible(randCustomer);
+
+        boolean inserted = insertAtMostFeasible(randCustomer);
+        if (!inserted) {
+            randVehicle.insertCustomer(randCustomer, customerIndex);
+        }
     }
 
     /** 
@@ -278,12 +250,6 @@ public class Depot{
                        .flatMap(vehicle -> vehicle.getCustomers().stream())
                        .collect(Collectors.toList());
     }
-
-    public boolean hasActiveVehicles() {
-        return vehicles.stream()
-                       .anyMatch(Vehicle::isActive);
-    }
-
 
     public void addSwappableCustomer(Customer customer) {
         if (!swappableCustomers.contains(customer)) {

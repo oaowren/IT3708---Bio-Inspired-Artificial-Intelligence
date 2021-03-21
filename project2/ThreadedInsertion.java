@@ -9,20 +9,27 @@ public class ThreadedInsertion implements Runnable {
     private Vehicle vehicle;
     private Customer customer;
     private int id;
-    List<Tuple<Integer, Tuple<Integer, Double>>> currentBest;
+    List<Tuple<Vehicle, Integer>> feasible, inFeasible;
 
-    public ThreadedInsertion(Vehicle vehicle, Customer customer, List<Tuple<Integer, Tuple<Integer, Double>>> currentBest, int id) {
+    public ThreadedInsertion(Vehicle vehicle, Customer customer, List<Tuple<Vehicle, Integer>> feasible, List<Tuple<Vehicle, Integer>> inFeasible) {
         this.vehicle = vehicle;
         this.customer = customer; 
-        this.currentBest = currentBest;
-        this.id = id;
+        this.feasible = feasible;
+        this.inFeasible = inFeasible;
     }
 
     public void run() {
-        Tuple<Integer, Double> best = vehicle.mostFeasibleInsertion(customer);
-        synchronized (currentBest){
-            if (!Objects.isNull(best)){
-                currentBest.add(new Tuple<>(this.id, best));
+        Tuple<Integer, Boolean> best = vehicle.feasibleInsertion(customer);
+        if (best == null) {
+            return;
+        }
+        if (best.y){
+            synchronized (feasible){
+                feasible.add(new Tuple<>(this.vehicle, best.x));
+            }
+        } else {
+            synchronized (inFeasible){
+                inFeasible.add(new Tuple<>(this.vehicle, best.x));
             }
         }
     }
