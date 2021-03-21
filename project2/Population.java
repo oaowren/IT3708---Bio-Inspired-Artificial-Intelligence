@@ -82,11 +82,11 @@ public class Population{
     public List<Individual> tournamentSelection(){
         List<Individual> parents = Collections.synchronizedList(new ArrayList<>());
         // Create parents list of given parentSelectionSize in parameters
-        for (int i = 0; i< Parameters.parentSelectionSize; i++){
+        for (int i = 0; i< (Parameters.parentSelectionSize - Parameters.eliteSize); i++){
             ThreadedTournament tt = new ThreadedTournament(this.individuals, parents);
             executor.execute(tt);
         }
-        while (parents.size() != Parameters.parentSelectionSize){
+        while (parents.size() != Parameters.parentSelectionSize - Parameters.eliteSize){
             ;
         }
         return parents;
@@ -105,7 +105,7 @@ public class Population{
     public List<Individual> crossover(List<Individual> parents, int generationCount){
         List<Individual> new_population = Collections.synchronizedList(new ArrayList<>());
         for (int i=0; i<Parameters.populationSize;i++){
-            Individual p1 = parents.get(Utils.randomInt(Parameters.parentSelectionSize));
+            Individual p1 = parents.get(Utils.randomInt(parents.size()));
             Individual p2 = Utils.randomPick(parents, p -> p != p1);
             ThreadedCrossover offspring = new ThreadedCrossover(p1, p2, generationCount, new_population);     
             executor.execute(offspring);
@@ -114,13 +114,10 @@ public class Population{
     }
 
     public List<Individual> survivorSelection(List<Individual> parents, List<Individual> offspring){
-        int elitism = Parameters.eliteSize;
         List<Individual> copyOffspring = new ArrayList<>(offspring);
         List<Individual> copyParents = new ArrayList<>(parents);
-        copyOffspring.sort(Comparator.comparingDouble(Individual::getFitness));
         copyParents.sort(Comparator.comparingDouble(Individual::getFitness));
-        copyOffspring.subList(copyOffspring.size() - elitism, copyOffspring.size()).clear();
-        copyOffspring.addAll(copyParents.subList(0, elitism));
+        copyOffspring.addAll(copyParents.subList(0, Parameters.eliteSize));
         return copyOffspring;
     }
 

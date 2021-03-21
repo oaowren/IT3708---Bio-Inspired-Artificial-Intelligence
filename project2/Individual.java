@@ -72,6 +72,12 @@ public class Individual{
                           .reduce(0.0, (total, element) -> total + element);
     }
 
+    public double getLoadDeviation(){
+        return this.depots.stream()
+                          .map(Depot::getLoadDeviation)
+                          .reduce(0.0, (total, element) -> total + element);
+    }
+
     public boolean createRandomIndividual(HashMap<Integer, Customer> customers){
         List<Customer> customerValues = new ArrayList<>(customers.values());
         Collections.shuffle(customerValues);

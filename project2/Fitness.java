@@ -64,35 +64,11 @@ public class Fitness{
     }
 
     public static double getDepotFitness(Depot depot) {
-        return Parameters.durationPenalty * depot.getDistanceDeviation() + Parameters.beta * getDepotRouteFitness(depot);
+        return Parameters.durationPenalty * depot.getDistanceDeviation() 
+                + Parameters.beta * getDepotRouteFitness(depot)
+                + Parameters.loadPenalty * depot.getLoadDeviation();
     }
-
-    public static Individual crowding(Individual i1, Individual i2){
-        return i1.getFitness() < i2.getFitness() ? i1 : i2;
-    }
-
-    public static int distanceCrowding(Individual i1, Individual i2){
-        int total = 0;
-        for (int i=0;i<i1.getDepots().size();i++){
-            Depot d1 = i1.getDepots().get(i);
-            Depot d2 = i2.getDepots().get(i);
-            for (int n=0;n<d1.getAllVehicles().size();n++){
-                Vehicle v1 = d1.getAllVehicles().get(n);
-                Vehicle v2 = d2.getAllVehicles().get(n);
-                for (int j=0; j<v1.getCustomers().size();j++){
-                    try{
-                        total += v1.getCustomers().get(j) == v2.getCustomers().get(j) ? 0 : 1;
-                    } catch (IndexOutOfBoundsException e){
-                        total ++;
-                    }
-                }
-                int diff = v2.getCustomers().size() - v1.getCustomers().size();
-                total += diff > 0 ? diff : 0;
-            }
-        }
-        return total;
-    }
-
+    
     // Memoized in pairMemo
     public static Double getDistance(int x1, int x2, int y1, int y2) {
         int x = Math.abs(x1-x2);

@@ -4,8 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.xml.namespace.QName;
-
 import DataClasses.*;
 
 public class Depot{
@@ -44,76 +42,33 @@ public class Depot{
     public boolean removeCustomer(Customer c) {
         boolean removed = vehicles.stream()
                                   .anyMatch(vehicle -> vehicle.removeCustomer(c));
-        if (removed){
-            this.swappableCustomers.add(c);
-        }
         return removed;
     }
 
     public boolean insertAtMostFeasible(Customer customer) {
-        List<Tuple<Vehicle, Integer>> feasible = Collections.synchronizedList(new ArrayList<>());
-        List<Tuple<Vehicle, Integer>> inFeasible = Collections.synchronizedList(new ArrayList<>());
+        List<Tuple<Tuple<Vehicle, Integer>, Double>> feasible = Collections.synchronizedList(new ArrayList<>());
         for (int i=0; i<this.vehicles.size(); i++) {
             Vehicle v = this.vehicles.get(i);
-            ThreadedInsertion ti = new ThreadedInsertion(v, customer, feasible, inFeasible);
+            ThreadedInsertion ti = new ThreadedInsertion(v, customer, feasible);
             Population.executor.execute(ti);
         }
-        if (feasible.size() == 0 && inFeasible.size() == 0) {
+        if (feasible.size() == 0) {
             return false;
         }
-        double rand = Utils.randomDouble();
-        if (rand < Parameters.feasibleProb && feasible.size() != 0){
-            Vehicle v = null;
-            int index = -1;
-            double minFit = Integer.MAX_VALUE;
-            synchronized (feasible){
-                for (Tuple<Vehicle, Integer> t : feasible){
-                    double fit = getFitnessIfInserted(t.x, customer, t.y);
-                    if (fit < minFit){
-                        v = t.x;
-                        index = t.y;
-                        minFit = fit;
-                    }
+        Vehicle v = null;
+        int index = -1;
+        double minFit = Integer.MAX_VALUE;
+        synchronized (feasible){
+            for (Tuple<Tuple<Vehicle, Integer>, Double> t : feasible){
+                if (t.y < minFit){
+                    v = t.x.x;
+                    index = t.x.y;
+                    minFit = t.y;
                 }
             }
-            v.insertCustomer(customer, index);
-        } else if (rand > 1-(1-Parameters.feasibleProb)/2 && inFeasible.size() != 0){
-            Tuple<Vehicle, Integer> insertion;
-            synchronized (inFeasible){
-                insertion = inFeasible.get(Utils.randomInt(inFeasible.size()));
-            }
-            insertion.x.insertCustomer(customer, insertion.y);
-        } else if (feasible.size() != 0){
-            Vehicle v = null;
-            int index = -1;
-            double minFit = Integer.MAX_VALUE;
-            synchronized (feasible){
-                for (Tuple<Vehicle, Integer> t : feasible){
-                    double fit = getFitnessIfInserted(t.x, customer, t.y);
-                    if (fit < minFit){
-                        v = t.x;
-                        index = t.y;
-                        minFit = fit;
-                    }
-                }
-            }
-            v.insertCustomer(customer, index);
-        } else {
-            Tuple<Vehicle, Integer> insertion;
-            synchronized (inFeasible) {
-                insertion = inFeasible.get(Utils.randomInt(inFeasible.size()));
-            }
-            insertion.x.insertCustomer(customer, insertion.y);
         }
-        this.swappableCustomers.remove(customer);
+        v.insertCustomer(customer, index);
         return true;
-    }
-
-    private double getFitnessIfInserted(Vehicle v, Customer c, int index){
-        Depot dClone = this.clone();
-        Vehicle vClone = dClone.getAllVehicles().get(this.vehicles.indexOf(v));
-        vClone.insertCustomer(c, index);
-        return Fitness.getDepotFitness(dClone);
     }
 
     public double getDistanceDeviation(){
@@ -257,6 +212,10 @@ public class Depot{
         } else {
             throw new IllegalArgumentException("Customer should not be added as a swappable customer to a Depot more than once!");
         }
+    }
+
+    public double getLoadDeviation(){
+        return this.vehicles.stream().map(v->v.getLoad() > v.maxLoad ? v.getLoad() - v.maxLoad : 0.0).reduce(0.0, (acc, el) -> acc + el);
     }
 
     public List<Customer> getSwappableCustomers() {

@@ -49,7 +49,7 @@ public class GeneticAlgorithm {
             HashMap<Integer, Depot> depotMap = new HashMap<>();
             customer.candidateList.add(closestDepot.id);
             depotMap.put(closestDepot.id, closestDepot);
-            //closestDepot.addSwappableCustomer(customer);
+            closestDepot.addSwappableCustomer(customer);
             for (int i = 0; i < depots.size(); i++) {
                 if (depots.get(i) == closestDepot) {
                     continue;
@@ -69,17 +69,15 @@ public class GeneticAlgorithm {
     public void run() {
         Individual bestInd = p.getIndividualByRank(0);
         double bestIndFitness = Fitness.getIndividualRouteFitness(bestInd);
-        while ((bestIndFitness > threshold || bestInd.getDistanceDeviation() != 0.0) && generation < Parameters.generationSpan){
+        while ((bestIndFitness > threshold || bestInd.getDistanceDeviation() != 0.0 || bestInd.getLoadDeviation() != 0.0) && generation < Parameters.generationSpan){
             generation++;
             List<Individual> parents = p.tournamentSelection();
             List<Individual> new_pop = p.crossover(parents, generation);
-            if (!Parameters.useCrowding){
-                new_pop = p.survivorSelection(p.getIndividuals(), new_pop);
-            }
+            new_pop = p.survivorSelection(p.getIndividuals(), new_pop);
             p.setNewPopulation(new_pop);
             bestInd = p.getIndividualByRankAndDeviation(0, false);
             bestIndFitness = Fitness.getIndividualRouteFitness(bestInd);
-            System.out.println(String.format("Generation %d\tRoute Fitness: %.3f\tDeviation from max duration: %.2f", generation, bestIndFitness, bestInd.getDistanceDeviation()));
+            System.out.println(String.format("Generation %d\tRoute Fitness: %.3f\tDeviation from max duration: %.2f\tDeviation from max load: %.2f", generation, bestIndFitness, bestInd.getDistanceDeviation(), bestInd.getLoadDeviation()));
             generationalFitness.add(new Tuple<>(generation, bestIndFitness));
         }
     }

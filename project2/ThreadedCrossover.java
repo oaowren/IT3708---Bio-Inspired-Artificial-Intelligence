@@ -32,7 +32,7 @@ public class ThreadedCrossover implements Runnable{
         if (generation % Parameters.interDepotMutationRate == 0 && generation != 0) {
             if (rand < Parameters.mutationProbability) {
                 this.offspring.x.interDepotMutation();
-            } else if (rand > 1-Parameters.mutationProbability){
+            } else if (rand > 1-(Parameters.mutationProbability)){
                 this.offspring.y.interDepotMutation();
             }
         } else { 
@@ -46,18 +46,6 @@ public class ThreadedCrossover implements Runnable{
         }
         this.offspring.x.calculateFitness();
         this.offspring.y.calculateFitness();
-        if (Parameters.useCrowding){
-            if (Fitness.distanceCrowding(this.offspring.x, this.parents.x) + Fitness.distanceCrowding(this.offspring.y, this.parents.y) < 
-                Fitness.distanceCrowding(this.offspring.x, this.parents.y) + Fitness.distanceCrowding(this.offspring.y, this.parents.x)){
-                Individual i1 = Fitness.crowding(this.offspring.x, this.parents.x);
-                Individual i2 = Fitness.crowding(this.offspring.y, this.parents.y);
-                this.offspring = new Tuple<>(i1,i2);
-            } else {
-                Individual i1 = Fitness.crowding(this.offspring.x, this.parents.y);
-                Individual i2 = Fitness.crowding(this.offspring.y, this.parents.x);
-                this.offspring = new Tuple<>(i1,i2);
-            }
-        }
         synchronized(this.population){
             if (this.population.size() >= Parameters.populationSize){
                 return;

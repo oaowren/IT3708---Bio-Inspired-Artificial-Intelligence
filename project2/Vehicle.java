@@ -32,12 +32,12 @@ public class Vehicle{
         this.maxLoad = vehicle.maxLoad;
         this.maxDuration = vehicle.maxDuration;
         this.depot = vehicle.getDepot();
-        this.load = vehicle.getLoad();
+        this.load = 0;
         addCustomersToRoute(customers, 0);
     }
 
     public void visitCustomer(Customer customer){
-        if (this.load + customer.demand > this.maxLoad) {
+        if (this.load + customer.demand > this.maxLoad && Parameters.forceMaxLoad){
             throw new IllegalStateException("Too much load for current route");
         }
         this.load += customer.demand;
@@ -45,7 +45,7 @@ public class Vehicle{
     }
 
     public void insertCustomer(Customer customer, int index){
-        if (this.load + customer.demand > this.maxLoad) {
+        if (this.load + customer.demand > this.maxLoad && Parameters.forceMaxLoad) {
             throw new IllegalStateException("Too much load for current route");
         }
         this.load += customer.demand;
@@ -54,7 +54,7 @@ public class Vehicle{
 
     public void addCustomersToRoute(List<Customer> customers, int index){
         int totalDemand = customers.stream().map(c-> c.demand).reduce(0, (total, demand) -> total + demand);
-        if (this.load + totalDemand > this.maxLoad) {
+        if (this.load + totalDemand > this.maxLoad && Parameters.forceMaxLoad) {
             throw new IllegalStateException("Too much load for current route");
         }
         this.load += totalDemand;
@@ -70,31 +70,44 @@ public class Vehicle{
         return false;
     }
 
-    public Tuple<Integer, Boolean> feasibleInsertion(Customer customer){
-        if (this.load + customer.demand > this.maxLoad){
+    public Tuple<Integer, Double> feasibleInsertion(Customer customer){
+        if (this.load + customer.demand > this.maxLoad && Parameters.forceMaxLoad){
             return null;
         }
         List<Customer> cCopy = new ArrayList<>(this.customers);
         int lengthOfRoute = cCopy.size();
-        if (lengthOfRoute == 0){
-            return new Tuple<>(0, false);
-        }
         double lowestDiff = Integer.MAX_VALUE;
         int index = -1;
-        for (int i=0; i< lengthOfRoute + 1;i++){
-            double currentDist;
-            double diff;
-            if (i==0){
-                currentDist = Fitness.getDistance(cCopy.get(0), this.depot);
-                diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, cCopy.get(0)) - currentDist;
-            } else if(i == lengthOfRoute) {
-                currentDist = Fitness.getDistance(cCopy.get(lengthOfRoute-1), this.depot);
-                diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, cCopy.get(lengthOfRoute-1)) - currentDist;
-            } else {
-                currentDist = Fitness.getDistance(cCopy.get(i-1), cCopy.get(i));
-                diff = Fitness.getDistance(customer, cCopy.get(i-1)) + Fitness.getDistance(customer, cCopy.get(i)) - currentDist;
+        if (lengthOfRoute == 0){
+            try {
+                lowestDiff = 2 * Fitness.getDistance(customer, this.depot);
+            } catch (NullPointerException e){
+                return null;
             }
-            if (diff < lowestDiff){
+
+            double durationDeviation = 0;
+            if (this.maxDuration != 0){
+                durationDeviation = (lowestDiff > this.maxDuration ? lowestDiff - this.maxDuration : 0);
+            }
+            return new Tuple<>(0, Parameters.beta * lowestDiff + Parameters.durationPenalty * durationDeviation);
+        }
+        for (int i=0; i< lengthOfRoute + 1 ;i++){
+            double currentDist, diff;
+            try {
+                if (i==0){
+                    currentDist = Fitness.getDistance(cCopy.get(0), this.depot);
+                    diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, cCopy.get(0)) - currentDist;
+                } else if(i == lengthOfRoute) {
+                    currentDist = Fitness.getDistance(cCopy.get(lengthOfRoute-1), this.depot);
+                    diff = Fitness.getDistance(customer, this.depot) + Fitness.getDistance(customer, cCopy.get(lengthOfRoute-1)) - currentDist;
+                } else {
+                    currentDist = Fitness.getDistance(cCopy.get(i-1), cCopy.get(i));
+                    diff = Fitness.getDistance(customer, cCopy.get(i-1)) + Fitness.getDistance(customer, cCopy.get(i)) - currentDist;
+                }
+            } catch (NullPointerException e){
+                return null;
+            }
+            if (diff < lowestDiff) {
                 lowestDiff = diff;
                 index = i;
             }
@@ -102,7 +115,21 @@ public class Vehicle{
         if (index == -1){
             return null;
         }
-        return new Tuple<>(index, (Fitness.getVehicleFitness(this, this.depot) + lowestDiff > this.maxDuration || lowestDiff <= Parameters.feasibleInsertionLimit));
+        double loadDeviation = 0;
+        if (!Parameters.forceMaxLoad){
+            // Only count contributions made by the new insertion.
+            loadDeviation = this.load > this.maxLoad ? customer.demand : (customer.demand + this.load > this.maxLoad  ? this.load + customer.demand - this.maxLoad : 0);
+        }
+        double oldFit = Fitness.getVehicleFitness(this, this.depot);
+        double durationDeviation = 0;
+        if (this.maxDuration != 0){
+            // Only count contributions made by the new insertion.
+            durationDeviation = (oldFit > this.maxDuration ? lowestDiff : (lowestDiff + oldFit > this.maxDuration ? lowestDiff + oldFit - this.maxDuration : 0));
+        }
+        // Returns the index of best insertion and the new fitness-value which will give a globally optimal choice in Depot
+        return new Tuple<>(index, Parameters.loadPenalty * loadDeviation + 
+                                  Parameters.beta * lowestDiff + 
+                                  Parameters.durationPenalty * durationDeviation);
     }
 
     public void setDepot(Depot depot){
