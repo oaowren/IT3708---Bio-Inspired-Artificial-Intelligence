@@ -159,8 +159,6 @@ public class Individual{
                 return null;
             }
         }
-        offspring1.calculateFitness();
-        offspring2.calculateFitness();
         return new Tuple<>(offspring1, offspring2);
     }
 
