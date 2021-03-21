@@ -77,7 +77,7 @@ public class GeneticAlgorithm {
             p.setNewPopulation(new_pop);
             bestInd = p.getIndividualByRankAndDeviation(0, false);
             bestIndFitness = Fitness.getIndividualRouteFitness(bestInd);
-            System.out.println(String.format("Generation %d\tRoute Fitness: %.3f\tDeviation from max duration: %.2f\tDeviation from max load: %.2f", generation, bestIndFitness, bestInd.getDistanceDeviation(), bestInd.getLoadDeviation()));
+            System.out.println(String.format("Generation %d\tRoute Fitness: %.2f\tDeviation from max duration: %.2f\tDeviation from max load: %.2f", generation, bestIndFitness, bestInd.getDistanceDeviation(), bestInd.getLoadDeviation()));
             generationalFitness.add(new Tuple<>(generation, bestIndFitness));
         }
     }
