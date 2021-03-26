@@ -43,6 +43,9 @@ public class DataSetIo {
         put("p21", 6426.0);
         put("p22", 6230.7);
         put("p23", 6520.5);
+        put("1", 0.0);
+        put("2", 0.0);
+        put("3", 0.0);
      }};
 
     public void readDataFile(String filename) {
