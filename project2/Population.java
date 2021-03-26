@@ -110,7 +110,7 @@ public class Population{
             ThreadedCrossover offspring = new ThreadedCrossover(p1, p2, generationCount, new_population);     
             executor.execute(offspring);
         }
-        return List.of(new_population.toArray(new Individual[]{}));
+        return new_population;
     }
 
     public List<Individual> survivorSelection(List<Individual> parents, List<Individual> offspring){
