@@ -1,15 +1,15 @@
 package Code;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 public class Pixel {
     
     public final RGB color;
     public final int x;
     public final int y;
-    private final Set<Pixel> neighbours = new HashSet<>(); // F
+    private final Map<Integer, Pixel> neighbours = new HashMap<>(); // F
 
     public Pixel(RGB color, int x, int y) {
         this.color = color;
@@ -17,12 +17,12 @@ public class Pixel {
         this.y = y;
     }
 
-    public Set<Pixel> getNeighbours() {
-        return new HashSet<>(neighbours);
+    public Map<Integer, Pixel> getNeighbours() {
+        return new HashMap<>(neighbours);
     }
 
-    public void addNeighbour(Pixel neighbour) {
-        this.neighbours.add(neighbour);
+    public void addNeighbour(int key, Pixel neighbour) {
+        this.neighbours.put(key, neighbour);
     }
 
     @Override

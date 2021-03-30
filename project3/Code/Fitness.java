@@ -1,5 +1,6 @@
 package Code;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 public class Fitness {
@@ -10,7 +11,7 @@ public class Fitness {
     public double edgeValue(Segment segment) {
         int edgeValue = 0;
         for (Pixel pixel : segment.getPixels()) {
-            for (Pixel neighbour : pixel.getNeighbours()) {
+            for (Pixel neighbour : pixel.getNeighbours().values()) {
                 edgeValue += 
                     segment.getPixels().contains(neighbour) 
                         ? 0 
@@ -20,12 +21,27 @@ public class Fitness {
         return edgeValue;
     }
 
-    public double connectivityMeasure() {
-        return 0.0;
+    public double connectivityMeasure(Segment segment) {
+        int connectivity = 0;
+        for (Pixel pixel : segment.getPixels()) {
+            for (Integer neighbourKey : pixel.getNeighbours().keySet()) {
+                connectivity += 
+                    segment.getPixels().contains(pixel.getNeighbours().get(neighbourKey)) 
+                        ? 0 
+                        : 1 / neighbourKey;
+            }
+        }
+        return connectivity;
     }
 
-    public double overallDeviation() {
-        return 0.0;
+    public double overallDeviation(Collection<Segment> segments) {
+        int overallDeviation = 0;
+        for (Segment segment : segments) {
+            for (Pixel pixel : segment.getPixels()) {
+                overallDeviation += distance(pixel.color, segment.getCentroid());
+            }
+        }
+        return overallDeviation;
     }
 
     public double distance(RGB i, RGB j) {
