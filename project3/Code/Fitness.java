@@ -18,7 +18,7 @@ public class Fitness {
                         : distance(pixel.color, neighbour.color);
             }
         }
-        return edgeValue;
+        return -edgeValue; // This objective should be maximized. How-ever, to keep similarity with other two objectives, we convert it as subject tominimization by negating it
     }
 
     public double connectivityMeasure(Segment segment) {
@@ -28,7 +28,7 @@ public class Fitness {
                 connectivity += 
                     segment.getPixels().contains(pixel.getNeighbours().get(neighbourKey)) 
                         ? 0 
-                        : 1 / neighbourKey;
+                        : 1 / neighbourKey; // TODO: Skal det være L her? Se forskjell på de to PDF-ene
             }
         }
         return connectivity;
