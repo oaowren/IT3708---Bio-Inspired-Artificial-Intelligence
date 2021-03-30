@@ -1,8 +1,8 @@
 package Code;
 
 public enum Gene {
-    LEFT,
     RIGHT,
+    LEFT,
     UP,
     DOWN,
     NONE

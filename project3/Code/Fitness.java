@@ -8,7 +8,7 @@ public class Fitness {
     // Memoize euclidian distance between two points
     private static final HashMap<Tuple<RGB, RGB>, Double> pairMemo = new HashMap<>();
 
-    public double edgeValue(Segment segment) {
+    public static double edgeValue(Segment segment) {
         int edgeValue = 0;
         for (Pixel pixel : segment.getPixels()) {
             for (Pixel neighbour : pixel.getNeighbours().values()) {
@@ -21,7 +21,7 @@ public class Fitness {
         return -edgeValue; // This objective should be maximized. How-ever, to keep similarity with other two objectives, we convert it as subject tominimization by negating it
     }
 
-    public double connectivityMeasure(Segment segment) {
+    public static double connectivityMeasure(Segment segment) {
         int connectivity = 0;
         for (Pixel pixel : segment.getPixels()) {
             for (Integer neighbourKey : pixel.getNeighbours().keySet()) {
@@ -34,7 +34,7 @@ public class Fitness {
         return connectivity;
     }
 
-    public double overallDeviation(Collection<Segment> segments) {
+    public static double overallDeviation(Collection<Segment> segments) {
         int overallDeviation = 0;
         for (Segment segment : segments) {
             for (Pixel pixel : segment.getPixels()) {
@@ -44,7 +44,7 @@ public class Fitness {
         return overallDeviation;
     }
 
-    public double distance(RGB i, RGB j) {
+    public static double distance(RGB i, RGB j) {
         Tuple<RGB, RGB> pair = new Tuple<>(i, j);
         if (pairMemo.containsKey(pair)) {
             return pairMemo.get(pair);
