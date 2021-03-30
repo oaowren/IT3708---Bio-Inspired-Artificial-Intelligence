@@ -6,6 +6,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch MOEA",
+            "request": "launch",
+            "mainClass": "MOEA",
+            "projectName": "IT3708_c2d6d2a5"
+        },
+        {
+            "type": "java",
+            "name": "Launch Objectives",
+            "request": "launch",
+            "mainClass": "Code.Objectives",
+            "projectName": "IT3708_c2d6d2a5"
+        },
+        {
+            "type": "java",
+            "name": "Launch Moea",
+            "request": "launch",
+            "mainClass": "Moea",
+            "projectName": "IT3708_c2d6d2a5"
+        },
+        {
+            "type": "java",
             "name": "Launch Main_2",
             "request": "launch",
             "mainClass": "Main_2",
