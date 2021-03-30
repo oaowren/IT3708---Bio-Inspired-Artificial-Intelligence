@@ -17,7 +17,7 @@ public class Fitness {
                         : distance(pixel.color, neighbour.color);
             }
         }
-        return edgeValue(segment);
+        return edgeValue;
     }
 
     public double connectivityMeasure() {
