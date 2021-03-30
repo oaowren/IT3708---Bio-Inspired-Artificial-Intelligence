@@ -7,8 +7,17 @@ public class Fitness {
     // Memoize euclidian distance between two points
     private static final HashMap<Tuple<RGB, RGB>, Double> pairMemo = new HashMap<>();
 
-    public double edgeValue() {
-        return 0.0;
+    public double edgeValue(Segment segment) {
+        int edgeValue = 0;
+        for (Pixel pixel : segment.getPixels()) {
+            for (Pixel neighbour : pixel.getNeighbours()) {
+                edgeValue += 
+                    segment.getPixels().contains(neighbour) 
+                        ? 0 
+                        : distance(pixel.color, neighbour.color);
+            }
+        }
+        return edgeValue(segment);
     }
 
     public double connectivityMeasure() {
