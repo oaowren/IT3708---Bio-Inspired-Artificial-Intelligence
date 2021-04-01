@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ImageSegmentationIO {
     
@@ -92,10 +93,12 @@ public class ImageSegmentationIO {
         }
         int segmentColor = color == "b" ? RGB.black.toRgbInt() : RGB.green.toRgbInt();
         String fileSuffix = color == "b" ? "black" : "green";
-        // TODO: correct number of segments
+        String folder = color == "b" ? "" : "_Green";
         int numberOfSegments = solution.getNoOfSegments();
+        String fullPath = "project3/Evaluator/Student_Segmentation_Files" + folder + "/" + path + "/" + fileSuffix + numberOfSegments + ".jpg";
+        System.out.println("Writing file to " + fullPath);
         try {
-            File output = new File("project3/solution_images/" + path + "/" + fileSuffix + numberOfSegments + ".jpg");
+            File output = new File(fullPath);
             BufferedImage image = new BufferedImage(this.getImageWidth(), this.getImageHeight(), BufferedImage.TYPE_INT_RGB);
 
             for (int y = 0; y < this.getImageHeight(); y++) {
@@ -125,5 +128,11 @@ public class ImageSegmentationIO {
 
     private int getBackground(Pixel pixel, String color){
         return color== "b" ? RGB.white.toRgbInt() : pixel.color.toRgbInt();
+    }
+
+    public void deletePrevious(String path){
+        for (File file : Objects.requireNonNull(new File(path).listFiles()))
+            if (!file.isDirectory())
+                file.delete();
     }
 }
