@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ImageSegmentationIO {
@@ -16,7 +17,7 @@ public class ImageSegmentationIO {
     private Pixel[][] pixels;
 
     public ImageSegmentationIO(String fileName) {
-        try (InputStream input = new FileInputStream(new File("training_images/" + fileName+ "/Test image.jpg"))) {
+        try (InputStream input = new FileInputStream(new File("project3/training_images/" + fileName+ "/Test image.jpg"))) {
             BufferedImage image = ImageIO.read(input);
             this.imageWidth = image.getWidth();
             this.imageHeight = image.getHeight();
@@ -33,13 +34,14 @@ public class ImageSegmentationIO {
                             color.getBlue()
                         ), x, y
                     );
-                    pixels[x][y] = pixel;
+                    pixels[y][x] = pixel;
                 }
             }
 
+            // NOTE: pixels are indexed by x = width and y = height
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
-                    pixels[x][y].setNeighbours(getPixelNeighbours(x, y));
+                    pixels[y][x].setNeighbours(getPixelNeighbours(x, y));
                 }
             }
         } catch (IOException e) {
@@ -72,16 +74,16 @@ public class ImageSegmentationIO {
     }
     
     private Map<Integer, Pixel> getPixelNeighbours(int x, int y) {
-        return Map.of(
-            1, x+1 >= imageWidth ? null : pixels[x+1][y],
-            2, x-1 < 0 ? null : pixels[x-1][y],
-            3, y-1 < 0 ? null : pixels[x][y-1],
-            4, y+1 >= imageHeight ? null : pixels[x][y+1],
-            5, y-1 < imageHeight || x+1 >= imageWidth ? null : pixels[x+1][y-1],
-            6, y+1 >= imageHeight || x+1 >= imageWidth ? null : pixels[x+1][y+1],
-            7, y-1 < imageHeight || x-1 < imageWidth ? null : pixels[x-1][y-1],
-            8, y+1 >= imageHeight || x-1 < imageWidth ? null : pixels[x-1][y+1]
-        );
+        Map<Integer, Pixel> neighbours = new HashMap<>();
+        if (x+1 < imageWidth) neighbours.put(1, pixels[y][x+1]);
+        if (x-1 >= 0) neighbours.put(2, pixels[y][x-1]);
+        if (y-1 >= 0) neighbours.put(3, pixels[y-1][x]);
+        if (y+1 < imageHeight) neighbours.put(4, pixels[y+1][x]);
+        if (y-1 >= 0 && x+1 < imageWidth) neighbours.put(5, pixels[y-1][x+1]);
+        if (y+1 < imageHeight && x+1 < imageWidth) neighbours.put(6, pixels[y+1][x+1]);
+        if (y-1 >= 0 && x-1 >= 0) neighbours.put(7, pixels[y-1][x-1]);
+        if (y+1 < imageHeight && x-1 >= 0) neighbours.put(8, pixels[y+1][x-1]);
+        return neighbours;
     }
 
     public void save(String path, String color){
@@ -91,7 +93,7 @@ public class ImageSegmentationIO {
         int segmentColor = color == "b" ? RGB.black.toRgbInt() : RGB.green.toRgbInt();
         String fileSuffix = color == "b" ? "black" : "green";
         try {
-            File output = new File("solution_images/" + path + fileSuffix + ".jpg");
+            File output = new File("project3/solution_images/" + path + "_" + fileSuffix + ".jpg");
             BufferedImage image = new BufferedImage(this.getImageWidth(), this.getImageHeight(), BufferedImage.TYPE_INT_RGB);
             //TODO: Draw the solution
 

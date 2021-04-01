@@ -2,14 +2,16 @@ package Code;
 
 public class Parameters {
     
-    static final int populationSize = 20;
-    static final int generationSpan = 10000;
-    static final int eliteSize = 2;
-    static final int tournamentSize = 4;
-    static final int parentSelectionSize = 10;
-    static final double tournamentProb = 0.9;
-    static final double crossoverProbability = 0.7;
-    static final double mutationProbability = 0.35;
-    static final int threadPoolSize = 10;
+    public static final String filename = "86016"; // Use folder name in training_images
+    public static final String segmentColor = "g"; // Either g(green) or b(black)
+    public static final int populationSize = 20;
+    public static final int generationSpan = 10000;
+    public static final int eliteSize = 2;
+    public static final int tournamentSize = 4;
+    public static final int parentSelectionSize = 10;
+    public static final double tournamentProb = 0.9;
+    public static final double crossoverProbability = 0.7;
+    public static final double mutationProbability = 0.35;
+    public static final int threadPoolSize = 10;
 
 }
