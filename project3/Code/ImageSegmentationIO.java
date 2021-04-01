@@ -38,7 +38,7 @@ public class ImageSegmentationIO {
                 }
             }
 
-            // NOTE: pixels are indexed by x = width and y = height
+            // NOTE: pixels are indexed by x = width and y = height, inverse of typical 2D-arrays
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
                     pixels[y][x].setNeighbours(getPixelNeighbours(x, y));
