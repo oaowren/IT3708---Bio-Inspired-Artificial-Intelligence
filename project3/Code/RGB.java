@@ -1,6 +1,7 @@
 package Code;
 
 import java.util.Objects;
+import java.awt.Color;
 
 public class RGB {
 
@@ -10,6 +11,13 @@ public class RGB {
         this.r = r;
         this.g = g;
         this.b = b;
+    }
+
+    public static RGB green = new RGB(0, 255, 0);
+    public static RGB black = new RGB(0, 0, 0);
+
+    public int toRgbInt(){
+        return new Color(this.r, this.g, this.b).getRGB();
     }
 
     @Override

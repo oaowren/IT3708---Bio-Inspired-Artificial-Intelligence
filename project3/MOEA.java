@@ -1,5 +1,8 @@
+import Code.ImageSegmentationIO;
+
 class MOEA {
     public static void main(String[] args) {
-        System.out.println("Welcome to this session.");
+        ImageSegmentationIO imageIO = new ImageSegmentationIO("86016");
+        imageIO.save("86016", "g");
     }
 }

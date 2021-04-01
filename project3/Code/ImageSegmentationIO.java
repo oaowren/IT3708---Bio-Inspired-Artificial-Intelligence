@@ -16,7 +16,7 @@ public class ImageSegmentationIO {
     private Pixel[][] pixels;
 
     public ImageSegmentationIO(String fileName) {
-        try (InputStream input = new FileInputStream(new File("images/" + fileName))) {
+        try (InputStream input = new FileInputStream(new File("training_images/" + fileName+ "/Test image.jpg"))) {
             BufferedImage image = ImageIO.read(input);
             this.imageWidth = image.getWidth();
             this.imageHeight = image.getHeight();
@@ -55,6 +55,14 @@ public class ImageSegmentationIO {
         this.imageWidth = imageWidth;
     }
 
+    public int getImageHeight(){
+        return this.imageHeight;
+    }
+
+    public void setImageHeight(int imageHeight){
+        this.imageHeight = imageHeight;
+    }
+
     public Pixel[][] getPixels() {
         return this.pixels;
     }
@@ -74,5 +82,31 @@ public class ImageSegmentationIO {
             7, y-1 < imageHeight || x-1 < imageWidth ? null : pixels[x-1][y-1],
             8, y+1 >= imageHeight || x-1 < imageWidth ? null : pixels[x-1][y+1]
         );
+    }
+
+    public void save(String path, String color){
+        if (color !="b" && color != "g"){
+            throw new IllegalArgumentException("Color must be either 'b'(black) or 'g'(green).");
+        }
+        int segmentColor = color == "b" ? RGB.black.toRgbInt() : RGB.green.toRgbInt();
+        String fileSuffix = color == "b" ? "black" : "green";
+        try {
+            File output = new File("solution_images/" + path + fileSuffix + ".jpg");
+            BufferedImage image = new BufferedImage(this.getImageWidth(), this.getImageHeight(), BufferedImage.TYPE_INT_RGB);
+            //TODO: Draw the solution
+
+            // Edge around the image
+            for (int j = 0; j < this.getImageWidth(); j++) {
+                image.setRGB(j, 0, segmentColor);
+                image.setRGB(j, this.getImageHeight() - 1, segmentColor);
+            }
+            for (int i = 0; i < this.getImageHeight(); i++) {
+                image.setRGB(0, i, segmentColor);
+                image.setRGB(this.getImageWidth() - 1, i, segmentColor);
+            }
+            ImageIO.write(image, "jpg", output);
+        } catch (IOException e){
+            System.out.println(e);
+        }
     }
 }

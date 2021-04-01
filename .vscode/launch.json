@@ -9,6 +9,13 @@
             "name": "Launch MOEA",
             "request": "launch",
             "mainClass": "MOEA",
+            "projectName": "IT3708_efccb8b9"
+        },
+        {
+            "type": "java",
+            "name": "Launch MOEA",
+            "request": "launch",
+            "mainClass": "MOEA",
             "projectName": "IT3708_c2d6d2a5"
         },
         {
