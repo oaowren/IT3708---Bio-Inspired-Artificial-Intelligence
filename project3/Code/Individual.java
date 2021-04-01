@@ -9,6 +9,11 @@ public class Individual {
     // TODO:
     // If a graphnode at an edge of the image plane points in an outwards direction, it is treatedas having the value none. This means that all possible chromosome permutationsare valid.
     public final List<Gene> genotype = new ArrayList<>();
+    private Pixel[][] pixels;
+
+    public Individual(Pixel[][] pixels){
+        this.pixels = pixels;
+    }
 
     public void primMST(Pixel[][] pixels) {
         Random rand = new Random();

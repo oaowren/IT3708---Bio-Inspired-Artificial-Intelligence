@@ -86,7 +86,7 @@ public class ImageSegmentationIO {
         return neighbours;
     }
 
-    public void save(String path, String color){
+    public void save(String path, Individual solution, String color){
         if (color !="b" && color != "g"){
             throw new IllegalArgumentException("Color must be either 'b'(black) or 'g'(green).");
         }
