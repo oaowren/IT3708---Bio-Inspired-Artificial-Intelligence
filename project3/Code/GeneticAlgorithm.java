@@ -3,6 +3,7 @@ package Code;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class GeneticAlgorithm {
     
@@ -28,10 +29,11 @@ public class GeneticAlgorithm {
 
     public void createPopulation(){
         List<Individual> newPopulation = Collections.synchronizedList(new ArrayList<>());
+        Random rand = new Random();
 
         for (int i=0; i< Parameters.populationSize; i++){
             // TODO: threading?
-            Individual ind = new Individual(this.pixels);
+            Individual ind = new Individual(this.pixels, rand.nextInt(30)+5);
             newPopulation.add(ind);
         }
         this.population = newPopulation;
