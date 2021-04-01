@@ -14,8 +14,8 @@ public class Pixel {
 
     public Pixel(RGB color, int x, int y) {
         this.color = color;
-        this.x = x;
-        this.y = y;
+        this.x = x; // Position on width
+        this.y = y; // Position on height
     }
 
     public Map<Integer, Pixel> getNeighbours() {

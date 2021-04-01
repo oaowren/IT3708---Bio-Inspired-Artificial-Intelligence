@@ -31,8 +31,8 @@ public class Individual {
         while (visitedNodes.size() < totalNodes) {
             minimumWeight = Integer.MAX_VALUE;
             for (Pixel currentNode : visitedNodes) {
-                for (int y = 0; y < totalNodes; ++y){
-                    for (int x = 0; x < totalNodes; ++x){
+                for (int y = 0; y < pixels.length; ++y){
+                    for (int x = 0; x < pixels[y].length; ++x){
                         if (minimumWeight > Fitness.distance(currentNode.color, pixels[y][x].color) && !visitedNodes.contains(pixels[y][x])){
                             minimumWeight = Fitness.distance(currentNode.color, pixels[y][x].color);
                             w = pixels[y][x];
@@ -44,6 +44,16 @@ public class Individual {
             mstWeight += minimumWeight;
             
         }
+    }
+
+    private int pixelToGenotype(int x, int y){
+        return pixels[x].length * y + x;
+    }
+
+    private Tuple<Integer, Integer> genotypeToPixel(int i){
+        int x = i % pixels[0].length;
+        int y = Math.floorDiv(i, pixels[0].length);
+        return new Tuple<>(x,y);
     }
 
 }
