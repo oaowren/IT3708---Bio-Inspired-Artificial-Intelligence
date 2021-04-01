@@ -10,6 +10,7 @@ class MOEA {
         GeneticAlgorithm ga = new GeneticAlgorithm(imageIO.getPixels());
         ga.run();
         Individual i = ga.getPopulation().get(0);
-        imageIO.save(Parameters.filename, i, Parameters.segmentColor);
+        imageIO.save(Parameters.filename, i, "g");
+        imageIO.save(Parameters.filename, i, "b");
     }
 }

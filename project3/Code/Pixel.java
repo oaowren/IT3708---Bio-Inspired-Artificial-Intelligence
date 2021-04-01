@@ -36,6 +36,10 @@ public class Pixel {
         };
     }
 
+    public Pixel getCardinalNeighbour(int direction){
+        return direction == 0 ? this : neighbours.get(direction);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == this)

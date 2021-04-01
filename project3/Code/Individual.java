@@ -1,11 +1,9 @@
 package Code;
 
-import java.security.KeyException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Random;
@@ -17,12 +15,14 @@ public class Individual {
     public final List<Gene> genotype;
     private Pixel[][] pixels;
     private int noOfSegments;
+    private List<Segment> segments = new ArrayList<>();
 
     public Individual(Pixel[][] pixels, int noOfSegments){
         this.noOfSegments = noOfSegments;
         this.pixels = pixels;
         this.genotype = new ArrayList<>();
         primMST();
+        createSegments();
     }
 
     public void primMST() {
@@ -31,23 +31,27 @@ public class Individual {
         int randY = rand.nextInt(this.pixels.length);
         int totalNodes = this.pixels.length * this.pixels[0].length;
 
+        // Initialize genotype to only point at itself
         for (int i=0; i<totalNodes ; i++) {
             this.genotype.add(Gene.NONE);
         }
-
+        //Initialize priorityqueue of Edges and list of visitedNodes
         PriorityQueue<Edge> priorityQueue = new PriorityQueue<>();
         List<Edge> createdEdges = new ArrayList<>();
         List<Pixel> visitedNodes = new ArrayList<>();
-
+        // Initial choice of pixel is randomized
         Pixel current = this.pixels[randY][randX];
-
+        // Make sure that all nodes are visited once
         while (visitedNodes.size() < totalNodes) {
             if (!visitedNodes.contains(current)){
+                // Add to priorityqueue if not already there
                 visitedNodes.add(current);
                 priorityQueue.addAll(this.createEdges(current));
             }
+            // Get current best edge (measured in RGB-distance between pixels)
             Edge e = priorityQueue.poll();
             if (!visitedNodes.contains(e.to)){
+                // Set genotype to the corresponding gene to get from pixel to pixel
                 updateGenotype(e);
                 createdEdges.add(e);
             }
@@ -55,18 +59,70 @@ public class Individual {
         }
         Collections.sort(createdEdges);
         Collections.reverse(createdEdges);
-
+        // Remove the worst edges, as to create noOfSegments initial segments
         for (int i=0; i<this.noOfSegments; i++){
-            Edge removedEdge = createdEdges.remove(i);
+            Edge removedEdge = createdEdges.get(i);
             updateGenoType(removedEdge.from, removedEdge.from);
         }
+    }
+
+    private void createSegments(){
+        Pixel current;
+        int currentIndex;
+        boolean[] visitedNodes = new boolean[genotype.size()];
+        Arrays.fill(visitedNodes, false);
+        List<Pixel> segment;
+        for (int i=0; i<genotype.size();i++){
+            // If already visited, skip
+            if (visitedNodes[i]){
+                continue;
+            }
+            // Select pixel at index, add to segment and visitedNodes
+            segment = new ArrayList<>();
+            Tuple<Integer, Integer> pixelIndex = genotypeToPixel(i);
+            current = this.pixels[pixelIndex.y][pixelIndex.x];
+            segment.add(current);
+            visitedNodes[i] = true;
+            // Move on to neighbour as defined by genotype
+            current = current.getCardinalNeighbour(genotype.get(i));
+            currentIndex = pixelToGenotype(current.x, current.y);
+            // While the neighbour has not been visited previously, keep moving
+            while (!visitedNodes[currentIndex]){
+                segment.add(current);
+                visitedNodes[currentIndex] = true;
+                current = current.getCardinalNeighbour(genotype.get(currentIndex));
+                currentIndex = pixelToGenotype(current.x, current.y);
+            }
+            // If last visited node has been visited before and does not point to itself, merge segments
+            if (this.pixels[pixelIndex.y][pixelIndex.x] != current){
+                boolean flag = false;
+                for (Segment s: this.segments){
+                    if (s.contains(current)){
+                        s.addPixels(segment);
+                        flag = true;
+                        break;
+                    }
+                }
+                // If we reach a node with NONE as Gene, which does not belong to another segment
+                // it should create a new segment
+                if (!flag){
+                    this.segments.add(new Segment(segment));
+                }
+            // Else create new segment
+            } else {
+                this.segments.add(new Segment(segment));
+            }
+        }
+        // Update number of segments
+        this.noOfSegments = this.segments.size();
+        System.out.println(noOfSegments);
     }
 
     private List<Edge> createEdges(Pixel pixel){
         // Adds all neighbours as a potential edge
         List<Edge> edges = new ArrayList<>();
-        for (int i=0; i<5; i++){
-            Pixel neighbour = pixel.getNeighbours().get(i);
+        for (int i=1; i<5; i++){
+            Pixel neighbour = pixel.getCardinalNeighbour(i);
             if (neighbour != null) edges.add(new Edge(pixel, neighbour));
         }
         return edges;
@@ -82,12 +138,8 @@ public class Individual {
             return;
         }
         // Sets the gene at e.from to point towards e.to
-        Map<Integer, Pixel> neighbours = from.getNeighbours();
-        for (Integer key : neighbours.keySet()){
-            if (Objects.equals(neighbours.get(key), to)){
-                this.genotype.set(this.pixelToGenotype(from.x, from.y), Gene.values()[key-1]);
-            }
-        }
+        this.genotype.set(this.pixelToGenotype(to.x, to.y), 
+                          Utils.mapNeighbourToGene.get(new Tuple<>(from.x-to.x, from.y-to.y)));
     }
 
     private int pixelToGenotype(int x, int y){
@@ -98,6 +150,22 @@ public class Individual {
         int x = i % pixels[0].length;
         int y = Math.floorDiv(i, pixels[0].length);
         return new Tuple<>(x,y);
+    }
+
+    public int getNoOfSegments(){
+        return this.noOfSegments;
+    }
+
+    public boolean isEdge(Pixel pixel){
+        Segment pixelSegment = this.segments.get(0);
+        for (Segment s: this.segments){
+            if (s.contains(pixel)){
+                pixelSegment = s;
+                break;
+            }
+        }
+        // If both neighbours are in the same segment as the pixel, it is not an edge
+        return !pixelSegment.contains(pixel.getCardinalNeighbour(Gene.LEFT)) || !pixelSegment.contains(pixel.getCardinalNeighbour(Gene.DOWN));
     }
 
 }
