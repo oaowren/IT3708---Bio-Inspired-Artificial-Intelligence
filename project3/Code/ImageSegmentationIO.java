@@ -92,10 +92,18 @@ public class ImageSegmentationIO {
         }
         int segmentColor = color == "b" ? RGB.black.toRgbInt() : RGB.green.toRgbInt();
         String fileSuffix = color == "b" ? "black" : "green";
+        // TODO: correct number of segments
+        int numberOfSegments = 0;
         try {
-            File output = new File("project3/solution_images/" + path + "_" + fileSuffix + ".jpg");
+            File output = new File("project3/solution_images/" + path + "/" + fileSuffix + numberOfSegments + ".jpg");
             BufferedImage image = new BufferedImage(this.getImageWidth(), this.getImageHeight(), BufferedImage.TYPE_INT_RGB);
             //TODO: Draw the solution
+
+            for (int y = 0; y < this.getImageHeight(); y++) {
+                for (int x = 0; x < this.getImageWidth(); x++) {
+                        image.setRGB(x, y, getBackground(pixels[y][x], color));
+                }
+            }
 
             // Edge around the image
             for (int j = 0; j < this.getImageWidth(); j++) {
@@ -110,5 +118,9 @@ public class ImageSegmentationIO {
         } catch (IOException e){
             System.out.println(e);
         }
+    }
+
+    private int getBackground(Pixel pixel, String color){
+        return color== "b" ? RGB.white.toRgbInt() : pixel.color.toRgbInt();
     }
 }

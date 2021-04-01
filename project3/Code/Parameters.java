@@ -2,7 +2,7 @@ package Code;
 
 public class Parameters {
     
-    public static final String filename = "86016"; // Use folder name in training_images
+    public static final String filename = "353013"; // Use folder name in training_images
     public static final String segmentColor = "g"; // Either g(green) or b(black)
     public static final int populationSize = 20;
     public static final int generationSpan = 10000;
