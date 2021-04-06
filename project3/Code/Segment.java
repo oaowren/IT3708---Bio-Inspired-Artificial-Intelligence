@@ -1,30 +1,41 @@
 package Code;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Segment {
 
     private RGB centroid; // μk
-    private List<Pixel> pixels;
+    private Set<Pixel> pixels;
+    public final double connectivity, edgeValue, deviation;
 
-    public Segment(List<Pixel> pixels){
+    public Segment(Set<Pixel> pixels){
         this.pixels = pixels;
+        setCentroid(findCentroid());
+        this.connectivity = Fitness.connectivityMeasure(this);
+        this.edgeValue = Fitness.edgeValue(this);
+        this.deviation = Fitness.Deviation(this);
     }
 
     public Segment(){
-        this.pixels = new ArrayList<>();
+        this.pixels = new HashSet<>();
+        setCentroid(findCentroid());
+        this.connectivity = Fitness.connectivityMeasure(this);
+        this.edgeValue = Fitness.edgeValue(this);
+        this.deviation = Fitness.Deviation(this);
     }
 
     public boolean contains(Pixel pixel){
+        if (pixel == null){
+            return false;
+        }
         return this.pixels.contains(pixel);
     }
 
     public RGB getCentroid() {
         return this.centroid;
-    }
-    public Pixel getPixel(int i) {
-        return this.pixels.get(i);
     }
 
     public void setCentroid(RGB centroid) {
@@ -35,12 +46,26 @@ public class Segment {
         return new ArrayList<>(this.pixels);
     }
 
-    public void setPixels(List<Pixel> pixels) {
+    public void setPixels(Set<Pixel> pixels) {
         this.pixels = pixels;
     }
 
-    public void addPixels(List<Pixel> pixels){
+    public void addPixels(Set<Pixel> pixels){
         this.pixels.addAll(pixels);
+    }
+
+    public RGB findCentroid(){
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        int segmentSize = this.pixels.size();
+        for (Pixel p: this.pixels){
+            r += p.color.r;
+            g += p.color.g;
+            b += p.color.b;
+        }
+        RGB centroid = new RGB(r/segmentSize, g/segmentSize, b/segmentSize);
+        return centroid;
     }
 
 }

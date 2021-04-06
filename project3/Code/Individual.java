@@ -3,10 +3,12 @@ package Code;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.Set;
 
 public class Individual {
 
@@ -16,6 +18,8 @@ public class Individual {
     private Pixel[][] pixels;
     private int noOfSegments;
     private List<Segment> segments = new ArrayList<>();
+    private int rank;
+    public final double deviation, edgeValue, connectivity;
 
     public Individual(Pixel[][] pixels, int noOfSegments){
         this.noOfSegments = noOfSegments;
@@ -23,6 +27,26 @@ public class Individual {
         this.genotype = new ArrayList<>();
         primMST();
         createSegments();
+        this.deviation = Fitness.overallDeviation(this);
+        this.edgeValue = Fitness.overallEdgeValue(this);
+        this.connectivity = Fitness.overallConnectivity(this);
+    }
+
+    public Individual(List<Gene> genotype, Pixel[][] pixels){
+        this.genotype = genotype;
+        this.pixels = pixels;
+        createSegments();
+        this.deviation = Fitness.overallDeviation(this);
+        this.edgeValue = Fitness.overallEdgeValue(this);
+        this.connectivity = Fitness.overallConnectivity(this);
+    }
+
+    public void setRank(int rank){
+        this.rank = rank;
+    }
+
+    public int getRank(){
+        return this.rank;
     }
 
     public void primMST() {
@@ -38,7 +62,7 @@ public class Individual {
         //Initialize priorityqueue of Edges and list of visitedNodes
         PriorityQueue<Edge> priorityQueue = new PriorityQueue<>();
         List<Edge> createdEdges = new ArrayList<>();
-        List<Pixel> visitedNodes = new ArrayList<>();
+        Set<Pixel> visitedNodes = new HashSet<>();
         // Initial choice of pixel is randomized
         Pixel current = this.pixels[randY][randX];
         // Make sure that all nodes are visited once
@@ -71,14 +95,14 @@ public class Individual {
         int currentIndex;
         boolean[] visitedNodes = new boolean[genotype.size()];
         Arrays.fill(visitedNodes, false);
-        List<Pixel> segment;
+        Set<Pixel> segment;
         for (int i=0; i<genotype.size();i++){
             // If already visited, skip
             if (visitedNodes[i]){
                 continue;
             }
             // Select pixel at index, add to segment and visitedNodes
-            segment = new ArrayList<>();
+            segment = new HashSet<>();
             Tuple<Integer, Integer> pixelIndex = genotypeToPixel(i);
             current = this.pixels[pixelIndex.y][pixelIndex.x];
             segment.add(current);
@@ -115,7 +139,6 @@ public class Individual {
         }
         // Update number of segments
         this.noOfSegments = this.segments.size();
-        System.out.println(noOfSegments);
     }
 
     private List<Edge> createEdges(Pixel pixel){
@@ -154,6 +177,10 @@ public class Individual {
 
     public int getNoOfSegments(){
         return this.noOfSegments;
+    }
+
+    public List<Segment> getSegments(){
+        return this.segments;
     }
 
     public boolean isEdge(Pixel pixel){

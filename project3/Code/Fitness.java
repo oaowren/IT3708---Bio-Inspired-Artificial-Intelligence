@@ -2,6 +2,7 @@ package Code;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 public class Fitness {
 
@@ -11,9 +12,10 @@ public class Fitness {
     public static double edgeValue(Segment segment) {
         int edgeValue = 0;
         for (Pixel pixel : segment.getPixels()) {
-            for (Pixel neighbour : pixel.getNeighbours().values()) {
+            Collection<Pixel> neighbours = pixel.getCardinalNeighbours().values();
+            for (Pixel neighbour : neighbours){
                 edgeValue += 
-                    segment.getPixels().contains(neighbour) 
+                    segment.contains(neighbour) 
                         ? 0 
                         : distance(pixel.color, neighbour.color);
             }
@@ -21,36 +23,64 @@ public class Fitness {
         return -edgeValue; // This objective should be maximized. How-ever, to keep similarity with other two objectives, we convert it as subject tominimization by negating it
     }
 
+    public static double overallEdgeValue(Individual individual){
+        double edgeValue = 0;
+        for (Segment s: individual.getSegments()){
+            edgeValue += s.edgeValue;
+        }
+        return edgeValue;
+    }
+
     public static double connectivityMeasure(Segment segment) {
-        int connectivity = 0;
+        double connectivity = 0;
         for (Pixel pixel : segment.getPixels()) {
-            for (Integer neighbourKey : pixel.getNeighbours().keySet()) {
+            for (Pixel neighbour : pixel.getCardinalNeighbours().values()) {
                 connectivity += 
-                    segment.getPixels().contains(pixel.getNeighbours().get(neighbourKey)) 
+                    segment.contains(neighbour)
                         ? 0 
-                        : 1 / neighbourKey; // TODO: Skal det være L her? Se forskjell på de to PDF-ene
+                        : 0.125; // TODO: Skal det være L her? Se forskjell på de to PDF-ene
             }
         }
         return connectivity;
     }
 
-    public static double overallDeviation(Collection<Segment> segments) {
-        int overallDeviation = 0;
+    public static double overallConnectivity(Individual individual){
+        double conn = 0.0;
+        for (Segment s: individual.getSegments()){
+            conn += s.connectivity;
+        }
+        return conn;
+    }
+
+    public static double overallDeviation(Individual individual) {
+        List<Segment> segments = individual.getSegments();
+        double overallDeviation = 0;
         for (Segment segment : segments) {
-            for (Pixel pixel : segment.getPixels()) {
-                overallDeviation += distance(pixel.color, segment.getCentroid());
-            }
+            overallDeviation += segment.deviation;
+        }
+        return overallDeviation;
+    }
+
+    public static double Deviation(Segment segment){
+        double overallDeviation = 0;
+        RGB centroid = segment.getCentroid();
+        for (Pixel pixel : segment.getPixels()) {
+            overallDeviation += distance(pixel.color, centroid);
         }
         return overallDeviation;
     }
 
     public static double distance(RGB i, RGB j) {
-        Tuple<RGB, RGB> pair = new Tuple<>(i, j);
-        if (pairMemo.containsKey(pair)) {
-            return pairMemo.get(pair);
+        Tuple<RGB, RGB> pair = new Tuple<>(i,j);
+        synchronized (pairMemo){
+            if (pairMemo.containsKey(pair)){
+                return pairMemo.get(pair);
+            }
         }
         double result = Math.sqrt(Math.pow(Math.abs(j.r-i.r), 2) + Math.pow(Math.abs(j.g-i.g), 2) + Math.pow(Math.abs(j.b-i.b), 2));
-        pairMemo.put(pair, result);
+        synchronized (pairMemo){
+            pairMemo.put(pair, result);
+        }
         return result;
     }
 }

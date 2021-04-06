@@ -30,8 +30,8 @@ public class ImageSegmentationIO {
                     final Color color = new Color(image.getRGB(x, y));
                     final Pixel pixel = new Pixel(
                         new RGB(
-                            (color.getRed() << 16), 
-                            (color.getGreen() << 8), 
+                            (color.getRed()), 
+                            (color.getGreen()), 
                             color.getBlue()
                         ), x, y
                     );

@@ -1,12 +1,12 @@
 package Code;
 
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.Random;
 
 public class Utils {
 
-    public static ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Parameters.threadPoolSize);
+    private static Random random = new Random();
+
     public static Map<Gene, Tuple<Integer, Integer>> mapGeneToNeighbour = Map.of(
         Gene.RIGHT, new Tuple<>(1, 0),
         Gene.LEFT, new Tuple<>(-1, 0),
@@ -21,4 +21,16 @@ public class Utils {
         new Tuple<>(0, 1), Gene.DOWN,
         new Tuple<>(0,0), Gene.NONE
     );
+
+    public static int randomInt(int lower, int upper){
+        return lower + randomInt(upper - lower);
+    }
+
+    public static int randomInt(int upper){
+        return random.nextInt(upper);
+    }
+
+    public static double randomDouble(){
+        return random.nextDouble();
+    }
 }

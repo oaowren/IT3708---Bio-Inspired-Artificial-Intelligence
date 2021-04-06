@@ -26,6 +26,16 @@ public class Pixel {
         this.neighbours = neighbours;
     }
 
+    public Map<Integer, Pixel> getCardinalNeighbours(){
+        Map<Integer, Pixel> temp = new HashMap<>();
+        for (int i=1; i<5; i++){
+            if (this.neighbours.get(i) != null){
+                temp.put(i, this.neighbours.get(i));
+            }
+        }
+        return temp;
+    }
+
     public Pixel getCardinalNeighbour(Gene gene) {
         return switch(gene) {
             case RIGHT -> neighbours.get(1);

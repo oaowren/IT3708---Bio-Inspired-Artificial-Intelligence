@@ -13,12 +13,12 @@ public class RGB {
         this.b = b;
     }
 
-    public static RGB green = new RGB((0 << 16), (255 << 8), 0);
-    public static RGB black = new RGB((0 << 16), (0 << 8), 0);
-    public static RGB white = new RGB((255 << 16), (255 << 8), 255);
+    public static RGB green = new RGB((0), (255), 0);
+    public static RGB black = new RGB((0), (0), 0);
+    public static RGB white = new RGB((255), (255), 255);
 
     public int toRgbInt(){
-        return new Color((this.r >> 16), (this.g >> 8), this.b).getRGB();
+        return new Color(this.r, this.g, this.b).getRGB();
     }
 
     @Override
