@@ -14,7 +14,7 @@ class MOEA {
 
     public static void main(String[] args) {
         ImageSegmentationIO imageIO = new ImageSegmentationIO(Parameters.filename);
-        GeneticAlgorithm ga = new GeneticAlgorithm(imageIO.getPixels());
+        GeneticAlgorithm ga = new GeneticAlgorithm(imageIO);
         ga.run();
         List<Individual> highestRank = ga.rankPopulation(ga.getPopulation()).get(0);
         imageIO.deletePrevious("project3/Evaluator/Student_Segmentation_Files/" + Parameters.filename + "/");
