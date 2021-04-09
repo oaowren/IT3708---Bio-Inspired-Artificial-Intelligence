@@ -14,9 +14,11 @@ public class GeneticAlgorithm {
     private Pixel[][] pixels;
     private List<Individual> population; 
     private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Parameters.threadPoolSize);
+    private ImageSegmentationIO imageIO;
 
-    public GeneticAlgorithm(Pixel[][] pixels){
-        this.pixels = pixels;
+    public GeneticAlgorithm(ImageSegmentationIO imageIO){
+        this.pixels = imageIO.getPixels();
+        this.imageIO = imageIO;
     }
 
     public List<Individual> getPopulation(){
@@ -46,6 +48,15 @@ public class GeneticAlgorithm {
             rankPopulation(newPopulation);
             this.population = newPopulation;
             generationCount ++;
+
+            if (Parameters.printEveryGeneration) {
+                for (Individual i: population){
+                    executor.execute(()->{
+                        i.mergeSmallSegments(0);
+                        imageIO.save("/debug/", i, "b");
+                    });
+                }
+            }
         }
     }
 
