@@ -76,14 +76,14 @@ public class ImageSegmentationIO {
     
     private Map<Integer, Pixel> getPixelNeighbours(int x, int y) {
         Map<Integer, Pixel> neighbours = new HashMap<>();
-        if (x+1 < imageWidth) neighbours.put(1, pixels[y][x+1]);
-        if (x-1 >= 0) neighbours.put(2, pixels[y][x-1]);
-        if (y-1 >= 0) neighbours.put(3, pixels[y-1][x]);
-        if (y+1 < imageHeight) neighbours.put(4, pixels[y+1][x]);
-        if (y-1 >= 0 && x+1 < imageWidth) neighbours.put(5, pixels[y-1][x+1]);
+        if (x+1 < imageWidth)                      neighbours.put(1, pixels[y][x+1]);
+        if (x-1 >= 0)                              neighbours.put(2, pixels[y][x-1]);
+        if (y-1 >= 0)                              neighbours.put(3, pixels[y-1][x]);
+        if (y+1 < imageHeight)                     neighbours.put(4, pixels[y+1][x]);
+        if (y-1 >= 0 && x+1 < imageWidth)          neighbours.put(5, pixels[y-1][x+1]);
         if (y+1 < imageHeight && x+1 < imageWidth) neighbours.put(6, pixels[y+1][x+1]);
-        if (y-1 >= 0 && x-1 >= 0) neighbours.put(7, pixels[y-1][x-1]);
-        if (y+1 < imageHeight && x-1 >= 0) neighbours.put(8, pixels[y+1][x-1]);
+        if (y-1 >= 0 && x-1 >= 0)                  neighbours.put(7, pixels[y-1][x-1]);
+        if (y+1 < imageHeight && x-1 >= 0)         neighbours.put(8, pixels[y+1][x-1]);
         return neighbours;
     }
 

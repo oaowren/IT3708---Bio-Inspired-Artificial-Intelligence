@@ -16,4 +16,6 @@ public class Parameters {
     public static final int minimumSegmentSize = 400;
     public static final int mergeTries = 10;
 
+    // Debug:
+    public static final boolean printEveryGeneration = true;
 }
