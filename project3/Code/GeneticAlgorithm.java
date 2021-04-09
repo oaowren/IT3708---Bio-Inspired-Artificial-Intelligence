@@ -94,6 +94,9 @@ public class GeneticAlgorithm {
         List<Gene> gene1 = parent1.getGenotype();
         List<Gene> gene2 = parent2.getGenotype();
 
+        gene1 = mutateRandomGene(gene1);
+        gene2 = mutateRandomGene(gene2);
+
         if (Utils.randomDouble() < Parameters.crossoverProbability){
             for (int i=0; i<gene1.size(); i++){
                 if (Utils.randomDouble() < Parameters.singleGeneCrossoverProb){
@@ -103,10 +106,6 @@ public class GeneticAlgorithm {
                 }
             }
         }
-        gene1 = mutateRandomGene(gene1);
-        gene2 = mutateRandomGene(gene2);
-        // gene1 = mutateRandomGenes(gene1);
-        // gene2 = mutateRandomGenes(gene2);
         return new Tuple<>(new Individual(gene1, this.pixels), new Individual(gene2, this.pixels));
     }
 

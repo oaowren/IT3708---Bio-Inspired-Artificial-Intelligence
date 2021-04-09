@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.PriorityQueue;
-import java.util.Random;
 import java.util.Set;
 
 public class Individual {
@@ -113,7 +112,7 @@ public class Individual {
         for (Segment s: mergeableSegments){
             Edge merge = getBestSegmentEdge(s);
             if (merge != null){
-                updateGenotype(merge.from, merge.to);
+                updateGenotype(merge.to, merge.from);
             }
         }
         // Update prevMerge and create segments based on new genotype
@@ -217,7 +216,7 @@ public class Individual {
             return;
         }
         // Sets the gene at e.to to point towards e.from as an MST can only have one parent but multiple children
-        this.genotype.set(Utils.pixelToGenotype(to.x, to.y, this.pixels[to.y].length), 
+        this.genotype.set(Utils.pixelToGenotype(to.x, to.y, rowLength), 
                           Utils.mapNeighbourToGene.get(new Tuple<>(from.x-to.x, from.y-to.y)));
     }
 
