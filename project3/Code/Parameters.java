@@ -6,7 +6,7 @@ public class Parameters {
     public static final int populationSize = 10;
     public static final int generationSpan = 2;
     public static final int eliteSize = 2;
-    public static final int parentSelectionSize = 10;
+    public static final int parentSelectionSize = 4;
     public static final double tournamentProb = 0.7;
     public static final double crossoverProbability = 0.7;
     public static final double singleGeneCrossoverProb = 0.5;

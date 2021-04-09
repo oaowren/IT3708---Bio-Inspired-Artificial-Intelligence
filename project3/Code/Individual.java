@@ -91,7 +91,7 @@ public class Individual {
         Collections.sort(createdEdges);
         Collections.reverse(createdEdges);
         // Remove the worst edges, as to create noOfSegments initial segments
-        for (int i=0; i<this.noOfSegments; i++){
+        for (int i=0; i<this.noOfSegments - 1; i++){
             Edge removedEdge = createdEdges.get(Utils.randomInt(createdEdges.size()));
             updateGenotype(removedEdge.from, removedEdge.from);
         }
@@ -99,33 +99,42 @@ public class Individual {
 
     public void mergeSmallSegments(int tries){
         List<Segment> mergeableSegments = new ArrayList<>();
+        // Find segments with fewer pixels than threshold
         for (Segment s: this.segments){
             if (s.getPixels().size() < Parameters.minimumSegmentSize){
                 mergeableSegments.add(s);
             }
         }
+        // If no merge was made previous run, increment tries counter
         if (mergeableSegments.size() == this.prevMerge) tries++;
+        // If no merge is needed or tries exceeded; exit condition
         if (mergeableSegments.size() == 0 || tries > Parameters.mergeTries) return;
+        // Find the best edge from each segment to merge
         for (Segment s: mergeableSegments){
             Edge merge = getBestSegmentEdge(s);
             if (merge != null){
-                updateGenotype(merge);
+                updateGenotype(merge.to, merge.from);
             }
         }
         System.out.println(mergeableSegments.size());
+        // Update prevMerge and create segments based on new genotype
         this.prevMerge = mergeableSegments.size();
         this.createSegments();
+        // Recursively run until exit condition is reached
         mergeSmallSegments(tries);
     }
 
     private Edge getBestSegmentEdge(Segment segment){
         Edge bestEdge = null;
         double bestDistance = Integer.MAX_VALUE;
+        // Iterate through pixels in segment, find neighbours
         for (Pixel p: segment.getPixels()){
             for (Pixel n: p.getCardinalNeighbours().values()){
+                // Assign neighbours who are not in the same segment to a new Edge candidate
                 if (!segment.contains(n)){
                     Edge temp = new Edge(p, n);
                     if (temp.distance < bestDistance){
+                        // Update bestEdge to keep the edge with the lowest distance in RGB-space
                         bestDistance = temp.distance;
                         bestEdge = temp;
                     }
@@ -162,16 +171,17 @@ public class Individual {
                 current = current.getCardinalNeighbour(genotype.get(currentIndex));
                 currentIndex = pixelToGenotype(current.x, current.y);
             }
-            // If last visited node has been visited before and does not point to itself, merge segments
-            if (this.pixels[pixelIndex.y][pixelIndex.x] != current){
-                for (Segment s: this.segments){
-                    if (s.contains(current)){
-                        s.addPixels(segment);
-                        break;
-                    }
+            // If the node that is last pointed to is contained in another segment, merge
+            boolean flag = false;
+            for (Segment s: this.segments){
+                if (s.contains(current)){
+                    s.addPixels(segment);
+                    flag = true;
+                    break;
                 }
-            // Else create new segment
-            } else {
+            }
+            // If flag is not set, this means we can create a new segment
+            if (!flag){
                 this.segments.add(new Segment(segment));
             }
         }
@@ -182,7 +192,7 @@ public class Individual {
     private List<Edge> createEdges(Pixel pixel){
         // Adds all neighbours as a potential edge
         List<Edge> edges = new ArrayList<>();
-        for (int i=1; i<5; i++){
+        for (int i = 1; i<5; i++){
             Pixel neighbour = pixel.getCardinalNeighbour(i);
             if (neighbour != null) edges.add(new Edge(pixel, neighbour));
         }
@@ -198,7 +208,7 @@ public class Individual {
             this.genotype.set(this.pixelToGenotype(from.x, from.y), Gene.NONE);
             return;
         }
-        // Sets the gene at e.from to point towards e.to
+        // Sets the gene at e.to to point towards e.from as an MST can only have one parent but multiple children
         this.genotype.set(this.pixelToGenotype(to.x, to.y), 
                           Utils.mapNeighbourToGene.get(new Tuple<>(from.x-to.x, from.y-to.y)));
     }
