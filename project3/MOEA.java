@@ -20,8 +20,8 @@ class MOEA {
         imageIO.deletePrevious("project3/Evaluator/Student_Segmentation_Files/" + Parameters.filename + "/");
         imageIO.deletePrevious("project3/Evaluator/Student_Segmentation_Files_Green/" + Parameters.filename + "/"); 
         for (Individual i: highestRank){
-            i.mergeSmallSegments(0);
             executor.execute(()->{
+                i.mergeSmallSegments(0);
                 imageIO.save(Parameters.filename, i, "g");
                 imageIO.save(Parameters.filename, i, "b");
             });

@@ -105,7 +105,7 @@ public class GeneticAlgorithm {
             }
         }
         
-        return new Tuple<>(new Individual(gene1, this.pixels), new Individual(gene1, this.pixels));
+        return new Tuple<>(new Individual(gene1, this.pixels), new Individual(gene2, this.pixels));
     }
 
     public List<Gene> mutateRandomGene(List<Gene> parentGenotype) {

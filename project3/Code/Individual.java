@@ -92,7 +92,7 @@ public class Individual {
         Collections.reverse(createdEdges);
         // Remove the worst edges, as to create noOfSegments initial segments
         for (int i=0; i<this.noOfSegments - 1; i++){
-            Edge removedEdge = createdEdges.get(Utils.randomInt(createdEdges.size()));
+            Edge removedEdge = createdEdges.get(i);
             updateGenotype(removedEdge.from, removedEdge.from);
         }
     }
@@ -116,8 +116,8 @@ public class Individual {
                 updateGenotype(merge.to, merge.from);
             }
         }
-        System.out.println(mergeableSegments.size());
         // Update prevMerge and create segments based on new genotype
+        System.out.println(mergeableSegments.size());
         this.prevMerge = mergeableSegments.size();
         this.createSegments();
         // Recursively run until exit condition is reached
@@ -129,7 +129,7 @@ public class Individual {
         double bestDistance = Integer.MAX_VALUE;
         // Iterate through pixels in segment, find neighbours
         for (Pixel p: segment.getPixels()){
-            for (Pixel n: p.getCardinalNeighbours().values()){
+            for (Pixel n: p.getCardinalNeighbours()){
                 // Assign neighbours who are not in the same segment to a new Edge candidate
                 if (!segment.contains(n)){
                     Edge temp = new Edge(p, n);
@@ -145,6 +145,7 @@ public class Individual {
     }
 
     private void createSegments(){
+        List<Segment> tempSegments = new ArrayList<>();
         Pixel current;
         int currentIndex;
         boolean[] visitedNodes = new boolean[genotype.size()];
@@ -171,22 +172,29 @@ public class Individual {
                 current = current.getCardinalNeighbour(genotype.get(currentIndex));
                 currentIndex = pixelToGenotype(current.x, current.y);
             }
-            // If the node that is last pointed to is contained in another segment, merge
-            boolean flag = false;
-            for (Segment s: this.segments){
-                if (s.contains(current)){
-                    s.addPixels(segment);
-                    flag = true;
-                    break;
+            // If last visited node has been visited before and does not point to itself, merge segments
+            if (this.pixels[pixelIndex.y][pixelIndex.x] != current){
+                boolean flag = false;
+                for (Segment s: tempSegments){
+                    if (s.contains(current)){
+                        s.addPixels(segment);
+                        flag = true;
+                        break;
+                    }
                 }
-            }
-            // If flag is not set, this means we can create a new segment
-            if (!flag){
-                this.segments.add(new Segment(segment));
+                // If we reach a node with NONE as Gene, which does not belong to another segment
+                // it should create a new segment
+                if (!flag){
+                    tempSegments.add(new Segment(segment));
+                }
+            // Else create new segment
+            } else {
+                tempSegments.add(new Segment(segment));
             }
         }
         // Update number of segments
-        this.noOfSegments = this.segments.size();
+        this.noOfSegments = tempSegments.size();
+        this.segments = tempSegments;
     }
 
     private List<Edge> createEdges(Pixel pixel){

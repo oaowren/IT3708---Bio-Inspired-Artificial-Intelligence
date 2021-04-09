@@ -1,5 +1,7 @@
 package Code;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -25,11 +27,11 @@ public class Pixel {
         this.neighbours = neighbours;
     }
 
-    public Map<Integer, Pixel> getCardinalNeighbours(){
-        Map<Integer, Pixel> temp = new HashMap<>();
+    public Collection<Pixel> getCardinalNeighbours(){
+        Collection<Pixel> temp = new ArrayList<>();
         for (int i=1; i<5; i++){
             if (this.neighbours.get(i) != null){
-                temp.put(i, this.neighbours.get(i));
+                temp.add(this.neighbours.get(i));
             }
         }
         return temp;
