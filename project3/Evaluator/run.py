@@ -5,7 +5,7 @@ import re
 
 path = os.path.dirname(os.path.abspath(__file__).replace("evaluator", "img"))
 
-problem_number = "118035"
+problem_number = "147091"
 optimalFolder = path + "\\Optimal_Segmentation_Files\\"+problem_number  # you may have to specify the complete path
 studentFolder = path + "\\Student_Segmentation_Files\\"+problem_number  # you may have to specify the complete path
 colorValueSlackRange = 40

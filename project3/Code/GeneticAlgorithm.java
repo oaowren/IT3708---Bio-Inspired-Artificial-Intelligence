@@ -14,11 +14,9 @@ public class GeneticAlgorithm {
     private Pixel[][] pixels;
     private List<Individual> population; 
     private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Parameters.threadPoolSize);
-    private ImageSegmentationIO imageIO;
 
-    public GeneticAlgorithm(ImageSegmentationIO imageIO){
-        this.pixels = imageIO.getPixels();
-        this.imageIO = imageIO;
+    public GeneticAlgorithm(Pixel[][] pixels){
+        this.pixels = pixels;
     }
 
     public List<Individual> getPopulation(){
@@ -48,15 +46,6 @@ public class GeneticAlgorithm {
             rankPopulation(newPopulation);
             this.population = newPopulation;
             generationCount ++;
-
-            if (Parameters.printEveryGeneration) {
-                for (Individual i: population){
-                    executor.execute(()->{
-                        i.mergeSmallSegments(0);
-                        imageIO.save("/debug/", i, "b");
-                    });
-                }
-            }
         }
     }
 
@@ -109,14 +98,25 @@ public class GeneticAlgorithm {
         gene2 = mutateRandomGene(gene2);
 
         if (Utils.randomDouble() < Parameters.crossoverProbability){
-            for (int i=0; i<gene1.size(); i++){
-                if (Utils.randomDouble() < Parameters.singleGeneCrossoverProb){
-                    Gene tmp = gene1.get(i);
-                    gene1.set(i, gene2.get(i));
-                    gene2.set(i, tmp);
-                }
-            }
+            int len = gene1.size();
+            int cutpoint = Utils.randomInt(len);
+            List<Gene> temp = new ArrayList<>(gene1.subList(cutpoint, len));
+            gene1.subList(cutpoint, len).clear();
+            gene1.addAll(gene2.subList(cutpoint, len));
+            gene2.subList(cutpoint,len).clear();
+            gene2.addAll(temp);
+
+
+            // for (int i=0; i<gene1.size(); i++){
+            //     if (Utils.randomDouble() < Parameters.singleGeneCrossoverProb){
+            //         Gene tmp = gene1.get(i);
+            //         gene1.set(i, gene2.get(i));
+            //         gene2.set(i, tmp);
+            //     }
+            // }
         }
+        // gene1 = mutateRandomGenes(gene1);
+        // gene2 = mutateRandomGenes(gene2);
         return new Tuple<>(new Individual(gene1, this.pixels), new Individual(gene2, this.pixels));
     }
 
