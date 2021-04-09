@@ -23,7 +23,7 @@ public class Individual {
     public Individual(Pixel[][] pixels, int noOfSegments){
         this.noOfSegments = noOfSegments;
         this.pixels = pixels;
-        this.rowLength = this.pixels[0].length;
+        this.rowLength = pixels[0].length;
         this.genotype = new ArrayList<>();
         primMST();
         createSegments();
@@ -35,6 +35,7 @@ public class Individual {
     public Individual(List<Gene> genotype, Pixel[][] pixels){
         this.genotype = genotype;
         this.pixels = pixels;
+        this.rowLength = pixels[0].length;
         createSegments();
         this.deviation = Fitness.overallDeviation(this);
         this.edgeValue = Fitness.overallEdgeValue(this);
@@ -128,7 +129,7 @@ public class Individual {
         double bestDistance = Integer.MAX_VALUE;
         // Iterate through pixels in segment, find neighbours
         for (Pixel p: segment.getPixels()){
-            for (Pixel n: p.getCardinalNeighbours()){
+            for (Pixel n: p.getCardinalNeighbours().values()){
                 // Assign neighbours who are not in the same segment to a new Edge candidate
                 if (!segment.contains(n)){
                     Edge temp = new Edge(p, n);

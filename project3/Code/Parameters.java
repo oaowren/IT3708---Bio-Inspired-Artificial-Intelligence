@@ -10,7 +10,7 @@ public class Parameters {
     public static final double tournamentProb = 0.8;
     public static final double crossoverProbability = 0.6;
     public static final double singleGeneCrossoverProb = 0.5;
-    public static final double mutationProbability = 0.001;
+    public static final double mutationProbability = 0.6;
     public static final int threadPoolSize = 10;
 
     public static final int minimumSegmentSize = 400;

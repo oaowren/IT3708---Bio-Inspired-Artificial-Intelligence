@@ -3,6 +3,7 @@ package Code;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -28,20 +29,19 @@ public class Pixel {
         this.neighbours = neighbours;
     }
 
-
-    public Collection<Gene> getValidGenes(){
-        return neighbours.entrySet()
+    public List<Gene> getValidGenes(){
+        return getCardinalNeighbours().entrySet()
                          .stream()
                          .filter((e) -> e.getValue() != null)
                          .map((e) -> Gene.getGene(e.getKey()))
                          .collect(Collectors.toList());
     }
 
-    public Collection<Pixel> getCardinalNeighbours(){
-        Collection<Pixel> temp = new ArrayList<>();
+    public HashMap<Integer, Pixel> getCardinalNeighbours(){
+        HashMap<Integer, Pixel> temp = new HashMap<>();
         for (int i=1; i<5; i++){
             if (this.neighbours.get(i) != null){
-                temp.add(this.neighbours.get(i));
+                temp.put(i, this.neighbours.get(i));
             }
         }
         return temp;
