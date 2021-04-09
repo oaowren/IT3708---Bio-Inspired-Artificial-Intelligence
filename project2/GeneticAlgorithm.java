@@ -14,8 +14,8 @@ public class GeneticAlgorithm {
     Population p;
     private List<Tuple<Integer, Double>> generationalFitness = new ArrayList<>();
     
-    public GeneticAlgorithm(DataSetIo dataSet) {
-        this.threshold = DataSetIo.getThreshold(Parameters.problem);
+    public GeneticAlgorithm(DataSetIO dataSet) {
+        this.threshold = DataSetIO.getThreshold(Parameters.problem);
         HashMap<Integer, Customer> customers = dataSet.getCustomers();
         Fitness.populateCustomers(customers);
         List<Depot> depots = dataSet.getDepots();
