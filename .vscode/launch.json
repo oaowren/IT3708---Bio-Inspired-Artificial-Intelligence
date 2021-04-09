@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch Main",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "IT3708_c2d6d2a5"
+        },
+        {
+            "type": "java",
             "name": "Launch MOEA",
             "request": "launch",
             "mainClass": "MOEA",
