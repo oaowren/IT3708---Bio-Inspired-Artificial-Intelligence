@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import DataClasses.Tuple;
 import DataClasses.Customer;
 
-public class DataSetIo {
+public class DataSetIO {
     
     private List<List<Integer>> dataSet;
     private int maxNumOfVehicles;

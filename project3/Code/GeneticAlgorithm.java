@@ -116,7 +116,6 @@ public class GeneticAlgorithm {
         return parent;
     }
 
-
     public List<List<Individual>> rankPopulation(List<Individual> population){
         List<List<Individual>> rankedPopulation = new ArrayList<>();
         int currentRank = 1;
