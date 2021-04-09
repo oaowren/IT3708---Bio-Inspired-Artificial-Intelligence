@@ -113,7 +113,7 @@ public class Individual {
         for (Segment s: mergeableSegments){
             Edge merge = getBestSegmentEdge(s);
             if (merge != null){
-                updateGenotype(merge.to, merge.from);
+                updateGenotype(merge.from, merge.to);
             }
         }
         // Update prevMerge and create segments based on new genotype

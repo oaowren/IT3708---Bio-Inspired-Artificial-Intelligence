@@ -92,8 +92,8 @@ public class GeneticAlgorithm {
         
         List<Gene> gene1 = parent1.getGenotype();
         List<Gene> gene2 = parent2.getGenotype();
-        mutateRandomGene(gene1);
-        mutateRandomGene(gene2);
+        // gene1 = mutateRandomGene(gene1);
+        // gene2 = mutateRandomGene(gene2);
 
         if (Utils.randomDouble() < Parameters.crossoverProbability){
             for (int i=0; i<gene1.size(); i++){
@@ -104,7 +104,8 @@ public class GeneticAlgorithm {
                 }
             }
         }
-        
+        gene1 = mutateRandomGenes(gene1);
+        gene2 = mutateRandomGenes(gene2);
         return new Tuple<>(new Individual(gene1, this.pixels), new Individual(gene2, this.pixels));
     }
 
@@ -114,6 +115,15 @@ public class GeneticAlgorithm {
             parentGenotype.set(randomGeneIndex, Gene.getRandomGene());
         }
         return parentGenotype;
+    }
+
+    public List<Gene> mutateRandomGenes(List<Gene> genotype){
+        for (int i = 0; i<genotype.size();i++){
+            if (Utils.randomDouble() < Parameters.mutationProbability){
+                genotype.set(i, Gene.getRandomGene());
+            }
+        }
+        return genotype;
     }
 
     public List<List<Individual>> rankPopulation(List<Individual> population){
