@@ -11,10 +11,9 @@ public class Edge implements Comparable<Edge>{
     }
 
     @Override
-    public int compareTo(Edge e){
-        if (this.distance > e.distance) return 1;
-        if (this.distance < e.distance) return -1;
-        return 0;
+    public int compareTo(Edge e) {
+        // Sorts by worse first
+        return Double.compare(e.distance, this.distance);
     }
 
 }

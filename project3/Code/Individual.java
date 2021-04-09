@@ -57,9 +57,8 @@ public class Individual {
     }
 
     public void primMST() {
-        Random rand = new Random();
-        int randX = rand.nextInt(this.pixels[0].length);
-        int randY = rand.nextInt(this.pixels.length);
+        int randX = Utils.randomInt(this.pixels[0].length);
+        int randY = Utils.randomInt(this.pixels.length);
         int totalNodes = this.pixels.length * this.pixels[0].length;
 
         // Initialize genotype to only point at itself
@@ -89,7 +88,6 @@ public class Individual {
             current = e.to;
         }
         Collections.sort(createdEdges);
-        Collections.reverse(createdEdges);
         // Remove the worst edges, as to create noOfSegments initial segments
         for (int i=0; i<this.noOfSegments - 1; i++){
             Edge removedEdge = createdEdges.get(Utils.randomInt(createdEdges.size()));

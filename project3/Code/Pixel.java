@@ -38,10 +38,10 @@ public class Pixel {
     public Pixel getCardinalNeighbour(Gene gene) {
         return switch(gene) {
             case RIGHT -> neighbours.get(1);
-            case LEFT -> neighbours.get(2);
-            case UP -> neighbours.get(3);
-            case DOWN -> neighbours.get(4);
-            case NONE -> this;
+            case LEFT  -> neighbours.get(2);
+            case UP    -> neighbours.get(3);
+            case DOWN  -> neighbours.get(4);
+            case NONE  -> this;
         };
     }
 
