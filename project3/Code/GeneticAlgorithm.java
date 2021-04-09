@@ -90,8 +90,12 @@ public class GeneticAlgorithm {
     }
 
     public Tuple<Individual, Individual> crossover(Individual parent1, Individual parent2){
-        List<Gene> gene1 = parent1.genotype;
-        List<Gene> gene2 = parent2.genotype;
+        
+        mutateRandomGene(parent1);
+        mutateRandomGene(parent2);
+
+        List<Gene> gene1 = parent1.getGenotype();
+        List<Gene> gene2 = parent2.getGenotype();
         if (Utils.randomDouble() < Parameters.crossoverProbability){
             for (int i=0; i<gene1.size(); i++){
                 if (Utils.randomDouble() < Parameters.singleGeneCrossoverProb){
@@ -101,9 +105,18 @@ public class GeneticAlgorithm {
                 }
             }
         }
-        // TODO: mutations
+        
         return new Tuple<>(new Individual(gene1, this.pixels), new Individual(gene1, this.pixels));
     }
+
+    public Individual mutateRandomGene(Individual parent) {
+        if (Utils.randomDouble() < Parameters.mutationProbability) {
+            int randomGeneIndex = Utils.randomInt(parent.getGenotype().size());
+            parent.getGenotype().set(randomGeneIndex, Gene.getRandomGene());
+        }
+        return parent;
+    }
+
 
     public List<List<Individual>> rankPopulation(List<Individual> population){
         List<List<Individual>> rankedPopulation = new ArrayList<>();

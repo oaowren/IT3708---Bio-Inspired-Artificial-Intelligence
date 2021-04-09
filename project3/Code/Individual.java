@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class Individual {
 
-    public final List<Gene> genotype;
+    private final List<Gene> genotype;
     private Pixel[][] pixels;
     private int noOfSegments;
     private List<Segment> segments = new ArrayList<>();
@@ -46,6 +46,10 @@ public class Individual {
 
     public int getRank(){
         return this.rank;
+    }
+
+    public List<Gene> getGenotype(){
+        return new ArrayList<>(this.genotype);
     }
 
     public void primMST() {

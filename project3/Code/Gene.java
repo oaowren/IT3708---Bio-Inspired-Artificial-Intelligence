@@ -5,5 +5,9 @@ public enum Gene {
     LEFT,
     UP,
     DOWN,
-    NONE
+    NONE;
+    
+    public static Gene getRandomGene() {
+        return values()[Utils.randomInt(values().length)];
+    }
 }
