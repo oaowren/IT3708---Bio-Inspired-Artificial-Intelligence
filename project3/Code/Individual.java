@@ -17,7 +17,7 @@ public class Individual {
     private int noOfSegments;
     private List<Segment> segments = new ArrayList<>();
     private int rank;
-    private int prevMerge = -1;
+    private int prevMerge = Integer.MAX_VALUE;
     public final double deviation, edgeValue, connectivity;
 
     public Individual(Pixel[][] pixels, int noOfSegments){
@@ -50,6 +50,10 @@ public class Individual {
 
     public List<Gene> getGenotype(){
         return new ArrayList<>(this.genotype);
+    }
+
+    public Gene getGenotypeFromPixel(Pixel p){
+        return this.genotype.get(this.pixelToGenotype(p.x, p.y));
     }
 
     public void primMST() {
@@ -104,7 +108,9 @@ public class Individual {
         if (mergeableSegments.size() == 0 || tries > Parameters.mergeTries) return;
         for (Segment s: mergeableSegments){
             Edge merge = getBestSegmentEdge(s);
-            updateGenotype(merge);
+            if (merge != null){
+                updateGenotype(merge);
+            }
         }
         System.out.println(mergeableSegments.size());
         this.prevMerge = mergeableSegments.size();
@@ -118,7 +124,7 @@ public class Individual {
         for (Pixel p: segment.getPixels()){
             for (Pixel n: p.getCardinalNeighbours().values()){
                 if (!segment.contains(n)){
-                    Edge temp = new Edge(p,n);
+                    Edge temp = new Edge(p, n);
                     if (temp.distance < bestDistance){
                         bestDistance = temp.distance;
                         bestEdge = temp;
@@ -158,18 +164,11 @@ public class Individual {
             }
             // If last visited node has been visited before and does not point to itself, merge segments
             if (this.pixels[pixelIndex.y][pixelIndex.x] != current){
-                boolean flag = false;
                 for (Segment s: this.segments){
                     if (s.contains(current)){
                         s.addPixels(segment);
-                        flag = true;
                         break;
                     }
-                }
-                // If we reach a node with NONE as Gene, which does not belong to another segment
-                // it should create a new segment
-                if (!flag){
-                    this.segments.add(new Segment(segment));
                 }
             // Else create new segment
             } else {

@@ -46,7 +46,6 @@ public class GeneticAlgorithm {
             this.population = newPopulation;
             generationCount ++;
         }
-        this.mergeSmallSegments(this.population);
     }
 
     public void createPopulation(){
@@ -173,12 +172,5 @@ public class GeneticAlgorithm {
         }
         nonDominated.removeAll(isDominated);
         return nonDominated;
-    }
-
-    private void mergeSmallSegments(List<Individual> population){
-        for (Individual i: population){
-            System.out.println("Merging "+i.hashCode());
-            i.mergeSmallSegments(0);
-        }
     }
 }
