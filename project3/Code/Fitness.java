@@ -12,7 +12,7 @@ public class Fitness {
     public static double edgeValue(Segment segment) {
         int edgeValue = 0;
         for (Pixel pixel : segment.getPixels()) {
-            Collection<Pixel> neighbours = pixel.getCardinalNeighbours().values();
+            Collection<Pixel> neighbours = pixel.getNeighbours().values();
             for (Pixel neighbour : neighbours){
                 edgeValue += 
                     segment.contains(neighbour) 
@@ -34,11 +34,11 @@ public class Fitness {
     public static double connectivityMeasure(Segment segment) {
         double connectivity = 0;
         for (Pixel pixel : segment.getPixels()) {
-            for (Pixel neighbour : pixel.getCardinalNeighbours().values()) {
+            for (Pixel neighbour : pixel.getNeighbours().values()) {
                 connectivity += 
                     segment.contains(neighbour)
                         ? 0 
-                        : 0.125; // TODO: Skal det være L her? Se forskjell på de to PDF-ene
+                        : 0.125;
             }
         }
         return connectivity;

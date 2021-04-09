@@ -12,13 +12,12 @@ import java.util.Set;
 
 public class Individual {
 
-    // TODO:
-    // If a graphnode at an edge of the image plane points in an outwards direction, it is treatedas having the value none. This means that all possible chromosome permutationsare valid.
     public final List<Gene> genotype;
     private Pixel[][] pixels;
     private int noOfSegments;
     private List<Segment> segments = new ArrayList<>();
     private int rank;
+    private int prevMerge = -1;
     public final double deviation, edgeValue, connectivity;
 
     public Individual(Pixel[][] pixels, int noOfSegments){
@@ -85,9 +84,45 @@ public class Individual {
         Collections.reverse(createdEdges);
         // Remove the worst edges, as to create noOfSegments initial segments
         for (int i=0; i<this.noOfSegments; i++){
-            Edge removedEdge = createdEdges.get(i);
-            updateGenoType(removedEdge.from, removedEdge.from);
+            Edge removedEdge = createdEdges.get(Utils.randomInt(createdEdges.size()));
+            updateGenotype(removedEdge.from, removedEdge.from);
         }
+    }
+
+    public void mergeSmallSegments(int tries){
+        List<Segment> mergeableSegments = new ArrayList<>();
+        for (Segment s: this.segments){
+            if (s.getPixels().size() < Parameters.minimumSegmentSize){
+                mergeableSegments.add(s);
+            }
+        }
+        if (mergeableSegments.size() == this.prevMerge) tries++;
+        if (mergeableSegments.size() == 0 || tries > Parameters.mergeTries) return;
+        for (Segment s: mergeableSegments){
+            Edge merge = getBestSegmentEdge(s);
+            updateGenotype(merge);
+        }
+        System.out.println(mergeableSegments.size());
+        this.prevMerge = mergeableSegments.size();
+        this.createSegments();
+        mergeSmallSegments(tries);
+    }
+
+    private Edge getBestSegmentEdge(Segment segment){
+        Edge bestEdge = null;
+        double bestDistance = Integer.MAX_VALUE;
+        for (Pixel p: segment.getPixels()){
+            for (Pixel n: p.getCardinalNeighbours().values()){
+                if (!segment.contains(n)){
+                    Edge temp = new Edge(p,n);
+                    if (temp.distance < bestDistance){
+                        bestDistance = temp.distance;
+                        bestEdge = temp;
+                    }
+                }
+            }
+        }
+        return bestEdge;
     }
 
     private void createSegments(){
@@ -152,10 +187,10 @@ public class Individual {
     }
 
     private void updateGenotype(Edge e){
-        updateGenoType(e.from, e.to);
+        updateGenotype(e.from, e.to);
     }
 
-    private void updateGenoType(Pixel from, Pixel to){
+    private void updateGenotype(Pixel from, Pixel to){
         if (Objects.equals(from, to)){
             this.genotype.set(this.pixelToGenotype(from.x, from.y), Gene.NONE);
             return;

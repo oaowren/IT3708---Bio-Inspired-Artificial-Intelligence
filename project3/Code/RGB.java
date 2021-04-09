@@ -13,9 +13,9 @@ public class RGB {
         this.b = b;
     }
 
-    public static RGB green = new RGB((0), (255), 0);
-    public static RGB black = new RGB((0), (0), 0);
-    public static RGB white = new RGB((255), (255), 255);
+    public static RGB green = new RGB(0, 255, 0);
+    public static RGB black = new RGB(0, 0, 0);
+    public static RGB white = new RGB(255, 255, 255);
 
     public int toRgbInt(){
         return new Color(this.r, this.g, this.b).getRGB();
