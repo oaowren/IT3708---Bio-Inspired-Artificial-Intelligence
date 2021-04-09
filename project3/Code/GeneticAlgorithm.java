@@ -1,6 +1,7 @@
 package Code;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -120,7 +121,9 @@ public class GeneticAlgorithm {
     public List<Gene> mutateRandomGenes(List<Gene> genotype){
         for (int i = 0; i<genotype.size();i++){
             if (Utils.randomDouble() < Parameters.mutationProbability){
-                genotype.set(i, Gene.getRandomGene());
+                Tuple<Integer, Integer> pixelInd = Utils.genotypeToPixel(i, this.pixels[0].length);
+                List<Gene> legalGenes = this.pixels[pixelInd.y][pixelInd.x].getValidGenes();
+                genotype.set(i, legalGenes.get(Utils.randomInt(legalGenes.size())));
             }
         }
         return genotype;

@@ -33,4 +33,14 @@ public class Utils {
     public static double randomDouble(){
         return random.nextDouble();
     }
+
+    public static int pixelToGenotype(int x, int y, int rowLength){
+        return rowLength * y + x;
+    }
+
+    public static Tuple<Integer, Integer> genotypeToPixel(int i, int rowLength){
+        int x = i % rowLength;
+        int y = Math.floorDiv(i, rowLength);
+        return new Tuple<>(x,y);
+    }
 }
