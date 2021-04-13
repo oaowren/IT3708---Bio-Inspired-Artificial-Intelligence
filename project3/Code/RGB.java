@@ -18,7 +18,7 @@ public class RGB {
     public static RGB white = new RGB(255, 255, 255);
 
     public int toRgbInt(){
-        return new Color(this.r, this.g, this.b).getRGB();
+        return new Color(r, g, b).getRGB();
     }
 
     @Override

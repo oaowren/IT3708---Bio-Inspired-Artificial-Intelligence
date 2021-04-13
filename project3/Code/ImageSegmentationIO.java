@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -130,8 +131,8 @@ public class ImageSegmentationIO {
         return color== "b" ? RGB.white.toRgbInt() : pixel.color.toRgbInt();
     }
 
-    public void deletePrevious(String path){
-        for (File file : Objects.requireNonNull(new File(path).listFiles()))
+    public void deletePrevious(Path path){
+        for (File file : path.toFile().listFiles())
             if (!file.isDirectory())
                 file.delete();
     }
