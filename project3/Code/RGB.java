@@ -18,7 +18,7 @@ public class RGB {
     public static RGB white = new RGB(255, 255, 255);
 
     public int toRgbInt(){
-        return new Color(this.r, this.g, this.b).getRGB();
+        return new Color(r, g, b).getRGB();
     }
 
     @Override
@@ -28,8 +28,8 @@ public class RGB {
         if (!(o instanceof RGB)) {
             return false;
         }
-        RGB rGB = (RGB) o;
-        return r == rGB.r && g == rGB.g && b == rGB.b;
+        RGB rgb = (RGB) o;
+        return r == rgb.r && g == rgb.g && b == rgb.b;
     }
 
     @Override
