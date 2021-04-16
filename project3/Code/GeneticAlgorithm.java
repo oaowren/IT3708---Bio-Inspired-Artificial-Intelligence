@@ -23,13 +23,13 @@ public class GeneticAlgorithm {
         return this.population;
     }
 
-    public void run(){
+    public void runNSGA(){
         int generationCount = 0;
         createPopulation();
         rankPopulation(this.population);
         while (generationCount < Parameters.generationSpan){
             System.out.println(generationCount);
-            List<Individual> parents = parentSelection(this.population);
+            List<Individual> parents = parentSelection(this.population, true);
             List<Individual> newPopulation = Collections.synchronizedList(new ArrayList<>());
             for (int i = 0; i < Parameters.populationSize / 2; i++){
                 executor.execute(()->{
@@ -43,7 +43,41 @@ public class GeneticAlgorithm {
             while (newPopulation.size() != Parameters.populationSize){
                 ;
             }
+            for (Individual individual : newPopulation) {
+                if (Utils.randomDouble() < Parameters.mutationProbability) {
+                    individual.mutationMergeSegments();
+                }
+            }
             rankPopulation(newPopulation);
+            this.population = newPopulation;
+            generationCount ++;
+        }
+    }
+
+    public void runGA(){
+        int generationCount = 0;
+        createPopulation();
+        while (generationCount < Parameters.generationSpan){
+            System.out.println(generationCount);
+            List<Individual> parents = parentSelection(this.population, false);
+            List<Individual> newPopulation = Collections.synchronizedList(new ArrayList<>());
+            for (int i = 0; i < Parameters.populationSize / 2; i++){
+                executor.execute(()->{
+                    Individual parent1 = parents.get(Utils.randomInt(parents.size()));
+                    Individual parent2 = parents.get(Utils.randomInt(parents.size()));
+                    Tuple<Individual, Individual> offspring = crossover(parent1, parent2);
+                    newPopulation.add(offspring.x);
+                    newPopulation.add(offspring.y);
+                });
+            }
+            while (newPopulation.size() != Parameters.populationSize){
+                ;
+            }
+            for (Individual individual : newPopulation) {
+                if (Utils.randomDouble() < Parameters.mutationProbability) {
+                    individual.mutationMergeSegments();
+                }
+            }
             this.population = newPopulation;
             generationCount ++;
         }
@@ -69,21 +103,21 @@ public class GeneticAlgorithm {
         this.population = newPopulation;
     }
 
-    public List<Individual> parentSelection(List<Individual> population){
+    public List<Individual> parentSelection(List<Individual> population, boolean useRank){
         List<Individual> selected = new ArrayList<>();
         while (selected.size() < Parameters.parentSelectionSize){
             Individual parent1 = population.get(Utils.randomInt(population.size()));
             Individual parent2 = population.get(Utils.randomInt(population.size()));
             if (Utils.randomDouble() < Parameters.tournamentProb){
-                if (parent1.getRank() < parent2.getRank()){
+                if (useRank ? (parent1.getRank() < parent2.getRank()) : (parent1.getWeightedFitness() < parent2.getWeightedFitness())){
                     selected.add(parent1);
-                } else if (parent1.getRank() > parent2.getRank()){
+                } else if (useRank ? (parent1.getRank() > parent2.getRank()) : (parent1.getWeightedFitness() > parent2.getWeightedFitness())){
                     selected.add(parent2);
                 } else {
-                    selected.add( Utils.randomDouble() < 0.5 ? parent1 : parent2);
+                    selected.add(Utils.randomDouble() < 0.5 ? parent1 : parent2);
                 }
             } else {
-                selected.add( Utils.randomDouble() < 0.5 ? parent1 : parent2);
+                selected.add(Utils.randomDouble() < 0.5 ? parent1 : parent2);
             }
         }
         return selected;
@@ -94,20 +128,20 @@ public class GeneticAlgorithm {
         List<Gene> gene1 = parent1.getGenotype();
         List<Gene> gene2 = parent2.getGenotype();
 
-        gene1 = mutateRandomGene(gene1);
-        gene2 = mutateRandomGene(gene2);
+        // gene1 = mutateRandomGene(gene1);
+        // gene2 = mutateRandomGene(gene2);
 
         if (Utils.randomDouble() < Parameters.crossoverProbability){
-            int len = gene1.size();
-            int cutpoint = Utils.randomInt(len);
-            List<Gene> temp = new ArrayList<>(gene1.subList(cutpoint, len));
-            gene1.subList(cutpoint, len).clear();
-            gene1.addAll(gene2.subList(cutpoint, len));
-            gene2.subList(cutpoint,len).clear();
+            int length = gene1.size();
+            int cutpoint = Utils.randomInt(length);
+            List<Gene> temp = new ArrayList<>(gene1.subList(cutpoint, length));
+            gene1.subList(cutpoint, length).clear();
+            gene1.addAll(gene2.subList(cutpoint, length));
+            gene2.subList(cutpoint,length).clear();
             gene2.addAll(temp);
 
 
-            // for (int i=0; i<gene1.size(); i++){
+            // for (int i=0; i<length; i++){
             //     if (Utils.randomDouble() < Parameters.singleGeneCrossoverProb){
             //         Gene tmp = gene1.get(i);
             //         gene1.set(i, gene2.get(i));
@@ -115,8 +149,8 @@ public class GeneticAlgorithm {
             //     }
             // }
         }
-        // gene1 = mutateRandomGenes(gene1);
-        // gene2 = mutateRandomGenes(gene2);
+        gene1 = mutateRandomGene(gene1);
+        gene2 = mutateRandomGene(gene2);
         return new Tuple<>(new Individual(gene1, this.pixels), new Individual(gene2, this.pixels));
     }
 

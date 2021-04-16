@@ -16,6 +16,11 @@ public class Parameters {
     public static final int minimumSegmentSize = 400;
     public static final int mergeTries = 10;
 
+    // Weighted fitness params
+    public static final double edge = 0.5;
+    public static final double connectivity = 0.5;
+    public static final double deviation = 0.5;
+
     // Debug:
     public static final boolean printEveryGeneration = false;
 }

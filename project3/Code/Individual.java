@@ -15,7 +15,7 @@ public class Individual {
     private Pixel[][] pixels;
     private int noOfSegments;
     private List<Segment> segments = new ArrayList<>();
-    private int rank, rowLength;
+    private int rank, rowLength, colLength;
     private int prevMerge = Integer.MAX_VALUE;
     public final double deviation, edgeValue, connectivity;
 
@@ -23,6 +23,7 @@ public class Individual {
         this.noOfSegments = noOfSegments;
         this.pixels = pixels;
         this.rowLength = pixels[0].length;
+        this.colLength = pixels.length;
         this.genotype = new ArrayList<>();
         primMST();
         createSegments();
@@ -35,6 +36,7 @@ public class Individual {
         this.genotype = genotype;
         this.pixels = pixels;
         this.rowLength = pixels[0].length;
+        this.colLength = pixels.length;
         createSegments();
         this.deviation = Fitness.overallDeviation(this);
         this.edgeValue = Fitness.overallEdgeValue(this);
@@ -49,6 +51,10 @@ public class Individual {
         return this.rank;
     }
 
+    public double getWeightedFitness(){
+        return Parameters.connectivity * this.connectivity + Parameters.deviation * this.deviation + Parameters.edge * this.edgeValue;
+    }
+
     public List<Gene> getGenotype(){
         return new ArrayList<>(this.genotype);
     }
@@ -59,8 +65,8 @@ public class Individual {
 
     public void primMST() {
         int randX = Utils.randomInt(rowLength);
-        int randY = Utils.randomInt(this.pixels.length);
-        int totalNodes = this.pixels.length * rowLength;
+        int randY = Utils.randomInt(colLength);
+        int totalNodes = colLength * rowLength;
 
         // Initialize genotype to only point at itself
         for (int i=0; i<totalNodes ; i++) {
@@ -116,11 +122,20 @@ public class Individual {
             }
         }
         // Update prevMerge and create segments based on new genotype
-        System.out.println(mergeableSegments.size());
         this.prevMerge = mergeableSegments.size();
         this.createSegments();
         // Recursively run until exit condition is reached
         mergeSmallSegments(tries);
+    }
+
+    public void mutationMergeSegments() {
+        // Find segments with fewer pixels than threshold
+        Segment pick1 = segments.get(Utils.randomInt(segments.size()));
+        Edge merge = getRandomSegmentEdge(pick1);
+        if (merge != null){
+            updateGenotype(merge.to, merge.from);
+        }
+        createSegments();
     }
 
     private Edge getBestSegmentEdge(Segment segment){
@@ -141,6 +156,20 @@ public class Individual {
             }
         }
         return bestEdge;
+    }
+
+    private Edge getRandomSegmentEdge(Segment segment){
+        List<Edge> candidates = new ArrayList<>();
+        // Iterate through pixels in segment, find neighbours
+        for (Pixel p: segment.getPixels()){
+            for (Pixel n: p.getCardinalNeighbours().values()){
+                // Assign neighbours who are not in the same segment to a new Edge candidate
+                if (!segment.contains(n)){
+                    candidates.add(new Edge(p, n));
+                }
+            }
+        }
+        return candidates.get(Utils.randomInt(candidates.size()));
     }
 
     private void createSegments(){
