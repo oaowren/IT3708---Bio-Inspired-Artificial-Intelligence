@@ -14,6 +14,7 @@ import java.util.Objects;
 
 public class ImageSegmentationIO {
     
+    private static int printedDebugImageCount = 0;
     private int imageWidth;
     private int imageHeight;
     private Pixel[][] pixels;
@@ -88,7 +89,12 @@ public class ImageSegmentationIO {
         return neighbours;
     }
 
-    public void save(String path, Individual solution, String color){
+
+    public void save(String path, Individual solution, String color) {
+        save(path, solution, color, false);
+    }
+
+    public void save(String path, Individual solution, String color, boolean debug){
         if (color !="b" && color != "g"){
             throw new IllegalArgumentException("Color must be either 'b'(black) or 'g'(green).");
         }
@@ -96,7 +102,7 @@ public class ImageSegmentationIO {
         String fileSuffix = color == "b" ? "black" : "green";
         String folder = color == "b" ? "" : "_Green";
         int numberOfSegments = solution.getNoOfSegments();
-        String fullPath = "project3/Evaluator/Student_Segmentation_Files" + folder + "/" + path + "/" + fileSuffix + numberOfSegments + ".jpg";
+        String fullPath = "project3/Evaluator/Student_Segmentation_Files" + folder + "/" + path + "/" + fileSuffix + (debug ? printedDebugImageCount++ : numberOfSegments) + ".jpg";
         System.out.println("Writing file to " + fullPath);
         try {
             File output = new File(fullPath);

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 public class GeneticAlgorithm {
     
@@ -46,19 +47,24 @@ public class GeneticAlgorithm {
             }
             for (Individual individual : newPopulation) {
                 if (Utils.randomDouble() < Parameters.mutationProbability) {
-                    individual.mutationMergeSegments();
+                    //executor.execute(() -> {
+                        individual.mutationMergeSegments();
+                    //});
                 }
             }
             rankPopulation(newPopulation);
             this.population = newPopulation;
             generationCount ++;
 
-            if (Parameters.printEveryGeneration) {
-                for (Individual i: population){
-                    executor.execute(()->{
-                        imageIO.save("debug", i, "b");
-                    });
-                }
+            if (Parameters.printEveryNthGeneration > 0 && generationCount % Parameters.printEveryNthGeneration == 0) {
+                Individual sample = 
+                        population.stream()
+                                .sorted((i1, i2) -> Double.compare(i1.getWeightedFitness(), i1.getWeightedFitness()))
+                                .collect(Collectors.toList()).get(0);
+                executor.execute(()->{
+                    imageIO.save("debug", sample, "b", true);
+                });
+                
             }
         }
     }
