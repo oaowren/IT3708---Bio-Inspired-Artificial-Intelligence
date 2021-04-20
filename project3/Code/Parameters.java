@@ -12,7 +12,7 @@ public class Parameters {
     public static final double crossoverProbability = 0.6;
     public static final double singleGeneCrossoverProb = 0.5;
     public static final double mutationProbability = 0.1;
-    public static final double mergeMutationEpsilon = 0.75;
+    public static final double mergeMutationEpsilon = 0.2;
     public static final int threadPoolSize = 10;
 
     public static final int minimumSegmentSize = 200;
@@ -24,5 +24,5 @@ public class Parameters {
     public static final double deviation = 0.5;
 
     // Debug:
-    public static final int printEveryNthGeneration = 3;
+    public static final int printEveryNthGeneration = 0;
 }
