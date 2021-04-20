@@ -38,250 +38,246 @@ public class Individual {
         createSegments();
     }
 
-    public void setRank(int rank){
-        this.rank = rank;
+  public void setRank(int rank) {
+    this.rank = rank;
+  }
+
+  public int getRank() {
+    return this.rank;
+  }
+
+  public double getWeightedFitness() {
+    return Parameters.connectivity * this.connectivity
+        + Parameters.deviation * this.deviation
+        + Parameters.edge * this.edgeValue;
+  }
+
+  public List<Gene> getGenotype() {
+    return new ArrayList<>(this.genotype);
+  }
+
+  public Gene getGenotypeFromPixel(Pixel p) {
+    return this.genotype.get(Utils.pixelToGenotype(p.x, p.y, rowLength));
+  }
+
+  public void primMST() {
+    int randX = Utils.randomInt(rowLength);
+    int randY = Utils.randomInt(colLength);
+    int totalNodes = colLength * rowLength;
+
+    // Initialize genotype to only point at itself
+    for (int i = 0; i < totalNodes; i++) {
+      this.genotype.add(Gene.NONE);
     }
-
-    public int getRank(){
-        return this.rank;
+    // Initialize priorityqueue of Edges and list of visitedNodes
+    PriorityQueue<Edge> priorityQueue = new PriorityQueue<>();
+    List<Edge> createdEdges = new ArrayList<>();
+    Set<Pixel> visitedNodes = new HashSet<>();
+    // Initial choice of pixel is randomized
+    Pixel current = this.pixels[randY][randX];
+    // Make sure that all nodes are visited once
+    while (visitedNodes.size() < totalNodes) {
+      if (!visitedNodes.contains(current)) {
+        // Add to priorityqueue if not already there
+        visitedNodes.add(current);
+        priorityQueue.addAll(this.createEdges(current));
+      }
+      // Get current best edge (measured in RGB-distance between pixels)
+      Edge e = priorityQueue.poll();
+      if (!visitedNodes.contains(e.to)) {
+        // Set genotype to the corresponding gene to get from pixel to pixel
+        updateGenotype(e);
+        createdEdges.add(e);
+      }
+      current = e.to;
     }
-
-    public double getWeightedFitness(){
-        return Parameters.connectivity * this.connectivity + Parameters.deviation * this.deviation + Parameters.edge * this.edgeValue;
+    Collections.sort(createdEdges);
+    // Remove the worst edges, as to create noOfSegments initial segments
+    for (int i = 0; i < this.noOfSegments - 1; i++) {
+      Edge removedEdge = createdEdges.get(i);
+      updateGenotype(removedEdge.from, removedEdge.from);
     }
+  }
+  /*
+      public void mergeSmallSegments(int tries){
+          List<Segment> mergeableSegments = new ArrayList<>();
+          // Find segments with fewer pixels than threshold
+          for (Segment s: this.segments){
+              if (s.getPixels().size() < Parameters.minimumSegmentSize){
+                  mergeableSegments.add(s);
+              }
+          }
+          // If no merge was made previous run, increment tries counter
+          if (mergeableSegments.size() == this.prevMerge) tries++;
+          // If no merge is needed or tries exceeded; exit condition
+          if (mergeableSegments.size() == 0 || tries > Parameters.mergeTries) return;
+          // Find the best edge from each segment to merge
+          for (Segment s: mergeableSegments){
+              Edge merge = getBestSegmentEdge(s);
+              if (merge != null){
+                  updateGenotype(merge.to, merge.from);
+              }
+          }
+          // Update prevMerge and create segments based on new genotype
+          this.prevMerge = mergeableSegments.size();
+          this.createSegments();
+          // Recursively run until exit condition is reached
+          mergeSmallSegments(tries);
+      }
+  */
+  public void mutationMergeSegments() {
+    // Find segments with fewer pixels than threshold
+    Segment pick1 = segments.get(Utils.randomInt(segments.size()));
+    Edge merge = Utils.randomDouble() > Parameters.mergeMutationEpsilon 
+                    ? getRandomSegmentEdge(pick1) 
+                    : getBestSegmentEdge(pick1);
 
-    public List<Gene> getGenotype(){
-        return new ArrayList<>(this.genotype);
+    if (merge != null) {
+      updateGenotype(merge.to, merge.from);
+      createSegments();
     }
+  }
 
-    public Gene getGenotypeFromPixel(Pixel p){
-        return this.genotype.get(Utils.pixelToGenotype(p.x, p.y, rowLength));
-    }
-
-    public void primMST() {
-        int randX = Utils.randomInt(rowLength);
-        int randY = Utils.randomInt(colLength);
-        int totalNodes = colLength * rowLength;
-
-        // Initialize genotype to only point at itself
-        for (int i=0; i<totalNodes ; i++) {
-            this.genotype.add(Gene.NONE);
+  private Edge getBestSegmentEdge(Segment segment) {
+    Edge bestEdge = null;
+    double bestDistance = Integer.MAX_VALUE;
+    // Iterate through pixels in segment, find neighbours
+    for (Pixel p : segment.getPixels()) {
+      for (Pixel n : p.getCardinalNeighbours().values()) {
+        // Assign neighbours who are not in the same segment to a new Edge candidate
+        if (!segment.contains(n)) {
+          Edge temp = new Edge(p, n);
+          if (temp.distance < bestDistance) {
+            // Update bestEdge to keep the edge with the lowest distance in RGB-space
+            bestDistance = temp.distance;
+            bestEdge = temp;
+          }
         }
-        //Initialize priorityqueue of Edges and list of visitedNodes
-        PriorityQueue<Edge> priorityQueue = new PriorityQueue<>();
-        List<Edge> createdEdges = new ArrayList<>();
-        Set<Pixel> visitedNodes = new HashSet<>();
-        // Initial choice of pixel is randomized
-        Pixel current = this.pixels[randY][randX];
-        // Make sure that all nodes are visited once
-        while (visitedNodes.size() < totalNodes) {
-            if (!visitedNodes.contains(current)){
-                // Add to priorityqueue if not already there
-                visitedNodes.add(current);
-                priorityQueue.addAll(this.createEdges(current));
-            }
-            // Get current best edge (measured in RGB-distance between pixels)
-            Edge e = priorityQueue.poll();
-            if (!visitedNodes.contains(e.to)){
-                // Set genotype to the corresponding gene to get from pixel to pixel
-                updateGenotype(e);
-                createdEdges.add(e);
-            }
-            current = e.to;
-        }
-        Collections.sort(createdEdges);
-        // Remove the worst edges, as to create noOfSegments initial segments
-        for (int i=0; i<this.noOfSegments - 1; i++){
-            Edge removedEdge = createdEdges.get(i);
-            updateGenotype(removedEdge.from, removedEdge.from);
-        }
+      }
     }
+    return bestEdge;
+  }
 
-    public void mergeSmallSegments(int tries){
-        List<Segment> mergeableSegments = new ArrayList<>();
-        // Find segments with fewer pixels than threshold
-        for (Segment s: this.segments){
-            if (s.getPixels().size() < Parameters.minimumSegmentSize){
-                mergeableSegments.add(s);
-            }
+  private Edge getRandomSegmentEdge(Segment segment) {
+    List<Edge> candidates = new ArrayList<>();
+    // Iterate through pixels in segment, find neighbours
+    for (Pixel p : segment.getPixels()) {
+      for (Pixel n : p.getCardinalNeighbours().values()) {
+        // Assign neighbours who are not in the same segment to a new Edge candidate
+        if (!segment.contains(n)) {
+          candidates.add(new Edge(p, n));
         }
-        // If no merge was made previous run, increment tries counter
-        if (mergeableSegments.size() == this.prevMerge) tries++;
-        // If no merge is needed or tries exceeded; exit condition
-        if (mergeableSegments.size() == 0 || tries > Parameters.mergeTries) return;
-        // Find the best edge from each segment to merge
-        for (Segment s: mergeableSegments){
-            Edge merge = getBestSegmentEdge(s);
-            if (merge != null){
-                updateGenotype(merge.to, merge.from);
-            }
-        }
-        // Update prevMerge and create segments based on new genotype
-        this.prevMerge = mergeableSegments.size();
-        this.createSegments();
-        // Recursively run until exit condition is reached
-        mergeSmallSegments(tries);
+      }
     }
+    return candidates.size() > 0 
+            ? candidates.get(Utils.randomInt(candidates.size()))
+            : null;
+  }
 
-    public void mutationMergeSegments() {
-        List<Segment> mergeableSegments = new ArrayList<>();
-        // Find segments with fewer pixels than threshold
-        for (Segment s: this.segments){
-            if (s.getPixels().size() < Parameters.minimumSegmentSize){
-                mergeableSegments.add(s);
-            }
+  private void createSegments() {
+    List<Segment> tempSegments = new ArrayList<>();
+    Pixel current;
+    int currentIndex;
+    boolean[] visitedNodes = new boolean[genotype.size()];
+    Arrays.fill(visitedNodes, false);
+    Set<Pixel> segment;
+    for (int i = 0; i < genotype.size(); i++) {
+      // If already visited, skip
+      if (visitedNodes[i]) {
+        continue;
+      }
+      // Select pixel at index, add to segment and visitedNodes
+      segment = new HashSet<>();
+      Tuple<Integer, Integer> pixelIndex = Utils.genotypeToPixel(i, rowLength);
+      current = this.pixels[pixelIndex.y][pixelIndex.x];
+      segment.add(current);
+      visitedNodes[i] = true;
+      // Move on to neighbour as defined by genotype
+      current = current.getCardinalNeighbour(genotype.get(i));
+      currentIndex = Utils.pixelToGenotype(current.x, current.y, rowLength);
+      // While the neighbour has not been visited previously, keep moving
+      while (!visitedNodes[currentIndex]) {
+        segment.add(current);
+        visitedNodes[currentIndex] = true;
+        current = current.getCardinalNeighbour(genotype.get(currentIndex));
+        currentIndex = Utils.pixelToGenotype(current.x, current.y, rowLength);
+      }
+      // If last visited node has been visited before and does not point to itself, merge segments
+      if (this.pixels[pixelIndex.y][pixelIndex.x] != current) {
+        boolean flag = false;
+        for (Segment s : tempSegments) {
+          if (s.contains(current)) {
+            s.addPixels(segment);
+            flag = true;
+            break;
+          }
         }
-        if (mergeableSegments.size()==0){
-            return;
+        // If we reach a node with NONE as Gene, which does not belong to another segment
+        // it should create a new segment
+        if (!flag) {
+          tempSegments.add(new Segment(segment));
         }
-        // Find segments with fewer pixels than threshold
-        Segment pick1 = mergeableSegments.get(Utils.randomInt(mergeableSegments.size()));
-        Edge merge = getRandomSegmentEdge(pick1);
-        if (merge != null){
-            updateGenotype(merge.to, merge.from);
-        }
-        createSegments();
+        // Else create new segment
+      } else {
+        tempSegments.add(new Segment(segment));
+      }
     }
+    // Update number of segments
+    this.noOfSegments = tempSegments.size();
+    this.segments = tempSegments;
+    this.deviation = Fitness.overallDeviation(this);
+    this.edgeValue = Fitness.overallEdgeValue(this);
+    this.connectivity = Fitness.overallConnectivity(this);
+  }
 
-    private Edge getBestSegmentEdge(Segment segment){
-        Edge bestEdge = null;
-        double bestDistance = Integer.MAX_VALUE;
-        // Iterate through pixels in segment, find neighbours
-        for (Pixel p: segment.getPixels()){
-            for (Pixel n: p.getCardinalNeighbours().values()){
-                // Assign neighbours who are not in the same segment to a new Edge candidate
-                if (!segment.contains(n)){
-                    Edge temp = new Edge(p, n);
-                    if (temp.distance < bestDistance){
-                        // Update bestEdge to keep the edge with the lowest distance in RGB-space
-                        bestDistance = temp.distance;
-                        bestEdge = temp;
-                    }
-                }
-            }
-        }
-        return bestEdge;
+  private List<Edge> createEdges(Pixel pixel) {
+    // Adds all neighbours as a potential edge
+    List<Edge> edges = new ArrayList<>();
+    for (int i = 1; i < 5; i++) {
+      Pixel neighbour = pixel.getCardinalNeighbour(i);
+      if (neighbour != null) edges.add(new Edge(pixel, neighbour));
     }
+    return edges;
+  }
 
-    private Edge getRandomSegmentEdge(Segment segment){
-        List<Edge> candidates = new ArrayList<>();
-        // Iterate through pixels in segment, find neighbours
-        for (Pixel p: segment.getPixels()){
-            for (Pixel n: p.getCardinalNeighbours().values()){
-                // Assign neighbours who are not in the same segment to a new Edge candidate
-                if (!segment.contains(n)){
-                    candidates.add(new Edge(p, n));
-                }
-            }
-        }
-        if (candidates.size()==0){
-            return null;
-        }
-        return candidates.get(Utils.randomInt(candidates.size()));
-    }
+  private void updateGenotype(Edge e) {
+    updateGenotype(e.from, e.to);
+  }
 
-    private void createSegments(){
-        List<Segment> tempSegments = new ArrayList<>();
-        Pixel current;
-        int currentIndex;
-        boolean[] visitedNodes = new boolean[genotype.size()];
-        Arrays.fill(visitedNodes, false);
-        Set<Pixel> segment;
-        for (int i=0; i<genotype.size();i++){
-            // If already visited, skip
-            if (visitedNodes[i]){
-                continue;
-            }
-            // Select pixel at index, add to segment and visitedNodes
-            segment = new HashSet<>();
-            Tuple<Integer, Integer> pixelIndex = Utils.genotypeToPixel(i, rowLength);
-            current = this.pixels[pixelIndex.y][pixelIndex.x];
-            segment.add(current);
-            visitedNodes[i] = true;
-            // Move on to neighbour as defined by genotype
-            current = current.getCardinalNeighbour(genotype.get(i));
-            currentIndex = Utils.pixelToGenotype(current.x, current.y, rowLength);
-            // While the neighbour has not been visited previously, keep moving
-            while (!visitedNodes[currentIndex]){
-                segment.add(current);
-                visitedNodes[currentIndex] = true;
-                current = current.getCardinalNeighbour(genotype.get(currentIndex));
-                currentIndex = Utils.pixelToGenotype(current.x, current.y, rowLength);
-            }
-            // If last visited node has been visited before and does not point to itself, merge segments
-            if (this.pixels[pixelIndex.y][pixelIndex.x] != current){
-                boolean flag = false;
-                for (Segment s: tempSegments){
-                    if (s.contains(current)){
-                        s.addPixels(segment);
-                        flag = true;
-                        break;
-                    }
-                }
-                // If we reach a node with NONE as Gene, which does not belong to another segment
-                // it should create a new segment
-                if (!flag){
-                    tempSegments.add(new Segment(segment));
-                }
-            // Else create new segment
-            } else {
-                tempSegments.add(new Segment(segment));
-            }
-        }
-        // Update number of segments
-        this.noOfSegments = tempSegments.size();
-        this.segments = tempSegments;
-        this.deviation = Fitness.overallDeviation(this);
-        this.edgeValue = Fitness.overallEdgeValue(this);
-        this.connectivity = Fitness.overallConnectivity(this);
+  private void updateGenotype(Pixel from, Pixel to) {
+    if (Objects.equals(from, to)) {
+      this.genotype.set(Utils.pixelToGenotype(from.x, from.y, rowLength), Gene.NONE);
+      return;
     }
+    // Sets the gene at e.to to point towards e.from as an MST can only have one parent but multiple
+    // children
+    this.genotype.set(
+        Utils.pixelToGenotype(to.x, to.y, rowLength),
+        Utils.mapNeighbourToGene.get(new Tuple<>(from.x - to.x, from.y - to.y)));
+  }
 
-    private List<Edge> createEdges(Pixel pixel){
-        // Adds all neighbours as a potential edge
-        List<Edge> edges = new ArrayList<>();
-        for (int i = 1; i<5; i++){
-            Pixel neighbour = pixel.getCardinalNeighbour(i);
-            if (neighbour != null) edges.add(new Edge(pixel, neighbour));
-        }
-        return edges;
-    }
+  public int getNoOfSegments() {
+    return this.noOfSegments;
+  }
 
-    private void updateGenotype(Edge e){
-        updateGenotype(e.from, e.to);
-    }
-
-    private void updateGenotype(Pixel from, Pixel to){
-        if (Objects.equals(from, to)){
-            this.genotype.set(Utils.pixelToGenotype(from.x, from.y, rowLength), Gene.NONE);
-            return;
-        }
-        // Sets the gene at e.to to point towards e.from as an MST can only have one parent but multiple children
-        this.genotype.set(Utils.pixelToGenotype(to.x, to.y, rowLength), 
-                          Utils.mapNeighbourToGene.get(new Tuple<>(from.x-to.x, from.y-to.y)));
-    }
-
-    public int getNoOfSegments(){
-        return this.noOfSegments;
-    }
-
-    public List<Segment> getSegments(){
-        return this.segments;
-    }
-
-    public boolean isEdge(Pixel pixel){
-        Segment pixelSegment = this.segments.get(0);
-        for (Segment s: this.segments){
-            if (s.contains(pixel)){
-                pixelSegment = s;
-                break;
-            }
-        }
-        // If both neighbours are in the same segment as the pixel, it is not an edge
-        return !pixelSegment.contains(pixel.getCardinalNeighbour(Gene.LEFT)) || !pixelSegment.contains(pixel.getCardinalNeighbour(Gene.DOWN));
-    }
+  public List<Segment> getSegments() {
+    return this.segments;
+  }
 
     public void setCrowding(double distance){
         this.crowdingDistance = distance;
     }
 
+  public boolean isEdge(Pixel pixel) {
+    Segment pixelSegment = this.segments.get(0);
+    for (Segment s : this.segments) {
+      if (s.contains(pixel)) {
+        pixelSegment = s;
+        break;
+      }
+    }
+    // If both neighbours are in the same segment as the pixel, it is not an edge
+    return !pixelSegment.contains(pixel.getCardinalNeighbour(Gene.LEFT))
+        || !pixelSegment.contains(pixel.getCardinalNeighbour(Gene.DOWN));
+  }
 }

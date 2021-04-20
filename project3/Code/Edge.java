@@ -15,9 +15,6 @@ public class Edge implements Comparable<Edge>{
         if (this.distance > e.distance) return 1;
         if (e.distance > this.distance) return -1;
         return 0;
-        // return this.distance - e.distance;
-        // // Sorts by worse first
-        // return Double.compare(e.distance, this.distance);
     }
 
 }
