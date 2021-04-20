@@ -17,7 +17,8 @@ public class Individual {
     private List<Segment> segments = new ArrayList<>();
     private int rank, rowLength, colLength;
     private int prevMerge = Integer.MAX_VALUE;
-    public final double deviation, edgeValue, connectivity;
+    public double deviation, edgeValue, connectivity;
+    public double crowdingDistance;
 
     public Individual(Pixel[][] pixels, int noOfSegments){
         this.noOfSegments = noOfSegments;
@@ -27,9 +28,6 @@ public class Individual {
         this.genotype = new ArrayList<>();
         primMST();
         createSegments();
-        this.deviation = Fitness.overallDeviation(this);
-        this.edgeValue = Fitness.overallEdgeValue(this);
-        this.connectivity = Fitness.overallConnectivity(this);
     }
 
     public Individual(List<Gene> genotype, Pixel[][] pixels){
@@ -38,9 +36,6 @@ public class Individual {
         this.rowLength = pixels[0].length;
         this.colLength = pixels.length;
         createSegments();
-        this.deviation = Fitness.overallDeviation(this);
-        this.edgeValue = Fitness.overallEdgeValue(this);
-        this.connectivity = Fitness.overallConnectivity(this);
     }
 
     public void setRank(int rank){
@@ -129,8 +124,18 @@ public class Individual {
     }
 
     public void mutationMergeSegments() {
+        List<Segment> mergeableSegments = new ArrayList<>();
         // Find segments with fewer pixels than threshold
-        Segment pick1 = segments.get(Utils.randomInt(segments.size()));
+        for (Segment s: this.segments){
+            if (s.getPixels().size() < Parameters.minimumSegmentSize){
+                mergeableSegments.add(s);
+            }
+        }
+        if (mergeableSegments.size()==0){
+            return;
+        }
+        // Find segments with fewer pixels than threshold
+        Segment pick1 = mergeableSegments.get(Utils.randomInt(mergeableSegments.size()));
         Edge merge = getRandomSegmentEdge(pick1);
         if (merge != null){
             updateGenotype(merge.to, merge.from);
@@ -168,6 +173,9 @@ public class Individual {
                     candidates.add(new Edge(p, n));
                 }
             }
+        }
+        if (candidates.size()==0){
+            return null;
         }
         return candidates.get(Utils.randomInt(candidates.size()));
     }
@@ -223,6 +231,9 @@ public class Individual {
         // Update number of segments
         this.noOfSegments = tempSegments.size();
         this.segments = tempSegments;
+        this.deviation = Fitness.overallDeviation(this);
+        this.edgeValue = Fitness.overallEdgeValue(this);
+        this.connectivity = Fitness.overallConnectivity(this);
     }
 
     private List<Edge> createEdges(Pixel pixel){
@@ -267,6 +278,10 @@ public class Individual {
         }
         // If both neighbours are in the same segment as the pixel, it is not an edge
         return !pixelSegment.contains(pixel.getCardinalNeighbour(Gene.LEFT)) || !pixelSegment.contains(pixel.getCardinalNeighbour(Gene.DOWN));
+    }
+
+    public void setCrowding(double distance){
+        this.crowdingDistance = distance;
     }
 
 }

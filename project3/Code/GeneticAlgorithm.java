@@ -11,7 +11,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class GeneticAlgorithm {
     
     private Pixel[][] pixels;
-    private List<Individual> population; 
+    private List<Individual> population;
+    private List<List<Individual>> rankedPopulation; 
     private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Parameters.threadPoolSize);
     private ImageSegmentationIO imageIO;
 
@@ -49,8 +50,10 @@ public class GeneticAlgorithm {
                     individual.mutationMergeSegments();
                 }
             }
-            rankPopulation(newPopulation);
-            this.population = newPopulation;
+            this.population.addAll(newPopulation);
+            //this.population = newPopulation;
+            this.rankedPopulation = rankPopulation(this.population);
+            newPopulationFromRank();
             generationCount ++;
 
             if (Parameters.printEveryGeneration) {
@@ -97,7 +100,7 @@ public class GeneticAlgorithm {
         List<Individual> newPopulation = Collections.synchronizedList(new ArrayList<>());
         ThreadPoolExecutor tempExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Parameters.threadPoolSize);
 
-        for (int i=0; i< Parameters.populationSize; i++){
+        for (int i=0; i< Parameters.populationSize / 2; i++){
             tempExecutor.execute(()->{
                 Individual ind = new Individual(this.pixels, Utils.randomInt(5,35));
                 System.out.println("Individual created.");
@@ -122,6 +125,10 @@ public class GeneticAlgorithm {
                     selected.add(parent1);
                 } else if (useRank ? (parent1.getRank() > parent2.getRank()) : (parent1.getWeightedFitness() > parent2.getWeightedFitness())){
                     selected.add(parent2);
+                } else if(useRank && parent1.crowdingDistance > parent2.crowdingDistance){
+                    selected.add(parent1);
+                } else if(useRank && parent1.crowdingDistance < parent2.crowdingDistance){
+                    selected.add(parent2);
                 } else {
                     selected.add(Utils.randomDouble() < 0.5 ? parent1 : parent2);
                 }
@@ -137,9 +144,6 @@ public class GeneticAlgorithm {
         List<Gene> gene1 = parent1.getGenotype();
         List<Gene> gene2 = parent2.getGenotype();
 
-        // gene1 = mutateRandomGene(gene1);
-        // gene2 = mutateRandomGene(gene2);
-
         if (Utils.randomDouble() < Parameters.crossoverProbability){
             int length = gene1.size();
             int cutpoint = Utils.randomInt(length);
@@ -149,14 +153,6 @@ public class GeneticAlgorithm {
             gene2.subList(cutpoint,length).clear();
             gene2.addAll(temp);
 
-
-            // for (int i=0; i<length; i++){
-            //     if (Utils.randomDouble() < Parameters.singleGeneCrossoverProb){
-            //         Gene tmp = gene1.get(i);
-            //         gene1.set(i, gene2.get(i));
-            //         gene2.set(i, tmp);
-            //     }
-            // }
         }
         gene1 = mutateRandomGene(gene1);
         gene2 = mutateRandomGene(gene2);
@@ -171,17 +167,6 @@ public class GeneticAlgorithm {
             parentGenotype.set(randomGeneIndex, legalGenes.get(Utils.randomInt(legalGenes.size())));
         }
         return parentGenotype;
-    }
-
-    public List<Gene> mutateRandomGenes(List<Gene> genotype){
-        for (int i = 0; i<genotype.size();i++){
-            if (Utils.randomDouble() < Parameters.mutationProbability){
-                Tuple<Integer, Integer> pixelInd = Utils.genotypeToPixel(i, this.pixels[0].length);
-                List<Gene> legalGenes = this.pixels[pixelInd.y][pixelInd.x].getValidGenes();
-                genotype.set(i, legalGenes.get(Utils.randomInt(legalGenes.size())));
-            }
-        }
-        return genotype;
     }
 
     public List<List<Individual>> rankPopulation(List<Individual> population){
@@ -239,5 +224,47 @@ public class GeneticAlgorithm {
         }
         nonDominated.removeAll(isDominated);
         return nonDominated;
+    }
+
+    private void newPopulationFromRank(){
+        this.population.clear();
+        for (List<Individual> paretoFront: this.rankedPopulation){
+            assignCrowdingDistance(paretoFront);
+            if (paretoFront.size() <= Parameters.populationSize - this.population.size()){
+                this.population.addAll(paretoFront);
+            } else {
+                List<Individual> copy = new ArrayList<>(paretoFront);
+                copy.sort((a,b) -> a.crowdingDistance > b.crowdingDistance ? - 1 : a.crowdingDistance == b.crowdingDistance ? 0 : 1);
+                this.population.addAll(copy.subList(0, Parameters.populationSize - this.population.size()));
+            }
+        }
+    }
+
+    private void assignCrowdingDistance(List<Individual> paretoFront){
+        for (Individual i: paretoFront){
+            i.setCrowding(0);
+        }
+        assignCrowdingDistanceToIndividuals(paretoFront, 0);
+        assignCrowdingDistanceToIndividuals(paretoFront, 1);
+        assignCrowdingDistanceToIndividuals(paretoFront, 2);
+    }
+
+    private void assignCrowdingDistanceToIndividuals(List<Individual> paretoFront, int objective){
+        if (objective == 0) paretoFront.sort((a,b) -> a.connectivity > b.connectivity ? 1 : a.connectivity == b.connectivity ? 0 : -1);
+        if (objective == 1) paretoFront.sort((a,b) -> a.deviation > b.deviation ? 1 : a.deviation == b.deviation ? 0 : -1);
+        if (objective == 2) paretoFront.sort((a,b) -> a.edgeValue > b.edgeValue ? 1 : a.edgeValue == b.edgeValue? 0 : -1);
+        paretoFront.get(0).setCrowding(Integer.MAX_VALUE);
+        paretoFront.get(paretoFront.size()-1).setCrowding(Integer.MAX_VALUE);
+        for (int i=1; i<paretoFront.size()-1;i++){
+            if (objective == 0){
+                paretoFront.get(i).setCrowding(paretoFront.get(i).crowdingDistance + (paretoFront.get(i+1).connectivity - paretoFront.get(i-1).connectivity));
+            }
+            if (objective == 1){
+                paretoFront.get(i).setCrowding(paretoFront.get(i).crowdingDistance + (paretoFront.get(i+1).deviation - paretoFront.get(i-1).deviation));
+            }
+            if (objective == 2){
+                paretoFront.get(i).setCrowding(paretoFront.get(i).crowdingDistance + (paretoFront.get(i+1).edgeValue - paretoFront.get(i-1).edgeValue));
+            }
+        }
     }
 }

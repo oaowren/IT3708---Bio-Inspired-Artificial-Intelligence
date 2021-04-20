@@ -11,5 +11,10 @@
     "79",
     "--experimental"
   ],
-  "python.analysis.extraPaths": ["./project1"]
+  "python.analysis.extraPaths": [
+    "./project1"
+  ],
+  "java.project.sourcePaths": [
+    "project3"
+  ]
 }

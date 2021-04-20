@@ -2,11 +2,12 @@ package Code;
 
 public class Parameters {
     
-    public static final String filename = "176039"; // Use folder name in training_images
+    public static final String filename = "353013"; // Use folder name in training_images
+    // Create popsize/2 initial population, is doubled on first generation
     public static final int populationSize = 20;
-    public static final int generationSpan = 20;
+    public static final int generationSpan = 100;
     public static final int eliteSize = 2;
-    public static final int parentSelectionSize = 12;
+    public static final int parentSelectionSize = 10;
     public static final double tournamentProb = 0.8;
     public static final double crossoverProbability = 0.7;
     public static final double singleGeneCrossoverProb = 0.5;
