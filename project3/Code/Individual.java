@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Individual {
 
@@ -16,7 +17,6 @@ public class Individual {
     private int noOfSegments;
     private List<Segment> segments = new ArrayList<>();
     private int rank, rowLength, colLength;
-    private int prevMerge = Integer.MAX_VALUE;
     public double deviation, edgeValue, connectivity;
     public double crowdingDistance;
 
@@ -106,36 +106,14 @@ public class Individual {
       updateGenotype(removedEdge.from, removedEdge.from);
     }
   }
-  /*
-      public void mergeSmallSegments(int tries){
-          List<Segment> mergeableSegments = new ArrayList<>();
-          // Find segments with fewer pixels than threshold
-          for (Segment s: this.segments){
-              if (s.getPixels().size() < Parameters.minimumSegmentSize){
-                  mergeableSegments.add(s);
-              }
-          }
-          // If no merge was made previous run, increment tries counter
-          if (mergeableSegments.size() == this.prevMerge) tries++;
-          // If no merge is needed or tries exceeded; exit condition
-          if (mergeableSegments.size() == 0 || tries > Parameters.mergeTries) return;
-          // Find the best edge from each segment to merge
-          for (Segment s: mergeableSegments){
-              Edge merge = getBestSegmentEdge(s);
-              if (merge != null){
-                  updateGenotype(merge.to, merge.from);
-              }
-          }
-          // Update prevMerge and create segments based on new genotype
-          this.prevMerge = mergeableSegments.size();
-          this.createSegments();
-          // Recursively run until exit condition is reached
-          mergeSmallSegments(tries);
-      }
-  */
+  
   public void mutationMergeSegments() {
     // Find segments with fewer pixels than threshold
-    Segment pick1 = segments.get(Utils.randomInt(segments.size()));
+    List<Segment> candidates = this.segments.stream().filter(p->p.getPixels().size() < Parameters.minimumSegmentSize).collect(Collectors.toList());
+    if (candidates.size()==0){
+      return;
+    }
+    Segment pick1 = candidates.get(Utils.randomInt(candidates.size()));
     Edge merge = Utils.randomDouble() > Parameters.mergeMutationEpsilon 
                     ? getRandomSegmentEdge(pick1) 
                     : getBestSegmentEdge(pick1);

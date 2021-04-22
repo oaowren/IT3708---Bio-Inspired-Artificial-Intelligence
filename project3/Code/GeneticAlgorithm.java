@@ -2,13 +2,11 @@ package Code;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.Collectors;
 
 public class GeneticAlgorithm {
     
@@ -16,11 +14,9 @@ public class GeneticAlgorithm {
     private List<Individual> population;
     private List<List<Individual>> rankedPopulation; 
     private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Parameters.threadPoolSize);
-    private ImageSegmentationIO imageIO;
 
     public GeneticAlgorithm(ImageSegmentationIO imageIO){
         this.pixels = imageIO.getPixels();
-        this.imageIO = imageIO;
     }
     
     public List<Individual> getPopulation(){
@@ -49,27 +45,13 @@ public class GeneticAlgorithm {
             }
             for (Individual individual : newPopulation) {
                 if (Utils.randomDouble() < Parameters.mutationProbability) {
-                    //executor.execute(() -> {
-                        individual.mutationMergeSegments();
-                    //});
+                    individual.mutationMergeSegments();
                 }
             }
             this.population.addAll(newPopulation);
-            //this.population = newPopulation;
             this.rankedPopulation = rankPopulation(this.population);
             newPopulationFromRank();
             generationCount ++;
-
-            if (Parameters.printEveryNthGeneration > 0 && generationCount % Parameters.printEveryNthGeneration == 0) {
-                Individual sample = 
-                        population.stream()
-                                .sorted((i1, i2) -> Double.compare(i1.getWeightedFitness(), i1.getWeightedFitness()))
-                                .collect(Collectors.toList()).get(0);
-                executor.execute(()->{
-                    imageIO.save("debug", sample, "b", true);
-                });
-                
-            }
         }
     }
 
@@ -269,9 +251,9 @@ public class GeneticAlgorithm {
         double segmentationCriteriaDiff;
 
         for (int i=1; i<paretoFront.size()-1;i++) {
-            segmentationCriteriaDiff = paretoFront.get(i+1).getSegmentationCriteriaValue(segCrit) - paretoFront.get(i-1).getSegmentationCriteriaValue(segCrit)
+            segmentationCriteriaDiff = paretoFront.get(i+1).getSegmentationCriteriaValue(segCrit) - paretoFront.get(i-1).getSegmentationCriteriaValue(segCrit);
             paretoFront.get(i).setCrowding(
-                paretoFront.get(i).crowdingDistance + segmentationCriteriaDiff / segmentationCriteriaDiff
+                paretoFront.get(i).crowdingDistance + segmentationCriteriaDiff / maxMinSegmentationCriteriaDiff
             );
         }
     }

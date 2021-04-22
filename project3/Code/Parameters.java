@@ -9,22 +9,18 @@ public class Parameters {
     public static final int eliteSize = 2;
     public static final int parentSelectionSize = 10;
     public static final double tournamentProb = 0.8;
-    public static final double crossoverProbability = 0.6;
-    public static final double singleGeneCrossoverProb = 0.5;
-    public static final double mutationProbability = 0.1;
+    public static final double crossoverProbability = 0.7;
+    public static final double mutationProbability = 0.2;
     public static final double mergeMutationEpsilon = 0.5;
     public static final int threadPoolSize = 10;
     // Whether or not to use NSGA or GA
     public static final boolean useGA = false;
 
-    public static final int minimumSegmentSize = 200;
+    public static final int minimumSegmentSize = 500;
     public static final int mergeTries = 10;
 
     // Weighted fitness params
     public static final double edge = 0.5;
     public static final double connectivity = 0.5;
     public static final double deviation = 0.5;
-
-    // Debug:
-    public static final int printEveryNthGeneration = 0;
 }

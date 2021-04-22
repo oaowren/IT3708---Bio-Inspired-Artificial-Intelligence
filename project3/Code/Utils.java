@@ -7,7 +7,6 @@ public class Utils {
 
     private static Random random = new Random();
 
-    // TODO: Refactor?
     public static Map<Gene, Tuple<Integer, Integer>> mapGeneToNeighbour = Map.of(
         Gene.RIGHT, new Tuple<>(1, 0),
         Gene.LEFT, new Tuple<>(-1, 0),
