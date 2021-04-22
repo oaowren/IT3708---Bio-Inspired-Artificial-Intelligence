@@ -119,10 +119,10 @@ public class GeneticAlgorithm {
                 } else if(useRank && parent1.crowdingDistance < parent2.crowdingDistance){
                     selected.add(parent2);
                 } else {
-                    selected.add(Utils.randomDouble() < 0.5 ? parent1 : parent2);
+                    selected.add(Utils.pickRandom(parent1, parent2));
                 }
             } else {
-                selected.add(Utils.randomDouble() < 0.5 ? parent1 : parent2);
+                selected.add(Utils.pickRandom(parent1, parent2));
             }
         }
         return selected;
