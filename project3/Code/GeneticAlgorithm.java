@@ -233,9 +233,9 @@ public class GeneticAlgorithm {
         for (Individual i: paretoFront){
             i.setCrowding(0);
         }
-        assignCrowdingDistanceToIndividuals(paretoFront, SegmentationCriteria.Connectivity);
-        assignCrowdingDistanceToIndividuals(paretoFront, SegmentationCriteria.Deviation);
-        assignCrowdingDistanceToIndividuals(paretoFront, SegmentationCriteria.EdgeValue);
+        for (SegmentationCriteria segCrit: SegmentationCriteria.values()) {
+            assignCrowdingDistanceToIndividuals(paretoFront, segCrit);
+        }
     }
 
     private void assignCrowdingDistanceToIndividuals(List<Individual> paretoFront, SegmentationCriteria segCrit) {
