@@ -34,6 +34,10 @@ public class Utils {
         return random.nextDouble();
     }
 
+    public static <T> T pickRandom(T item1, T item2) {
+        return randomDouble() < 0.5 ? item1 : item2;
+    }
+
     public static int pixelToGenotype(int x, int y, int rowLength){
         return rowLength * y + x;
     }

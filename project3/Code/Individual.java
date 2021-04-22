@@ -47,6 +47,12 @@ public class Individual {
       };
     }
 
+    public boolean dominates(Individual individual) {
+      return this.connectivity < individual.connectivity 
+          && this.deviation    < individual.deviation 
+          && this.edgeValue    < individual.edgeValue;
+    }
+
   public void setRank(int rank) {
     this.rank = rank;
   }
@@ -218,13 +224,13 @@ public class Individual {
   }
 
   private List<Edge> createEdges(Pixel pixel) {
-    // Adds all neighbours as a potential edge
-    List<Edge> edges = new ArrayList<>();
-    for (int i = 1; i < 5; i++) {
-      Pixel neighbour = pixel.getCardinalNeighbour(i);
-      if (neighbour != null) edges.add(new Edge(pixel, neighbour));
-    }
-    return edges;
+    return Gene.cardinalDirections().stream()
+                            .map(direction -> pixel.getCardinalNeighbour(direction))
+                            .filter(neighbour -> neighbour != null)
+                            .map(neighbour -> new Edge(pixel, neighbour))
+                            .collect(Collectors.toList());
+
+
   }
 
   public void mergeSmallSegments(int tries){
@@ -282,13 +288,10 @@ public class Individual {
     }
 
   public boolean isEdge(Pixel pixel) {
-    Segment pixelSegment = this.segments.get(0);
-    for (Segment s : this.segments) {
-      if (s.contains(pixel)) {
-        pixelSegment = s;
-        break;
-      }
-    }
+    Segment pixelSegment = segments.stream()
+                                   .filter((segment) -> segment.contains(pixel))
+                                   .findAny()
+                                   .orElse(segments.get(0));
     // If both neighbours are in the same segment as the pixel, it is not an edge
     return !pixelSegment.contains(pixel.getCardinalNeighbour(Gene.LEFT))
         || !pixelSegment.contains(pixel.getCardinalNeighbour(Gene.DOWN));
