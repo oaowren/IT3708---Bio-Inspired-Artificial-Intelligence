@@ -234,8 +234,8 @@ public class GeneticAlgorithm {
     private void assignCrowdingDistanceToIndividuals(List<Individual> paretoFront, SegmentationCriteria segCrit) {
         paretoFront.sort(SegmentationCriteria.getIndividualComparator(segCrit));
 
-        Individual maxIndividual = paretoFront.get(0);
-        Individual minIndividual = paretoFront.get(paretoFront.size()-1);
+        Individual minIndividual = paretoFront.get(0);
+        Individual maxIndividual = paretoFront.get(paretoFront.size()-1);
 
         maxIndividual.setCrowding(Integer.MAX_VALUE);
         minIndividual.setCrowding(Integer.MAX_VALUE);
@@ -244,7 +244,7 @@ public class GeneticAlgorithm {
         double segmentationCriteriaDiff;
 
         for (int i=1; i<paretoFront.size()-1;i++) {
-            segmentationCriteriaDiff = (paretoFront.get(i-1).getSegmentationCriteriaValue(segCrit) - paretoFront.get(i+1).getSegmentationCriteriaValue(segCrit))
+            segmentationCriteriaDiff = (paretoFront.get(i+1).getSegmentationCriteriaValue(segCrit) - paretoFront.get(i-1).getSegmentationCriteriaValue(segCrit))
                                         / maxMinSegmentationCriteriaDiff;
             paretoFront.get(i).setCrowding(
                 paretoFront.get(i).crowdingDistance + segmentationCriteriaDiff 

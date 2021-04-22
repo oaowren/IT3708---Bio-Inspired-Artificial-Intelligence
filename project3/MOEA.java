@@ -49,7 +49,9 @@ class MOEA {
         imageIO.deletePrevious(pathGreen); 
         for (Individual i: highestRank){
             executor.execute(()->{
-                i.mergeSmallSegments(0);
+                if (Parameters.mergeSmallSegments){
+                    i.mergeSmallSegments(0);
+                }
                 imageIO.save(Parameters.filename, i, "g");
                 imageIO.save(Parameters.filename, i, "b");
             });

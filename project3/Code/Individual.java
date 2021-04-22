@@ -229,8 +229,6 @@ public class Individual {
                             .filter(neighbour -> neighbour != null)
                             .map(neighbour -> new Edge(pixel, neighbour))
                             .collect(Collectors.toList());
-
-
   }
 
   public void mergeSmallSegments(int tries){
