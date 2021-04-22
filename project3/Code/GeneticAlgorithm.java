@@ -251,9 +251,10 @@ public class GeneticAlgorithm {
         double segmentationCriteriaDiff;
 
         for (int i=1; i<paretoFront.size()-1;i++) {
-            segmentationCriteriaDiff = paretoFront.get(i+1).getSegmentationCriteriaValue(segCrit) - paretoFront.get(i-1).getSegmentationCriteriaValue(segCrit);
+            segmentationCriteriaDiff = (paretoFront.get(i-1).getSegmentationCriteriaValue(segCrit) - paretoFront.get(i+1).getSegmentationCriteriaValue(segCrit))
+                                        / maxMinSegmentationCriteriaDiff;
             paretoFront.get(i).setCrowding(
-                paretoFront.get(i).crowdingDistance + segmentationCriteriaDiff / maxMinSegmentationCriteriaDiff
+                paretoFront.get(i).crowdingDistance + segmentationCriteriaDiff 
             );
         }
     }

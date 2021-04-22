@@ -1,6 +1,7 @@
 import Code.ImageSegmentationIO;
 import Code.Parameters;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -19,12 +20,16 @@ class MOEA {
     public static void main(String[] args) {
         ImageSegmentationIO imageIO = new ImageSegmentationIO(Parameters.filename);
         GeneticAlgorithm ga = new GeneticAlgorithm(imageIO);
+        List<Individual> highestRank;
         if (Parameters.useGA){
             ga.runGA();
+            List<Individual> pop = ga.getPopulation();
+            pop.sort(Comparator.comparingDouble(Individual::getWeightedFitness));
+            highestRank = pop.subList(0, 5);
         } else {
             ga.runNSGA();
+            highestRank = ga.rankPopulation(ga.getPopulation()).get(0);
         }
-        List<Individual> highestRank = ga.rankPopulation(ga.getPopulation()).get(0);
         Path pathBlack = Path.of("project3/Evaluator/Student_Segmentation_Files/" + Parameters.filename + "/");
         Path pathGreen = Path.of("project3/Evaluator/Student_Segmentation_Files_Green/" + Parameters.filename + "/");
 
@@ -44,6 +49,7 @@ class MOEA {
         imageIO.deletePrevious(pathGreen); 
         for (Individual i: highestRank){
             executor.execute(()->{
+                i.mergeSmallSegments(0);
                 imageIO.save(Parameters.filename, i, "g");
                 imageIO.save(Parameters.filename, i, "b");
             });

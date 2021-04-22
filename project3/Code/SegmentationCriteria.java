@@ -9,9 +9,9 @@ public enum SegmentationCriteria {
 
     public static Comparator<Individual> getIndividualComparator(SegmentationCriteria segmentationCriteria) {
         return switch(segmentationCriteria) {
-            case EdgeValue    -> (a, b) -> Double.compare(a.edgeValue, b.edgeValue);
-            case Connectivity -> (a, b) -> Double.compare(a.connectivity, b.connectivity);
-            case Deviation    -> (a, b) -> Double.compare(a.deviation, b.deviation);
+            case EdgeValue    -> (a, b) -> Double.compare(b.edgeValue, a.edgeValue);
+            case Connectivity -> (a, b) -> Double.compare(b.connectivity, a.connectivity);
+            case Deviation    -> (a, b) -> Double.compare(b.deviation, a.deviation);
         };
     }
 }

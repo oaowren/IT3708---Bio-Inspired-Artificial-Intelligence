@@ -17,6 +17,7 @@ public class Individual {
     private int noOfSegments;
     private List<Segment> segments = new ArrayList<>();
     private int rank, rowLength, colLength;
+    private int prevMerge = 0;
     public double deviation, edgeValue, connectivity;
     public double crowdingDistance;
 
@@ -225,6 +226,32 @@ public class Individual {
     }
     return edges;
   }
+
+  public void mergeSmallSegments(int tries){
+    List<Segment> mergeableSegments = new ArrayList<>();
+      // Find segments with fewer pixels than threshold
+      for (Segment s: this.segments){
+        if (s.getPixels().size() < Parameters.minimumSegmentSize){
+          mergeableSegments.add(s);
+          }
+        }
+        // If no merge was made previous run, increment tries counter
+        if (mergeableSegments.size() == this.prevMerge) tries++;
+        // If no merge is needed or tries exceeded; exit condition
+        if (mergeableSegments.size() == 0 || tries > Parameters.mergeTries) return;
+        // Find the best edge from each segment to merge
+        for (Segment s: mergeableSegments){
+          Edge merge = getBestSegmentEdge(s);
+            if (merge != null){
+              updateGenotype(merge.to, merge.from);
+            }
+        }
+        // Update prevMerge and create segments based on new genotype
+        this.prevMerge = mergeableSegments.size();
+        this.createSegments();
+        // Recursively run until exit condition is reached
+        mergeSmallSegments(tries);
+      }
 
   private void updateGenotype(Edge e) {
     updateGenotype(e.from, e.to);

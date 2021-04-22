@@ -71,16 +71,9 @@ public class Fitness {
     }
 
     public static double distance(RGB i, RGB j) {
-        Tuple<RGB, RGB> pair = new Tuple<>(i,j);
-        synchronized (pairMemo){
-            if (pairMemo.containsKey(pair)){
-                return pairMemo.get(pair);
-            }
-        }
-        double result = Math.sqrt(Math.pow(Math.abs(j.r-i.r), 2) + Math.pow(Math.abs(j.g-i.g), 2) + Math.pow(Math.abs(j.b-i.b), 2));
-        synchronized (pairMemo){
-            pairMemo.put(pair, result);
-        }
+        double result = Math.sqrt(Math.pow(Math.abs(j.r-i.r), 2) 
+                                + Math.pow(Math.abs(j.g-i.g), 2) 
+                                + Math.pow(Math.abs(j.b-i.b), 2));
         return result;
     }
 }
