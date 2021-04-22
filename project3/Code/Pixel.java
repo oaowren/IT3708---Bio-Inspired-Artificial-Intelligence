@@ -37,14 +37,11 @@ public class Pixel {
                                       .collect(Collectors.toList());
     }
 
-    public HashMap<Integer, Pixel> getCardinalNeighbours(){
-        HashMap<Integer, Pixel> temp = new HashMap<>();
-        for (int i=1; i<5; i++){
-            if (this.neighbours.get(i) != null){
-                temp.put(i, this.neighbours.get(i));
-            }
-        }
-        return temp;
+    public Map<Integer, Pixel> getCardinalNeighbours() {
+        return neighbours.entrySet()
+                         .stream()
+                         .filter(entry -> entry.getKey() < 5 && entry.getValue() != null)
+                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public Pixel getCardinalNeighbour(Gene gene) {
