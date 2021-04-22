@@ -2,6 +2,7 @@ package Code;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -250,25 +251,23 @@ public class GeneticAlgorithm {
         for (Individual i: paretoFront){
             i.setCrowding(0);
         }
-        assignCrowdingDistanceToIndividuals(paretoFront, 0);
-        assignCrowdingDistanceToIndividuals(paretoFront, 1);
-        assignCrowdingDistanceToIndividuals(paretoFront, 2);
+        assignCrowdingDistanceToIndividuals(paretoFront, SegmentationCriteria.Connectivity);
+        assignCrowdingDistanceToIndividuals(paretoFront, SegmentationCriteria.Deviation);
+        assignCrowdingDistanceToIndividuals(paretoFront, SegmentationCriteria.EdgeValue);
     }
 
-    private void assignCrowdingDistanceToIndividuals(List<Individual> paretoFront, int objective){
-        if (objective == 0) paretoFront.sort((a,b) -> a.connectivity > b.connectivity ? 1 : a.connectivity == b.connectivity ? 0 : -1);
-        if (objective == 1) paretoFront.sort((a,b) -> a.deviation > b.deviation ? 1 : a.deviation == b.deviation ? 0 : -1);
-        if (objective == 2) paretoFront.sort((a,b) -> a.edgeValue > b.edgeValue ? 1 : a.edgeValue == b.edgeValue? 0 : -1);
+    private void assignCrowdingDistanceToIndividuals(List<Individual> paretoFront, SegmentationCriteria segmentationCriteria) {
+        paretoFront.sort(SegmentationCriteria.getIndividualComparator(segmentationCriteria));
         paretoFront.get(0).setCrowding(Integer.MAX_VALUE);
         paretoFront.get(paretoFront.size()-1).setCrowding(Integer.MAX_VALUE);
         for (int i=1; i<paretoFront.size()-1;i++){
-            if (objective == 0){
+            if (segmentationCriteria == SegmentationCriteria.Connectivity){
                 paretoFront.get(i).setCrowding(paretoFront.get(i).crowdingDistance + (paretoFront.get(i+1).connectivity - paretoFront.get(i-1).connectivity));
             }
-            if (objective == 1){
+            if (segmentationCriteria == SegmentationCriteria.Deviation){
                 paretoFront.get(i).setCrowding(paretoFront.get(i).crowdingDistance + (paretoFront.get(i+1).deviation - paretoFront.get(i-1).deviation));
             }
-            if (objective == 2){
+            if (segmentationCriteria == SegmentationCriteria.EdgeValue){
                 paretoFront.get(i).setCrowding(paretoFront.get(i).crowdingDistance + (paretoFront.get(i+1).edgeValue - paretoFront.get(i-1).edgeValue));
             }
         }
