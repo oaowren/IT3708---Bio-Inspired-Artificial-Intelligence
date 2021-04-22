@@ -2,12 +2,8 @@ package Code;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 public class Fitness {
-
-    // Memoize euclidian distance between two points
-    private static final HashMap<Tuple<RGB, RGB>, Double> pairMemo = new HashMap<>();
 
     public static double edgeValue(Segment segment) {
         int edgeValue = 0;
@@ -24,11 +20,10 @@ public class Fitness {
     }
 
     public static double overallEdgeValue(Individual individual){
-        double edgeValue = 0;
-        for (Segment s: individual.getSegments()){
-            edgeValue += s.edgeValue;
-        }
-        return edgeValue;
+        return individual.getSegments()
+                         .stream()
+                         .map(segment -> segment.edgeValue)
+                         .reduce(0.0, (total, element) -> total + element);
     }
 
     public static double connectivityMeasure(Segment segment) {
@@ -44,30 +39,24 @@ public class Fitness {
         return connectivity;
     }
 
-    public static double overallConnectivity(Individual individual){
-        double conn = 0.0;
-        for (Segment s: individual.getSegments()){
-            conn += s.connectivity;
-        }
-        return conn;
+    public static double overallConnectivity(Individual individual) {
+        return individual.getSegments()
+                         .stream()
+                         .map(segment -> segment.connectivity)
+                         .reduce(0.0, (total, element) -> total + element);
     }
 
     public static double overallDeviation(Individual individual) {
-        List<Segment> segments = individual.getSegments();
-        double overallDeviation = 0;
-        for (Segment segment : segments) {
-            overallDeviation += segment.deviation;
-        }
-        return overallDeviation;
+        return individual.getSegments()
+                         .stream()
+                         .map(segment -> segment.deviation)
+                         .reduce(0.0, (total, element) -> total + element);
     }
 
-    public static double Deviation(Segment segment){
-        double overallDeviation = 0;
-        RGB centroid = segment.getCentroid();
-        for (Pixel pixel : segment.getPixels()) {
-            overallDeviation += distance(pixel.color, centroid);
-        }
-        return overallDeviation;
+    public static double deviation(Segment segment) {
+        return segment.getPixels().stream()
+                                  .map(pixel -> distance(pixel.color, segment.getCentroid()))
+                                  .reduce(0.0, (total, element) -> total + element);
     }
 
     public static double distance(RGB i, RGB j) {
