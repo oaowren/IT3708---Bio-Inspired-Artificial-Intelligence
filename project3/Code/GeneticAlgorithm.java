@@ -177,9 +177,9 @@ public class GeneticAlgorithm {
     }
 
     private List<Individual> findDominatingSet(List<Individual> population) {
-        List<Individual> nonDominated = new ArrayList<>();
+        List<Individual> nonDominatedList = new ArrayList<>();
         // Begin with first member of population
-        nonDominated.add(population.get(0));
+        nonDominatedList.add(population.get(0));
         Set<Individual> isDominated = new HashSet<>();
 
         for (Individual individual : population) {
@@ -187,13 +187,10 @@ public class GeneticAlgorithm {
                 continue;
             }
             // Add to nonDominated before comparison
-            nonDominated.add(individual);
+            nonDominatedList.add(individual);
             // Compare individual to other individuals currently not dominated
-            for (Individual nonDominatedInd : nonDominated) {
-                if (isDominated.contains(individual)) {
-                    continue;
-                }
-                if (nonDominatedInd == individual) {
+            for (Individual nonDominatedInd : nonDominatedList) {
+                if (isDominated.contains(individual) || nonDominatedInd == individual) {
                     continue;
                 }
                 // If individual dominates a member of nonDominated, then remove it
@@ -207,8 +204,8 @@ public class GeneticAlgorithm {
                 }
             }
         }
-        nonDominated.removeAll(isDominated);
-        return nonDominated;
+        nonDominatedList.removeAll(isDominated);
+        return nonDominatedList;
     }
 
     private void newPopulationFromRank(){
@@ -219,7 +216,7 @@ public class GeneticAlgorithm {
                 this.population.addAll(paretoFront);
             } else {
                 List<Individual> copy = new ArrayList<>(paretoFront);
-                copy.sort((a,b) -> a.crowdingDistance > b.crowdingDistance ? - 1 : a.crowdingDistance == b.crowdingDistance ? 0 : 1);
+                copy.sort((a,b) -> Double.compare(b.crowdingDistance, a.crowdingDistance));
                 this.population.addAll(copy.subList(0, Parameters.populationSize - this.population.size()));
             }
         }
