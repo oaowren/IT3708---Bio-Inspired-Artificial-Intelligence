@@ -46,6 +46,12 @@ public class Individual {
       };
     }
 
+    public boolean dominates(Individual individual) {
+      return this.connectivity < individual.connectivity 
+          && this.deviation    < individual.deviation 
+          && this.edgeValue    < individual.edgeValue;
+    }
+
   public void setRank(int rank) {
     this.rank = rank;
   }

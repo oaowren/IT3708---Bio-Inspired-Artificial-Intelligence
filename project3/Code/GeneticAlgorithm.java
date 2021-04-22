@@ -197,14 +197,10 @@ public class GeneticAlgorithm {
                     continue;
                 }
                 // If individual dominates a member of nonDominated, then remove it
-                if (individual.connectivity < nonDominatedInd.connectivity && 
-                    individual.deviation < nonDominatedInd.deviation &&
-                    individual.edgeValue < nonDominatedInd.edgeValue){
+                if (individual.dominates(nonDominatedInd)) {
                     isDominated.add(nonDominatedInd);
                 // If individual is dominated by any member in nonDominated, it should not be included
-                } else if (individual.connectivity > nonDominatedInd.connectivity && 
-                           individual.deviation > nonDominatedInd.deviation &&
-                           individual.edgeValue > nonDominatedInd.edgeValue){
+                } else if (nonDominatedInd.dominates(individual)) {
                     isDominated.add(individual);
                     // No need to compare with the rest of the list as domination has a transitive property
                     break;
