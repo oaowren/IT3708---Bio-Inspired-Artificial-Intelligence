@@ -27,11 +27,10 @@ public class Segment {
         this.deviation = Fitness.deviation(this);
     }
 
-    public boolean contains(Pixel pixel){
-        if (pixel == null){
-            return false;
-        }
-        return this.pixels.contains(pixel);
+    public boolean contains(Pixel pixel) {
+        return pixel != null
+            ? pixels.contains(pixel)
+            : false;
     }
 
     public RGB getCentroid() {
