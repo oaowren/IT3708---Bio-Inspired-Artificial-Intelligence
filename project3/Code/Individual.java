@@ -116,8 +116,10 @@ public class Individual {
   
   public void mutationMergeSegments() {
     // Find segments with fewer pixels than threshold
-    List<Segment> candidates = this.segments.stream().filter(p->p.getPixels().size() < Parameters.minimumSegmentSize).collect(Collectors.toList());
-    if (candidates.size()==0){
+    List<Segment> candidates = segments.stream()
+                                       .filter(segment -> segment.getPixels().size() < Parameters.minimumSegmentSize)
+                                       .collect(Collectors.toList());
+    if (candidates.size() == 0) {
       return;
     }
     Segment pick1 = candidates.get(Utils.randomInt(candidates.size()));
@@ -225,10 +227,10 @@ public class Individual {
 
   private List<Edge> createEdges(Pixel pixel) {
     return Gene.cardinalDirections().stream()
-                            .map(direction -> pixel.getCardinalNeighbour(direction))
-                            .filter(neighbour -> neighbour != null)
-                            .map(neighbour -> new Edge(pixel, neighbour))
-                            .collect(Collectors.toList());
+                                    .map(pixel::getCardinalNeighbour)
+                                    .filter(neighbour -> neighbour != null)
+                                    .map(neighbour -> new Edge(pixel, neighbour))
+                                    .collect(Collectors.toList());
 
 
   }

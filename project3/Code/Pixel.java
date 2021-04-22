@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 public class Pixel {
@@ -29,10 +30,11 @@ public class Pixel {
 
     public List<Gene> getValidGenes(){
         return getCardinalNeighbours().entrySet()
-                         .stream()
-                         .filter((e) -> e.getValue() != null)
-                         .map((e) -> Gene.getGene(e.getKey()))
-                         .collect(Collectors.toList());
+                                      .stream()
+                                      .filter(entry -> entry.getValue() != null)
+                                      .map(Entry::getKey)
+                                      .map(Gene::getGene)
+                                      .collect(Collectors.toList());
     }
 
     public HashMap<Integer, Pixel> getCardinalNeighbours(){

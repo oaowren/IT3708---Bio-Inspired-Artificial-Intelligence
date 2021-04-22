@@ -59,7 +59,7 @@ public class Segment {
         int g = 0;
         int b = 0;
         int segmentSize = this.pixels.size();
-        for (Pixel p: this.pixels){
+        for (Pixel p: this.pixels) {
             r += p.color.r;
             g += p.color.g;
             b += p.color.b;
