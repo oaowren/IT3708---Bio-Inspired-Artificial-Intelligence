@@ -38,6 +38,14 @@ public class Individual {
         createSegments();
     }
 
+    public double getSegmentationCriteriaValue(SegmentationCriteria segmentationCriteria) {
+      return switch(segmentationCriteria) {
+        case Connectivity -> connectivity;
+        case EdgeValue    -> edgeValue;
+        case Deviation    -> deviation;
+      };
+    }
+
   public void setRank(int rank) {
     this.rank = rank;
   }

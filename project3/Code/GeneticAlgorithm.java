@@ -256,20 +256,23 @@ public class GeneticAlgorithm {
         assignCrowdingDistanceToIndividuals(paretoFront, SegmentationCriteria.EdgeValue);
     }
 
-    private void assignCrowdingDistanceToIndividuals(List<Individual> paretoFront, SegmentationCriteria segmentationCriteria) {
-        paretoFront.sort(SegmentationCriteria.getIndividualComparator(segmentationCriteria));
-        paretoFront.get(0).setCrowding(Integer.MAX_VALUE);
-        paretoFront.get(paretoFront.size()-1).setCrowding(Integer.MAX_VALUE);
-        for (int i=1; i<paretoFront.size()-1;i++){
-            if (segmentationCriteria == SegmentationCriteria.Connectivity){
-                paretoFront.get(i).setCrowding(paretoFront.get(i).crowdingDistance + (paretoFront.get(i+1).connectivity - paretoFront.get(i-1).connectivity));
-            }
-            if (segmentationCriteria == SegmentationCriteria.Deviation){
-                paretoFront.get(i).setCrowding(paretoFront.get(i).crowdingDistance + (paretoFront.get(i+1).deviation - paretoFront.get(i-1).deviation));
-            }
-            if (segmentationCriteria == SegmentationCriteria.EdgeValue){
-                paretoFront.get(i).setCrowding(paretoFront.get(i).crowdingDistance + (paretoFront.get(i+1).edgeValue - paretoFront.get(i-1).edgeValue));
-            }
+    private void assignCrowdingDistanceToIndividuals(List<Individual> paretoFront, SegmentationCriteria segCrit) {
+        paretoFront.sort(SegmentationCriteria.getIndividualComparator(segCrit));
+
+        Individual maxIndividual = paretoFront.get(0);
+        Individual minIndividual = paretoFront.get(paretoFront.size()-1);
+
+        maxIndividual.setCrowding(Integer.MAX_VALUE);
+        minIndividual.setCrowding(Integer.MAX_VALUE);
+
+        double maxMinSegmentationCriteriaDiff = maxIndividual.getSegmentationCriteriaValue(segCrit) - minIndividual.getSegmentationCriteriaValue(segCrit);
+        double segmentationCriteriaDiff;
+
+        for (int i=1; i<paretoFront.size()-1;i++) {
+            segmentationCriteriaDiff = paretoFront.get(i+1).getSegmentationCriteriaValue(segCrit) - paretoFront.get(i-1).getSegmentationCriteriaValue(segCrit)
+            paretoFront.get(i).setCrowding(
+                paretoFront.get(i).crowdingDistance + segmentationCriteriaDiff / segmentationCriteriaDiff
+            );
         }
     }
 }
