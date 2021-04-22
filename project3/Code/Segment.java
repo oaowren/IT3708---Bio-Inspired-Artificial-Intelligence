@@ -11,12 +11,12 @@ public class Segment {
     private Set<Pixel> pixels;
     public final double connectivity, edgeValue, deviation;
 
-    public Segment(Set<Pixel> pixels){
+    public Segment(Set<Pixel> pixels) {
         this.pixels = pixels;
         setCentroid(findCentroid());
         this.connectivity = Fitness.connectivityMeasure(this);
         this.edgeValue = Fitness.edgeValue(this);
-        this.deviation = Fitness.Deviation(this);
+        this.deviation = Fitness.deviation(this);
     }
 
     public Segment(){
@@ -24,7 +24,7 @@ public class Segment {
         setCentroid(findCentroid());
         this.connectivity = Fitness.connectivityMeasure(this);
         this.edgeValue = Fitness.edgeValue(this);
-        this.deviation = Fitness.Deviation(this);
+        this.deviation = Fitness.deviation(this);
     }
 
     public boolean contains(Pixel pixel){
@@ -59,7 +59,7 @@ public class Segment {
         int g = 0;
         int b = 0;
         int segmentSize = this.pixels.size();
-        for (Pixel p: this.pixels){
+        for (Pixel p: this.pixels) {
             r += p.color.r;
             g += p.color.g;
             b += p.color.b;
