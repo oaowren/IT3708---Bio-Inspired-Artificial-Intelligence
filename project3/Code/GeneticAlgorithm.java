@@ -180,25 +180,25 @@ public class GeneticAlgorithm {
         List<Individual> nonDominatedList = new ArrayList<>();
         // Begin with first member of population
         nonDominatedList.add(population.get(0));
-        Set<Individual> isDominated = new HashSet<>();
+        Set<Individual> dominatedIndividualsSet = new HashSet<>();
 
         for (Individual individual : population) {
-            if (isDominated.contains(individual)) {
+            if (dominatedIndividualsSet.contains(individual)) {
                 continue;
             }
             // Add to nonDominated before comparison
             nonDominatedList.add(individual);
             // Compare individual to other individuals currently not dominated
             for (Individual nonDominatedInd : nonDominatedList) {
-                if (isDominated.contains(individual) || nonDominatedInd == individual) {
+                if (dominatedIndividualsSet.contains(individual) || nonDominatedInd == individual) {
                     continue;
                 }
                 // If individual dominates a member of nonDominated, then remove it
                 if (individual.dominates(nonDominatedInd)) {
-                    isDominated.add(nonDominatedInd);
+                    dominatedIndividualsSet.add(nonDominatedInd);
                 // If individual is dominated by any member in nonDominated, it should not be included
                 } else if (nonDominatedInd.dominates(individual)) {
-                    isDominated.add(individual);
+                    dominatedIndividualsSet.add(individual);
                     // No need to compare with the rest of the list as domination has a transitive property
                     break;
                 }
