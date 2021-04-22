@@ -25,7 +25,7 @@ public enum Gene {
         return values()[Utils.randomInt(values().length)];
     }
 
-    public static List<Gene> directions() {
+    public static List<Gene> cardinalDirections() {
         return Arrays.asList(new Gene[] {RIGHT, LEFT, UP, DOWN});
     }
 }

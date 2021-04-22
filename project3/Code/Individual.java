@@ -223,7 +223,7 @@ public class Individual {
   }
 
   private List<Edge> createEdges(Pixel pixel) {
-    return Gene.directions().stream()
+    return Gene.cardinalDirections().stream()
                             .map(direction -> pixel.getCardinalNeighbour(direction))
                             .filter(neighbour -> neighbour != null)
                             .map(neighbour -> new Edge(pixel, neighbour))

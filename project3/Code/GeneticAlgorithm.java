@@ -204,7 +204,7 @@ public class GeneticAlgorithm {
                 }
             }
         }
-        nonDominatedList.removeAll(isDominated);
+        nonDominatedList.removeAll(dominatedIndividualsSet);
         return nonDominatedList;
     }
 
