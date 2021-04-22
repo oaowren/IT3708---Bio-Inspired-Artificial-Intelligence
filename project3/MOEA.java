@@ -19,7 +19,11 @@ class MOEA {
     public static void main(String[] args) {
         ImageSegmentationIO imageIO = new ImageSegmentationIO(Parameters.filename);
         GeneticAlgorithm ga = new GeneticAlgorithm(imageIO);
-        ga.runNSGA();
+        if (Parameters.useGA){
+            ga.runGA();
+        } else {
+            ga.runNSGA();
+        }
         List<Individual> highestRank = ga.rankPopulation(ga.getPopulation()).get(0);
         Path pathBlack = Path.of("project3/Evaluator/Student_Segmentation_Files/" + Parameters.filename + "/");
         Path pathGreen = Path.of("project3/Evaluator/Student_Segmentation_Files_Green/" + Parameters.filename + "/");

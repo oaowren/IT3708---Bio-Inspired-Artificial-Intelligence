@@ -2,7 +2,7 @@ package Code;
 
 public class Parameters {
     
-    public static final String filename = "353013"; // Use folder name in training_images
+    public static final String filename = "176039"; // Use folder name in training_images
     // Create popsize/2 initial population, is doubled on first generation
     public static final int populationSize = 20;
     public static final int generationSpan = 100;
@@ -12,8 +12,10 @@ public class Parameters {
     public static final double crossoverProbability = 0.6;
     public static final double singleGeneCrossoverProb = 0.5;
     public static final double mutationProbability = 0.1;
-    public static final double mergeMutationEpsilon = 0.2;
+    public static final double mergeMutationEpsilon = 0.5;
     public static final int threadPoolSize = 10;
+    // Whether or not to use NSGA or GA
+    public static final boolean useGA = false;
 
     public static final int minimumSegmentSize = 200;
     public static final int mergeTries = 10;
