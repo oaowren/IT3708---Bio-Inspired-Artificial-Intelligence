@@ -1,5 +1,8 @@
 package Code;
 
+import java.util.Arrays;
+import java.util.List;
+
 public enum Gene {
     RIGHT,
     LEFT,
@@ -20,5 +23,9 @@ public enum Gene {
 
     public static Gene getRandomGene() {
         return values()[Utils.randomInt(values().length)];
+    }
+
+    public static List<Gene> directions() {
+        return Arrays.asList(new Gene[] {RIGHT, LEFT, UP, DOWN});
     }
 }
