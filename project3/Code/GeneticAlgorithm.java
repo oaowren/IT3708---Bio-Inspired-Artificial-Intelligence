@@ -23,6 +23,11 @@ public class GeneticAlgorithm {
         return this.population;
     }
 
+    public int getParetoFrontSize(){
+        return this.rankedPopulation.size();
+    }
+
+
     public void runNSGA(){
         int generationCount = 0;
         createPopulation();
@@ -210,7 +215,7 @@ public class GeneticAlgorithm {
 
     private void newPopulationFromRank(){
         this.population.clear();
-        for (List<Individual> paretoFront: this.rankedPopulation){
+        for (List<Individual> paretoFront: this.rankedPopulation) {
             assignCrowdingDistance(paretoFront);
             if (paretoFront.size() <= Parameters.populationSize - this.population.size()){
                 this.population.addAll(paretoFront);

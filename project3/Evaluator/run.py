@@ -5,7 +5,7 @@ import re
 
 path = os.path.dirname(os.path.abspath(__file__).replace("evaluator", "img"))
 
-problem_number = "176039"
+problem_number = "118035"
 # you may have to specify the complete path
 optimalFolder = path + os.sep + "Optimal_Segmentation_Files" + os.sep + problem_number
 # you may have to specify the complete path
