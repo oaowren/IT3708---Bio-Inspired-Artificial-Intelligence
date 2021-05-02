@@ -14,7 +14,7 @@ public class Segment {
     public Segment(Set<Pixel> pixels) {
         this.pixels = pixels;
         setCentroid(findCentroid());
-        this.connectivity = Fitness.connectivityMeasure(this);
+        this.connectivity = Fitness.connectivity(this);
         this.edgeValue = Fitness.edgeValue(this);
         this.deviation = Fitness.deviation(this);
     }
@@ -22,7 +22,7 @@ public class Segment {
     public Segment(){
         this.pixels = new HashSet<>();
         setCentroid(findCentroid());
-        this.connectivity = Fitness.connectivityMeasure(this);
+        this.connectivity = Fitness.connectivity(this);
         this.edgeValue = Fitness.edgeValue(this);
         this.deviation = Fitness.deviation(this);
     }
@@ -58,10 +58,10 @@ public class Segment {
         int g = 0;
         int b = 0;
         int segmentSize = this.pixels.size();
-        for (Pixel p: this.pixels) {
-            r += p.color.r;
-            g += p.color.g;
-            b += p.color.b;
+        for (Pixel pixel: this.pixels) {
+            r += pixel.color.r;
+            g += pixel.color.g;
+            b += pixel.color.b;
         }
         RGB centroid = new RGB(r/segmentSize, g/segmentSize, b/segmentSize);
         return centroid;

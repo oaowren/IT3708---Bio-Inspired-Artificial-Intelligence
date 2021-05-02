@@ -133,3 +133,10 @@ dmypy.json
 
 *.swp
 *.zip
+project1/.DS_Store
+project3/.DS_Store
+.DS_Store
+project3/Evaluator/.DS_Store
+project3/training_images/.DS_Store
+project3/Evaluator/.DS_Store
+project3/training_images/.DS_Store

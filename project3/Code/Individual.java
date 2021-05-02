@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
 public class Individual {
 
     private final List<Gene> genotype;
-    private Pixel[][] pixels;
+    private final Pixel[][] pixels;
     private int noOfSegments;
     private List<Segment> segments = new ArrayList<>();
     private int rank, rowLength, colLength;
     private int prevMerge = 0;
-    public double deviation, edgeValue, connectivity;
-    public double crowdingDistance;
+    private double deviation, edgeValue, connectivity;
+    private double crowdingDistance;
 
     public Individual(Pixel[][] pixels, int noOfSegments){
         this.noOfSegments = noOfSegments;
@@ -49,8 +49,8 @@ public class Individual {
 
     public boolean dominates(Individual individual) {
       return this.connectivity < individual.connectivity 
-          && this.deviation    < individual.deviation 
-          && this.edgeValue    < individual.edgeValue;
+          && this.deviation < individual.deviation 
+          && this.edgeValue < individual.edgeValue;
     }
 
   public void setRank(int rank) {
@@ -61,18 +61,33 @@ public class Individual {
     return this.rank;
   }
 
+  public double getDeviation() {
+    return this.deviation;
+  }
+
+  public double getEdgeValue() {
+    return this.edgeValue;
+  }
+
+  public double getConnectivity() {
+    return this.connectivity;
+  }
+  public double getCrowdingDistance() {
+    return this.crowdingDistance;
+  }
+
   public double getWeightedFitness() {
     return Parameters.connectivity * this.connectivity
-        + Parameters.deviation * this.deviation
-        + Parameters.edge * this.edgeValue;
+         + Parameters.deviation * this.deviation
+         + Parameters.edge * this.edgeValue;
   }
 
   public List<Gene> getGenotype() {
     return new ArrayList<>(this.genotype);
   }
 
-  public Gene getGenotypeFromPixel(Pixel p) {
-    return this.genotype.get(Utils.pixelToGenotype(p.x, p.y, rowLength));
+  public Gene getGenotypeFromPixel(Pixel pixel) {
+    return this.genotype.get(Utils.pixelToGenotypeIndex(pixel.x, pixel.y, rowLength));
   }
 
   public void primMST() {
@@ -124,8 +139,8 @@ public class Individual {
     }
     Segment pick1 = candidates.get(Utils.randomInt(candidates.size()));
     Edge merge = Utils.randomDouble() > Parameters.mergeMutationEpsilon 
-                    ? getRandomSegmentEdge(pick1) 
-                    : getBestSegmentEdge(pick1);
+      ? getRandomSegmentEdge(pick1) 
+      : getBestSegmentEdge(pick1);
 
     if (merge != null) {
       updateGenotype(merge.to, merge.from);
@@ -183,19 +198,19 @@ public class Individual {
       }
       // Select pixel at index, add to segment and visitedNodes
       segment = new HashSet<>();
-      Tuple<Integer, Integer> pixelIndex = Utils.genotypeToPixel(i, rowLength);
+      Tuple<Integer, Integer> pixelIndex = Utils.genotypeIndexToPixelCoordinates(i, rowLength);
       current = this.pixels[pixelIndex.y][pixelIndex.x];
       segment.add(current);
       visitedNodes[i] = true;
       // Move on to neighbour as defined by genotype
       current = current.getCardinalNeighbour(genotype.get(i));
-      currentIndex = Utils.pixelToGenotype(current.x, current.y, rowLength);
+      currentIndex = Utils.pixelToGenotypeIndex(current.x, current.y, rowLength);
       // While the neighbour has not been visited previously, keep moving
       while (!visitedNodes[currentIndex]) {
         segment.add(current);
         visitedNodes[currentIndex] = true;
         current = current.getCardinalNeighbour(genotype.get(currentIndex));
-        currentIndex = Utils.pixelToGenotype(current.x, current.y, rowLength);
+        currentIndex = Utils.pixelToGenotypeIndex(current.x, current.y, rowLength);
       }
       // If last visited node has been visited before and does not point to itself, merge segments
       if (this.pixels[pixelIndex.y][pixelIndex.x] != current) {
@@ -265,14 +280,14 @@ public class Individual {
 
   private void updateGenotype(Pixel from, Pixel to) {
     if (Objects.equals(from, to)) {
-      this.genotype.set(Utils.pixelToGenotype(from.x, from.y, rowLength), Gene.NONE);
+      this.genotype.set(Utils.pixelToGenotypeIndex(from.x, from.y, rowLength), Gene.NONE);
       return;
     }
     // Sets the gene at e.to to point towards e.from as an MST can only have one parent but multiple
     // children
     this.genotype.set(
-        Utils.pixelToGenotype(to.x, to.y, rowLength),
-        Utils.mapNeighbourToGene.get(new Tuple<>(from.x - to.x, from.y - to.y)));
+        Utils.pixelToGenotypeIndex(to.x, to.y, rowLength),
+        Gene.fromUnitVector(from.x - to.x, from.y - to.y));
   }
 
   public int getNoOfSegments() {
@@ -295,5 +310,11 @@ public class Individual {
     // If both neighbours are in the same segment as the pixel, it is not an edge
     return !pixelSegment.contains(pixel.getCardinalNeighbour(Gene.LEFT))
         || !pixelSegment.contains(pixel.getCardinalNeighbour(Gene.DOWN));
+  }
+
+  public boolean isStrictlyMoreFitThan(Individual other) {
+    return Parameters.useGA 
+      ? this.getWeightedFitness() < other.getWeightedFitness()
+      : this.getRank() < other.getRank();
   }
 }

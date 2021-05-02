@@ -61,7 +61,9 @@ class MOEA {
             ;
         }
         System.out.println("FINISHED!");
-        System.out.println("Number of pareto fronts: " + ga.getParetoFrontSize());
+        if (!Parameters.useGA) {
+            System.out.println("Number of pareto fronts: " + ga.getParetoFrontSize());
+        }
         System.exit(0);
     }
 }

@@ -100,7 +100,7 @@ public class ImageSegmentationIO {
         int segmentColor = color == "b" ? RGB.black.toRgbInt() : RGB.green.toRgbInt();
         String fileSuffix = color == "b" ? "black" : "green";
         String folder = color == "b" ? "" : "_Green";
-        String numberOfSegments = solution.getNoOfSegments() + "_" + solution.connectivity + "_" + solution.deviation + "_" + solution.edgeValue;
+        String numberOfSegments = solution.getNoOfSegments() + "_" + solution.getConnectivity() + "_" + solution.getDeviation()+ "_" + solution.getEdgeValue();
         String fullPath = "project3/Evaluator/Student_Segmentation_Files" + folder + "/" + path + "/" + fileSuffix + (debug ? printedDebugImageCount++ : numberOfSegments) + ".jpg";
         System.out.println("Writing file to " + fullPath);
         try {

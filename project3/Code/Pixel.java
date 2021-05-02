@@ -33,7 +33,7 @@ public class Pixel {
                                       .stream()
                                       .filter(entry -> entry.getValue() != null)
                                       .map(Entry::getKey)
-                                      .map(Gene::getGene)
+                                      .map(Gene::fromNumber)
                                       .collect(Collectors.toList());
     }
 
