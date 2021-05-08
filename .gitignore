@@ -1,5 +1,5 @@
-project3/Evaluator/Student_Segmentation_Files/
-project3/Evaluator/Student_Segmentation_Files_Green/
+MOEA/evaluator/Student_Segmentation_Files/
+MOEA/evaluator/Student_Segmentation_Files_Green/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -133,10 +133,10 @@ dmypy.json
 
 *.swp
 *.zip
-project1/.DS_Store
-project3/.DS_Store
+FeatureSelection/.DS_Store
+MOEA/.DS_Store
 .DS_Store
-project3/Evaluator/.DS_Store
-project3/training_images/.DS_Store
-project3/Evaluator/.DS_Store
-project3/training_images/.DS_Store
+MOEA/Evaluator/.DS_Store
+MOEA/training_images/.DS_Store
+MOEA/Evaluator/.DS_Store
+MOEA/training_images/.DS_Store
